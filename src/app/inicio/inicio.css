@@ -1,0 +1,55 @@
+
+:host {
+  display: block;
+  /* Evita que el componente “colapse” y respete el padding del <main> padre */
+  width: 100%;
+}
+
+/* Rejilla de tarjetas */
+.bienvenida {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(260px, 1fr));
+  gap: 1.6rem 2rem;
+  margin: 1rem 0 2rem; /* antes 7rem empujaba tod abajo */
+  align-content: center; /* centra horizontalmente las columnas */
+  min-height: 70vh; /* ocupa 80% del alto de la ventana */
+  padding-right: 5.5rem;
+}
+
+/* Tarjeta */
+.tile {
+  background: var(--color-white, #ffffff);
+  border-radius: var(--card-border-radius, 1rem);
+  box-shadow: var(--box-shadow, 0 1rem 1.5rem rgba(0,0,0,.06));
+  padding: var(--card-padding, 1rem);
+  transition: box-shadow .2s ease;
+  cursor: pointer;
+  margin: var(--card-padding, 1.5rem);
+}
+.tile:hover { box-shadow: none; }
+
+/* Contenido interno */
+.status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 10rem;
+}
+.status .info h1 {
+  font-size: 2rem;
+  color: var(--color-dark, #222);
+  margin-bottom: .4rem;
+}
+.status .info h3 {
+  font-size: 1rem;
+  color: var(--color-dark-variant, #555);
+  line-height: 1.4;
+}
+
+/* Responsivo */
+@media (max-width: 1200px) {
+  .bienvenida { grid-template-columns: repeat(2, minmax(260px, 1fr)); gap: 1rem 1.2rem; }
+}
+@media (max-width: 768px) {
+  .bienvenida { grid-template-columns: 1fr; margin: 0; gap: 1rem; }
+}

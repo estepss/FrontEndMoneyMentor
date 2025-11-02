@@ -6,6 +6,7 @@ import {Gestion} from './gestion/gestion';
 import {Asesor} from './asesor/asesor';
 import {Chat} from './chat/chat';
 import {Perfil} from './perfil/perfil';
+import {Muestra} from './muestra/muestra';
 
 export const routes: Routes = [
 // ejemplo de rutas o sea< direccionamiento a otras "pantallas"

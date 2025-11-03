@@ -1,1 +1,51 @@
-<h1>ejemplo cambiado</h1>
+<div class="asesor-page-container">
+  <h1 class="page-title">Lista de asesores</h1>
+
+  <div class="asesores-grid">
+    @for (asesor of asesores; track $index) {
+      <div class="asesor-card">
+        <div class="card-header">
+          <!-- Nombre del Asesor -->
+          <!-- CORRECCIÓN 1: Se elimina el [ngClass] condicional ya que no hay roles -->
+          <div class="header-name-box">
+            {{ asesor.nombre }}
+          </div>
+
+          <!-- Foto de perfil del Asesor -->
+          <div class="profile-photo">
+            <img
+              [src]="asesor.imagenUrl"
+              [alt]="'Foto de ' + asesor.nombre"
+              onerror="this.onerror=null; this.src='https://placehold.co/150x150/cccccc/333333?text=Foto';"
+            />
+          </div>
+        </div>
+
+        <div class="card-body">
+          <!-- Contenido: Texto Principal Unificado -->
+          <p class="content-text question-text">
+            <!-- CORRECCIÓN 2: Se usa el campo textoPrincipal, eliminando la lógica @if/@else -->
+            {{ asesor.textoPrincipal }}
+          </p>
+
+          <!-- Botón de acción (Reservar) -->
+          <button
+            class="action-button"
+            (click)="accionAsesor(asesor)">
+            <!-- Todos dicen "Reservar" y usan el icono de calendario -->
+            Reservar
+            <span class="material-icons-sharp">event_available</span>
+          </button>
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- Botón de Reservas al final -->
+  <div class="reservas-container">
+    <button class="reservas-button">
+      Reservas
+    </button>
+  </div>
+</div>
+

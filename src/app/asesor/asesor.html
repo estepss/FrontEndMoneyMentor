@@ -2,50 +2,89 @@
   <h1 class="page-title">Lista de asesores</h1>
 
   <div class="asesores-grid">
-    @for (asesor of asesores; track $index) {
-      <div class="asesor-card">
-        <div class="card-header">
-          <!-- Nombre del Asesor -->
-          <!-- CORRECCIÓN 1: Se elimina el [ngClass] condicional ya que no hay roles -->
-          <div class="header-name-box">
-            {{ asesor.nombre }}
-          </div>
-
-          <!-- Foto de perfil del Asesor -->
-          <div class="profile-photo">
-            <img
-              [src]="asesor.imagenUrl"
-              [alt]="'Foto de ' + asesor.nombre"
-              onerror="this.onerror=null; this.src='https://placehold.co/150x150/cccccc/333333?text=Foto';"
-            />
-          </div>
-        </div>
-
-        <div class="card-body">
-          <!-- Contenido: Texto Principal Unificado -->
-          <p class="content-text question-text">
-            <!-- CORRECCIÓN 2: Se usa el campo textoPrincipal, eliminando la lógica @if/@else -->
-            {{ asesor.textoPrincipal }}
-          </p>
-
-          <!-- Botón de acción (Reservar) -->
-          <button
-            class="action-button"
-            (click)="accionAsesor(asesor)">
-            <!-- Todos dicen "Reservar" y usan el icono de calendario -->
-            Reservar
-            <span class="material-icons-sharp">event_available</span>
-          </button>
+    <div class="asesor-card" *ngFor="let asesor of asesores; let i = index">
+      <div class="card-header">
+        <div class="header-name-box">{{ asesor.nombre }}</div>
+        <div class="profile-photo">
+          <img
+            [src]="asesor.imagenUrl"
+            [alt]="'Foto de ' + asesor.nombre"
+            (error)="onImageError($event)"
+          />
         </div>
       </div>
-    }
+
+      <div class="card-body">
+        <p class="content-text question-text">
+          {{ asesor.textoPrincipal }}
+        </p>
+
+        <button class="action-button" (click)="abrirModal(asesor)">
+          Revisar
+          <span class="material-icons-sharp">rate_review</span>
+        </button>
+      </div>
+    </div>
   </div>
 
-  <!-- Botón de Reservas al final -->
+  <!-- Botón inferior -->
   <div class="reservas-container">
-    <button class="reservas-button">
-      Reservas
-    </button>
+    <button class="reservas-button">Reservas</button>
   </div>
 </div>
 
+<!-- MODAL DE RESEÑA -->
+<div class="modal-overlay" *ngIf="mostrarModal">
+  <div class="modal">
+    <button class="cerrar-modal" (click)="cerrarModal()">X</button>
+
+    <div class="modal-header" *ngIf="asesorSeleccionado">
+      <div class="avatar-modal">
+        {{ getIniciales(asesorSeleccionado.nombre) }}
+      </div>
+      <div>
+        <h3>{{ asesorSeleccionado.nombre }}</h3>
+        <p class="descripcion-asesor">
+          Hola, soy
+          {{
+            asesorSeleccionado.nombre
+              ? asesorSeleccionado.nombre.split(' ')[0]
+              : ''
+          }}
+          y tengo {{ asesorSeleccionado.experiencia }} años de experiencia
+        </p>
+      </div>
+    </div>
+
+    <div class="form-reseña">
+      <input
+        type="number"
+        placeholder="Da una calificación del 1 al 5"
+        [(ngModel)]="nuevaResena.puntuacion"
+        min="1"
+        max="5"
+      />
+      <textarea
+        placeholder="Escribir un comentario"
+        [(ngModel)]="nuevaResena.comentario"
+      ></textarea>
+      <button class="btn-enviar" (click)="enviarResena()">Enviar</button>
+    </div>
+
+    <div class="reseñas-previas" *ngIf="asesorSeleccionado">
+      <div
+        class="reseña-item"
+        *ngFor="let r of resenas[asesorSeleccionado.id]"
+      >
+        <div class="avatar-mini">{{ getIniciales(r.cliente) }}</div>
+        <div>
+          <strong>{{ r.cliente }}</strong>
+          <span class="estrellas">{{ '★'.repeat(r.puntuacion) }}</span>
+          <p>{{ r.comentario }}</p>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn-reservar">Reservar</button>
+  </div>
+</div>

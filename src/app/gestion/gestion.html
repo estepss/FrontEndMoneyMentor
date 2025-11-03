@@ -1,0 +1,60 @@
+<main class="page">
+  <section class="Gestion">
+    <h1 class="title">Gestión Financiera</h1>
+    <p class="subtitle">Introduzca nuevo ingreso o egreso</p>
+
+    <!-- Fila de 3 campos -->
+    <form class="grid3">
+      <div class="field">
+        <label for="ingreso">Titulo</label>
+        <input type="text" id="ingreso" class="input" />
+      </div>
+
+      <div class="field">
+        <label for="tipo">Tipo</label>
+        <div class="select-wrap">
+          <select id="tipo" class="input select">
+            <option>Ingreso</option>
+            <option selected>Egreso</option>
+          </select>
+          <span class="chev">▾</span>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="monto">Monto</label>
+        <input type="number" id="monto" class="input" />
+      </div>
+
+      <div class="actions">
+        <button type="button" class="btn btn-primary">Registrar</button>
+        <button
+          type="button"
+          class="btn btn-secondary"
+          [routerLink]="'/Análisis'">
+          Análisis
+        </button>
+
+      </div>
+    </form>
+
+    <!-- Listado -->
+    <h3 class="list-title">Listado de gestión</h3>
+    <div class="table-wrap">
+      <div class="row head">
+        <div class="cell">ID</div>
+        <div class="cell">Titulo</div>
+        <div class="cell">Tipo</div>
+        <div class="cell">Monto</div>
+      </div>
+      <!-- filas de ejemplo -->
+      <div class="row">
+        <div class="cell">1</div>
+        <div class="cell">Compra libros</div>
+        <div class="cell">Egreso</div>
+        <div class="cell">120.00</div>
+      </div>
+    </div>
+  </section>
+  <router-outlet/>
+</main>

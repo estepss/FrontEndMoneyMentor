@@ -1,0 +1,162 @@
+:root{
+  --header-h:70px;
+  --surface:#fff;
+  --ink:#24343c;
+  --muted:#6b7b86;
+  --bg:#f1f4f6;            /* gris suave del fondo */
+  --accent:#ff7f45;        /* naranja botón Registrar */
+  --accent-2:#179bae;      /* celeste botón Análisis */
+  --shadow:0 10px 24px rgba(0,0,0,.08);
+  --radius:14px;
+}
+
+/* Centra el contenido del main respecto al sidebar */
+.page{
+  display:flex;
+  justify-content:center;
+  padding: 2rem;
+  margin-top: var(--header-h);
+  background:var(--bg);
+}
+
+/* Card central */
+.Gestion{
+  width:min(100%, 980px);
+  background:var(--surface);
+  border-radius:20px;
+  padding: 2.5rem 2rem 2rem;
+  box-shadow: var(--shadow);
+  text-align:center;
+}
+.Gestion .form-control,
+.Gestion select,
+.Gestion .input {
+  height: 48px;
+  padding: 0 16px;
+  border-radius: 14px;
+  border: 1px solid #d6dde3;        /* borde gris suave */
+  background-color: #f3f3f3; /* Fondo gris claro */
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1); /* Sombra interna */              /* fondo claro */
+  color: #24343c;
+  outline: none;
+  transition: box-shadow .2s ease, border-color .2s ease;
+  -webkit-appearance: none;
+  appearance: none;
+}
+/* Focus: un poco más de realce, sin “azul chillón” */
+.Gestion .form-control:focus,
+.Gestion select:focus {
+  border-color: #c7d7e2;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,1),
+    0 0 0 3px rgba(23,155,174,.12),     /* halo suave */
+    0 10px 22px rgba(22,34,44,.12);
+  background: #f7f9fb;
+}
+/* Placeholders más tenues */
+.Gestion .form-control::placeholder { color: #98a7b3; }
+
+/* Select con chevron (si usas el nativo) */
+.Gestion select {
+  padding-right: 34px;
+  background-image: linear-gradient(45deg, transparent 50%, #6c7a83 50%),
+  linear-gradient(135deg, #6c7a83 50%, transparent 50%);
+  background-position: calc(100% - 18px) 20px, calc(100% - 12px) 20px;
+  background-size: 6px 6px;
+  background-repeat: no-repeat;
+}
+/* Título + subtítulo */
+.title{
+  margin:0 0 .25rem;
+  font-size: clamp(1.6rem, 1.1rem + 1.5vw, 2.2rem);
+  color: var(--ink);
+  font-weight: 800;
+}
+.subtitle{
+  margin:0 0 1.8rem;
+  color: var(--muted);
+}
+
+/* Grid de 3 columnas para los campos */
+.grid3{
+  display:grid;
+  grid-template-columns: repeat(3, minmax(220px, 1fr));
+  gap: 1.25rem 1.5rem;
+  justify-items:center;
+  margin-bottom: 1.5rem;
+}
+.field{ width:100%; text-align:left; }
+.field label{ display:block; margin:0 0 .5rem; color:var(--ink); font-weight:600; }
+
+/* Inputs redondeados grandes como en el mock */
+.input{
+  width:100%;
+  height: 48px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 14px;
+  background: #eef2f5;
+  box-shadow: inset 0 2px 0 rgba(255,255,255,.7), 0 2px 0 #d6dde3, 0 6px 14px rgba(22,34,44,.08);
+  font: 500 15px 'Poppins', sans-serif;
+  color: var(--ink);
+}
+.input:focus{ outline: 2px solid #E8E8E8; }
+
+/* Select con chevron */
+.select-wrap{ position:relative; }
+.select{ appearance:none; padding-right: 34px; }
+.chev{
+  position:absolute; right:12px; top:50%; transform:translateY(-50%);
+  font-size: 18px; color:#6c7a83; pointer-events:none;
+}
+
+/* Acciones centradas bajo los 3 campos */
+.actions{
+  grid-column: 1 / -1;            /* ocupa las 3 columnas */
+  display:flex; gap: .8rem; justify-content:center; margin-top:.25rem;
+}
+.btn{
+  height:44px; min-width: 160px; padding: 0 18px;
+  border:0; border-radius: 12px; font-weight:700; cursor:pointer;
+  color:#fff; box-shadow: 0 6px 14px rgba(0,0,0,.12);
+}
+.btn-primary{ background: #FF8343; }
+.btn-primary:hover{ filter: brightness(.95); }
+.btn-secondary{ background: #179BAE; }
+.btn-secondary:hover{ filter: brightness(.85); }
+
+/* Listado */
+.list-title{
+  text-align:left; margin: 1.8rem 0 .75rem; color: var(--ink);
+}
+.table-wrap{
+  background:#e9eef1;
+  border-radius: 16px;
+  padding: 14px;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1); /* Sombra interna */              /* fondo claro */
+  color: #24343c;
+}
+.row{
+  display:grid;
+  grid-template-columns: 120px 1fr 160px 160px;
+  gap: 10px;
+  margin-bottom:10px;
+}
+.row.head .cell{
+  font-weight:700; color: var(--ink);
+}
+.cell{
+  background:#f5f8fa;
+  border-radius: 12px;
+  padding: 12px 14px;
+  text-align:left;
+  color: var(--ink);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.7), 0 1px 0 #d6dde3;
+}
+
+/* Responsive */
+@media (max-width: 900px){
+  .grid3{ grid-template-columns: 1fr; }
+  .actions{ grid-column: 1; }
+  .row{ grid-template-columns: 1fr 1fr; }
+}

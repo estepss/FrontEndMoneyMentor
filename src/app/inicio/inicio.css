@@ -1,4 +1,4 @@
-
+/* Inicio CSS*/
 :host {
   display: block;
   /* Evita que el componente “colapse” y respete el padding del <main> padre */

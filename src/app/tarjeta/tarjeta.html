@@ -1,0 +1,159 @@
+<div class="tarjeta-page-container">
+
+  <h1 class="page-title">
+    @if (vistaActual === 'agregar') {
+      Tarjeta
+    } @else {
+      Lista de Tarjeta
+    }
+  </h1>
+
+  <!-- VISTA: AGREGAR TARJETA (FORMULARIO) -->
+  @if (vistaActual === 'agregar') {
+    <div class="card-form-container">
+      <div class="form-header" style="background-color: #935B44;">
+        Ingresar una tarjeta
+      </div>
+
+      <form class="form-body">
+
+        <!-- Campo Nombre -->
+        <div class="input-group">
+          <label for="nombre">Nombre</label>
+          <input
+            id="nombre"
+            type="text"
+            [(ngModel)]="nuevaTarjeta.nombre"
+            name="nombre"
+            required
+            placeholder="Nombre en la tarjeta"
+          />
+        </div>
+
+        <!-- Campo Número de Tarjeta -->
+        <div class="input-group">
+          <label for="numero">Número de Tarjeta</label>
+          <input
+            id="numero"
+            type="text"
+            [(ngModel)]="nuevaTarjeta.numero"
+            name="numero"
+            required
+            placeholder="XXXX XXXX XXXX XXXX"
+          />
+        </div>
+
+        <!-- Campos Fecha y CVC -->
+        <div class="input-group-inline">
+
+          <div class="inline-section expiration-date">
+            <label>Fecha de expiración</label>
+            <div class="inline-fields">
+              <select [(ngModel)]="nuevaTarjeta.mesExpiracion" name="mes" required>
+                @for (mes of meses; track mes) {
+                  <option [value]="mes">{{ mes }}</option>
+                }
+              </select>
+              <select [(ngModel)]="nuevaTarjeta.anioExpiracion" name="anio" required>
+                @for (anio of anios; track anio) {
+                  <option [value]="anio">{{ anio }}</option>
+                }
+              </select>
+            </div>
+          </div>
+
+          <div class="inline-section cvc-field">
+            <label for="cvc">CVC</label>
+            <input
+              id="cvc"
+              type="text"
+              [(ngModel)]="nuevaTarjeta.cvc"
+              name="cvc"
+              required
+              placeholder="XXX"
+            />
+          </div>
+        </div>
+
+        <!-- Botones de Acción -->
+        <div class="form-actions">
+          <button
+            type="button"
+            class="action-button primary"
+            (click)="agregarTarjeta()"
+            style="background-color: #179BAE;">
+            Agregar tarjeta
+          </button>
+
+          <button
+            type="button"
+            class="action-button secondary"
+            (click)="mostrarLista()"
+            style="background-color: #179BAE;">
+            Ver tarjetas agregadas
+          </button>
+        </div>
+      </form>
+    </div>
+  }
+
+  <!-- VISTA: LISTA DE TARJETAS AGREGADAS -->
+  @if (vistaActual === 'lista') {
+    <div class="cards-list-container">
+      @if (tarjetasAgregadas.length === 0) {
+        <div class="empty-state">
+          <p>No tienes tarjetas agregadas.
+            <a (click)="mostrarAgregar()">Haz clic aquí para agregar una.</a>
+          </p>
+        </div>
+      } @else {
+        @for (tarjeta of tarjetasAgregadas; track $index) {
+          <div class="list-card-item">
+            <div class="delete-button" (click)="eliminarTarjeta($index)">
+              <!-- Icono de Bote de Basura/Eliminar (material-icons-sharp) -->
+              <span class="material-icons-sharp">delete</span>
+            </div>
+
+            <!-- Nombre -->
+            <div class="data-group">
+              <span class="label">Nombre</span>
+              <span class="value">{{ tarjeta.nombre }}</span>
+              <hr/>
+            </div>
+
+            <!-- Número de Tarjeta -->
+            <div class="data-group">
+              <span class="label">Número de Tarjeta</span>
+              <span class="value">{{ tarjeta.numero }}</span>
+              <hr/>
+            </div>
+
+            <!-- Fecha de expiración y CVC -->
+            <div class="data-group-inline">
+              <div class="inline-data expiration-info">
+                <span class="label">Fecha de expiración</span>
+                <span class="value">{{ tarjeta.mesExpiracion }} / {{ tarjeta.anioExpiracion }}</span>
+              </div>
+              <div class="inline-data cvc-info">
+                <span class="label">CVC</span>
+                <span class="value">{{ tarjeta.cvc }}</span>
+              </div>
+            </div>
+          </div>
+        }
+      }
+
+      <div class="form-actions list-actions">
+        <button
+          type="button"
+          class="action-button primary"
+          (click)="mostrarAgregar()"
+          style="background-color: #179BAE;">
+          Agregar otra tarjeta
+        </button>
+      </div>
+
+    </div>
+  }
+
+</div>

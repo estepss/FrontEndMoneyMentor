@@ -6,16 +6,18 @@ import {Gestion} from './gestion/gestion';
 import {Asesor} from './asesor/asesor';
 import {Chat} from './chat/chat';
 import {Perfil} from './perfil/perfil';
+// 1. IMPORTACIÓN NUEVA: Importamos el nuevo componente Tarjeta
+import {Tarjeta} from './tarjeta/tarjeta';
 
 export const routes: Routes = [
-// ejemplo de rutas o sea< direccionamiento a otras "pantallas"
-  {path: '', component: Inicio}, // primera pagina que se mostrará
-  {path: 'Calculadora', component: Calculadora}, //en esta en el path si se pone algo porque nos re dirigirá
-  {path: 'Análisis', component: Analisis}, // lo mismo que con about
+  {path: '', component: Inicio},
+  {path: 'Calculadora', component: Calculadora},
+  {path: 'Análisis', component: Analisis},
   {path: 'Gestión', component: Gestion},
   {path: 'Asesor', component: Asesor},
   {path: 'Chat', component: Chat},
   {path: 'Perfil', component: Perfil},
-  {path: '**', redirectTo: ''}, //re dirige a home
-
+  // 2. RUTA NUEVA: Agregamos la ruta para Tarjeta
+  {path: 'Tarjeta', component: Tarjeta},
+  {path: '**', redirectTo: ''},
 ];

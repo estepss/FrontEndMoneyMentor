@@ -1,87 +1,91 @@
-<div class="container" [ngClass]="{ 'sign-up-mode': isSignUpMode }">
+<!-- acceso.html -->
+<div class="container" [class.sign-up-mode]="isSignUpMode">
+  <!-- Formularios -->
   <div class="forms-container">
     <div class="signin-signup">
 
-      <!-- Iniciar sesión -->
-      <form id="sign-in-form" class="sign-in-form" (ngSubmit)="onSignInSubmit()" novalidate>
+      <!-- LOGIN -->
+      <form class="sign-in-form form-container"
+            [formGroup]="loginForm"
+            (ngSubmit)="onLogin()"
+            [hidden]="isSignUpMode">
         <h2 class="title">Iniciar sesión</h2>
-        <div class="input-field no-icon">
-          <input type="text" id="login-username" name="loginUsername"
-                 placeholder="Correo" required [(ngModel)]="login.username" />
-        </div>
-        <div class="input-field no-icon">
-          <input type="password" id="login-password" name="loginPassword"
-                 placeholder="Contraseña" required [(ngModel)]="login.password" />
-        </div>
-        <button type="submit" class="btn solid">INICIAR SESIÓN</button>
+
+        <mat-form-field appearance="fill">
+          <mat-label>Usuario</mat-label>
+          <input matInput formControlName="email" />
+        </mat-form-field>
+
+        <mat-form-field appearance="fill">
+          <mat-label>Contraseña</mat-label>
+          <input matInput type="password" formControlName="password" />
+        </mat-form-field>
+
+        <button mat-raised-button color="primary" type="submit">Iniciar sesión</button>
       </form>
 
-      <!-- Registro -->
-      <form id="sign-up-form" class="sign-up-form" (ngSubmit)="onSignUpSubmit()" novalidate>
+      <!-- REGISTRO -->
+      <form class="sign-up-form form-container"
+            [formGroup]="accesoForm"
+            (ngSubmit)="onSubmit()"
+            [hidden]="!isSignUpMode">
         <h2 class="title">Registro</h2>
 
-        <div class="input-field no-icon">
-          <input type="text" id="register-name" name="registerName"
-                 placeholder="Nombre" required [(ngModel)]="register.name" />
-        </div>
+        <mat-form-field appearance="fill">
+          <mat-label>Nombre</mat-label>
+          <input matInput formControlName="nombres" />
+        </mat-form-field>
 
-        <div class="input-field no-icon">
-          <input type="text" id="register-dni" name="registerDni"
-                 placeholder="DNI" required maxlength="12"
-                 [(ngModel)]="register.dni" />
-        </div>
+        <mat-form-field appearance="fill">
+          <mat-label>DNI</mat-label>
+          <input matInput formControlName="dni" maxlength="12" />
+        </mat-form-field>
 
-        <!-- necesario si está dentro de un form -->
-        <div class="input-field no-icon">
-          <select
-            [(ngModel)]="register.role"
-            name="role"
-            required>
-            <option [ngValue]="''" disabled selected>Selecciona un rol</option>
-            <option [ngValue]="'asesor'">Asesor</option>
-            <option [ngValue]="'cliente'">Cliente</option>
-          </select>
-          <p style="font-size:12px; color:#555;">
-            Rol seleccionado: {{ register.role || '(vacío)' }}
-          </p>
-        </div>
+        <mat-form-field appearance="fill">
+          <mat-label>Tipo de usuario</mat-label>
+          <mat-select formControlName="rol">
+            <mat-option value="ASESOR">Asesor</mat-option>
+            <mat-option value="CLIENTE">Cliente</mat-option>
+          </mat-select>
+        </mat-form-field>
 
+        <mat-form-field appearance="fill">
+          <mat-label>Correo</mat-label>
+          <input matInput formControlName="email" />
+        </mat-form-field>
 
-        <div class="input-field no-icon">
-          <input type="email" id="register-email" name="registerEmail"
-                 placeholder="Correo" required [(ngModel)]="register.email" />
-        </div>
+        <mat-form-field appearance="fill">
+          <mat-label>Contraseña</mat-label>
+          <input matInput type="password" formControlName="password" />
+        </mat-form-field>
 
-        <div class="input-field no-icon">
-          <input type="password" id="register-password" name="registerPassword"
-                 placeholder="Contraseña" required [(ngModel)]="register.password" />
-        </div>
-
-        <button type="submit" class="btn solid">CREAR CUENTA</button>
+        <button mat-raised-button color="primary" type="submit">Registrarme</button>
       </form>
+
 
     </div>
   </div>
 
-  <!-- Paneles -->
+  <!-- Paneles laterales con el “blob” -->
   <div class="panels-container">
+    <!-- Panel izquierdo (Registro visible, invitar a Iniciar sesión) -->
     <div class="panel left-panel">
-      <div class="content">
-        <h3>¿Eres nuevo?</h3>
-        <p>¡Únete a nuestra comunidad y comienza a mejorar tus finanzas hoy!</p>
-        <button class="btn transparent" id="toggle-sign-up" type="button" (click)="toggleSignUp()">
-          REGÍSTRATE
-        </button>
-      </div>
-    </div>
-    <div class="panel right-panel">
       <div class="content">
         <h3>¿Ya tienes cuenta?</h3>
         <p>Ingresa para seguir gestionando tus finanzas de manera eficiente.</p>
-        <button class="btn transparent" id="toggle-sign-in" type="button" (click)="toggleSignIn()">
-          INICIAR SESIÓN
-        </button>
+        <button class="btn transparent" type="button" (click)="toggleSignIn()">Iniciar sesión</button>
       </div>
+      <img class="image" src="assets/img/illustration.svg" alt="" />
+    </div>
+
+    <!-- Panel derecho (Login visible, invitar a Registrarse) -->
+    <div class="panel right-panel">
+      <div class="content">
+        <h3>¿Eres nuevo?</h3>
+        <p>Únete a nuestra comunidad y comienza a mejorar tus finanzas hoy.</p>
+        <button class="btn transparent" type="button" (click)="toggleSignUp()">Regístrate</button>
+      </div>
+      <img class="image" src="assets/img/illustration.svg" alt="" />
     </div>
   </div>
 </div>

@@ -1,0 +1,87 @@
+<div class="container" [ngClass]="{ 'sign-up-mode': isSignUpMode }">
+  <div class="forms-container">
+    <div class="signin-signup">
+
+      <!-- Iniciar sesión -->
+      <form id="sign-in-form" class="sign-in-form" (ngSubmit)="onSignInSubmit()" novalidate>
+        <h2 class="title">Iniciar sesión</h2>
+        <div class="input-field no-icon">
+          <input type="text" id="login-username" name="loginUsername"
+                 placeholder="Correo" required [(ngModel)]="login.username" />
+        </div>
+        <div class="input-field no-icon">
+          <input type="password" id="login-password" name="loginPassword"
+                 placeholder="Contraseña" required [(ngModel)]="login.password" />
+        </div>
+        <button type="submit" class="btn solid">INICIAR SESIÓN</button>
+      </form>
+
+      <!-- Registro -->
+      <form id="sign-up-form" class="sign-up-form" (ngSubmit)="onSignUpSubmit()" novalidate>
+        <h2 class="title">Registro</h2>
+
+        <div class="input-field no-icon">
+          <input type="text" id="register-name" name="registerName"
+                 placeholder="Nombre" required [(ngModel)]="register.name" />
+        </div>
+
+        <div class="input-field no-icon">
+          <input type="text" id="register-dni" name="registerDni"
+                 placeholder="DNI" required maxlength="12"
+                 [(ngModel)]="register.dni" />
+        </div>
+
+        <!-- necesario si está dentro de un form -->
+        <div class="input-field no-icon">
+          <select
+            [(ngModel)]="register.role"
+            name="role"
+            required>
+            <option [ngValue]="''" disabled selected>Selecciona un rol</option>
+            <option [ngValue]="'asesor'">Asesor</option>
+            <option [ngValue]="'cliente'">Cliente</option>
+          </select>
+          <p style="font-size:12px; color:#555;">
+            Rol seleccionado: {{ register.role || '(vacío)' }}
+          </p>
+        </div>
+
+
+        <div class="input-field no-icon">
+          <input type="email" id="register-email" name="registerEmail"
+                 placeholder="Correo" required [(ngModel)]="register.email" />
+        </div>
+
+        <div class="input-field no-icon">
+          <input type="password" id="register-password" name="registerPassword"
+                 placeholder="Contraseña" required [(ngModel)]="register.password" />
+        </div>
+
+        <button type="submit" class="btn solid">CREAR CUENTA</button>
+      </form>
+
+    </div>
+  </div>
+
+  <!-- Paneles -->
+  <div class="panels-container">
+    <div class="panel left-panel">
+      <div class="content">
+        <h3>¿Eres nuevo?</h3>
+        <p>¡Únete a nuestra comunidad y comienza a mejorar tus finanzas hoy!</p>
+        <button class="btn transparent" id="toggle-sign-up" type="button" (click)="toggleSignUp()">
+          REGÍSTRATE
+        </button>
+      </div>
+    </div>
+    <div class="panel right-panel">
+      <div class="content">
+        <h3>¿Ya tienes cuenta?</h3>
+        <p>Ingresa para seguir gestionando tus finanzas de manera eficiente.</p>
+        <button class="btn transparent" id="toggle-sign-in" type="button" (click)="toggleSignIn()">
+          INICIAR SESIÓN
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

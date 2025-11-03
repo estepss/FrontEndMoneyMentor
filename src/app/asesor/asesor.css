@@ -1,13 +1,13 @@
 /* Variables de color de tu aplicación */
-/**/
 :host {
   --color-dark-blue: #2B3D49;
   --color-turquesa: #179BAE;
-  --color-light-background: #f0f9ff; /* Blanco/Gris muy claro */
+  --color-light-background: #f0f9ff;
   --color-text-dark: #333333;
   --card-border-radius: 1.0rem;
 }
 
+/* --- PÁGINA PRINCIPAL --- */
 .asesor-page-container {
   padding: 0.5rem;
 }
@@ -22,7 +22,6 @@
 /* --- GRID LAYOUT --- */
 .asesores-grid {
   display: grid;
-  /* 2 columnas por defecto, ajusta a 1 en móviles */
   grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
   gap: 2.5rem;
   max-width: 1500px;
@@ -52,7 +51,6 @@
   margin-bottom: 1rem;
 }
 
-/* Nombre del Asesor */
 .header-name-box {
   background-color: var(--color-dark-blue);
   color: white;
@@ -63,18 +61,12 @@
   max-width: 70%;
 }
 
-.header-name-box.is-response {
-  /* Si el rol es 'respuesta', el color del nombre se mantiene igual */
-  background-color: var(--color-dark-blue);
-}
-
 /* Foto de Perfil */
 .profile-photo {
   width: 60px;
   height: 60px;
   border-radius: 50%;
   overflow: hidden;
-  /* Borde turquesa alrededor de la foto */
   border: 3px solid var(--color-turquesa);
   box-shadow: 0 0 0 2px white;
   flex-shrink: 0;
@@ -93,14 +85,14 @@
   justify-content: space-between;
 }
 
-/* Contenido de la pregunta/respuesta */
+/* Contenido */
 .content-text {
   font-size: 1.05rem;
   line-height: 1.5;
   color: var(--color-text-dark);
   margin-bottom: 1.5rem;
   font-style: italic;
-  padding-top: 0.5rem; /* Ajuste para compensar la eliminación del icono */
+  padding-top: 0.5rem;
 }
 
 .question-text {
@@ -108,14 +100,7 @@
   font-style: normal;
 }
 
-/* 💡 ESTA SECCIÓN HA SIDO ELIMINADA O COMENTADA PARA BORRAR EL ICONO '¿' */
-/*
-.question-text .query-mark {
-    ... Estilos del icono ...
-}
-*/
-
-/* --- BOTONES DE ACCIÓN (Responder/Revisar) --- */
+/* --- BOTONES --- */
 .action-button {
   background-color: var(--color-turquesa);
   color: white;
@@ -130,18 +115,13 @@
   justify-content: center;
   gap: 0.5rem;
   transition: background-color 0.2s;
-  align-self: flex-end; /* Alinea el botón a la derecha inferior */
+  align-self: flex-end;
 }
 
 .action-button:hover {
-  background-color: #12798e; /* Turquesa un poco más oscuro */
+  background-color: #12798e;
 }
 
-.action-button span {
-  font-size: 1.2rem;
-}
-
-/* --- BOTÓN DE RESERVAS --- */
 .reservas-container {
   text-align: center;
   margin-top: 2rem;
@@ -167,12 +147,132 @@
   box-shadow: 0 6px 10px rgba(23, 155, 174, 0.5);
 }
 
+/* --- MODAL --- */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.modal {
+  background: #f2f2f2;
+  border-radius: 12px;
+  padding: 20px;
+  width: 420px;
+  position: relative;
+  font-family: 'Poppins', sans-serif;
+}
+
+.cerrar-modal {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: var(--color-turquesa);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  cursor: pointer;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.avatar-modal {
+  background: #c5e1f0;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 20px;
+  margin-right: 12px;
+}
+
+.descripcion-asesor {
+  font-size: 0.9rem;
+  color: #444;
+}
+
+.form-reseña input,
+.form-reseña textarea {
+  width: 100%;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  margin-bottom: 8px;
+  padding: 8px;
+}
+
+.btn-enviar {
+  background: #F37C4A;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  width: 100%;
+  padding: 8px;
+  cursor: pointer;
+}
+
+.reseñas-previas {
+  margin-top: 15px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.reseña-item {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 10px;
+}
+
+.avatar-mini {
+  background: #c5e1f0;
+  border-radius: 50%;
+  width: 35px;
+  height: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  margin-right: 8px;
+}
+
+.estrellas {
+  color: #FFD700;
+  font-size: 18px;
+}
+
+.btn-reservar {
+  margin-top: 10px;
+  background: #5EA8C1;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  width: 100%;
+}
+
 /* --- RESPONSIVIDAD --- */
 @media (max-width: 768px) {
   .asesores-grid {
     grid-template-columns: 1fr;
     gap: 1.5rem;
   }
+
   .asesor-card {
     padding: 1.2rem;
   }

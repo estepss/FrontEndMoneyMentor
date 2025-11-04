@@ -85,6 +85,119 @@
       </div>
     </div>
 
-    <button class="btn-reservar">Reservar</button>
+    <!-- Este botón abre el calendario/reserva -->
+    <button class="btn-reservar" (click)="abrirReserva(asesorSeleccionado)">
+      Reservar
+    </button>
+  </div>
+</div>
+
+<!-- MODAL CALENDARIO / RESERVAS -->
+<div class="modal-overlay" *ngIf="mostrarReservaModal">
+  <div class="modal card-modal">
+    <button class="cerrar-modal" (click)="cerrarReservaModal()">X</button>
+
+    <h3 style="color:var(--color-dark-blue); margin-top: 6px;">Calendario</h3>
+
+    <div class="calendar-container">
+      <!-- calendario izquierdo -->
+      <div class="calendar">
+        <div class="month-header">
+          <div class="month-nav">
+            <button (click)="prevMonth()">&lt;</button>
+          </div>
+          <div class="month-title">
+            {{ monthNames[currentMonth] }} {{ currentYear }}
+          </div>
+          <div class="month-nav">
+            <button (click)="nextMonth()">&gt;</button>
+          </div>
+        </div>
+
+        <div class="weekdays">
+          <div *ngFor="let wd of weekDays">{{ wd }}</div>
+        </div>
+
+        <div class="days-grid">
+          <div
+            *ngFor="let day of calendarDays"
+            [class.day]="true"
+            [class.inactive]="!day.inCurrentMonth"
+            [class.selected]="isSelected(day)"
+            [class.today]="isToday(day)"
+            (click)="selectDay(day)"
+          >
+            {{ day.date.getDate() }}
+          </div>
+        </div>
+
+        <div style="margin-top: 12px; display:flex; gap:8px;">
+          <input type="text" [value]="inputMonthYear" readonly style="flex:1; padding:8px; border-radius:8px; border:1px solid #ddd;"/>
+          <button class="btn-ghost" (click)="goToToday()">Hoy</button>
+        </div>
+      </div>
+
+      <!-- panel derecho -->
+      <div class="calendar-right">
+        <h4>Día y hora seleccionada</h4>
+
+        <div class="selected-info">
+          <div *ngIf="selectedDateStr; else noSelection">
+            <div style="font-weight:700; margin-bottom:6px;">-- {{ selectedDateStr }} --</div>
+            <div style="color:#777; margin-bottom:8px;">-- {{ asesorReserva?.nombre }} --</div>
+
+            <div *ngIf="availableSlots.length">
+              <div *ngFor="let s of availableSlots" class="slot-box">
+                <div class="slot-pill">{{ s.label }}</div>
+                <div>
+                  <button class="btn-primary" (click)="registrarSlot(s)">Registrar</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="reserved-list">
+              <div *ngFor="let r of getReservasForAsesor(asesorReserva?.id)" class="reserved-item">
+                <div>
+                  • Cita con {{ asesorReserva?.nombre }}<br/>
+                  <small>{{ r.fecha }} — {{ r.horaInicio }} - {{ r.horaFin }}</small>
+                </div>
+                <div style="display:flex; gap:8px; align-items:center;">
+                  <button class="btn-ghost" (click)="openCardModal(r)">+</button>
+                  <button class="btn-ghost" (click)="eliminarReserva(asesorReserva?.id, r)">🗑</button>
+                </div>
+              </div>
+            </div>
+
+            <div style="margin-top: 12px;">
+              <button class="btn-primary" (click)="openCardModal()" [disabled]="!hasAnyReservaForSelectedDate()">Seleccionar tarjeta</button>
+            </div>
+          </div>
+
+          <ng-template #noSelection>
+            <div style="color:#666;">-- Selecciona un día a la izquierda --</div>
+          </ng-template>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL TARJETA / PAGO -->
+<div class="modal-overlay" *ngIf="mostrarCardModal">
+  <div class="modal card-modal">
+    <button class="cerrar-modal" (click)="cerrarCardModal()">X</button>
+    <h4>Seleccionar tarjetas registradas</h4>
+
+    <div style="margin-top:10px;">
+      <select style="width:100%; padding:8px; border-radius:8px; border:1px solid #ccc;" [(ngModel)]="selectedCard">
+        <option [ngValue]="null">Seleccione tarjeta...</option>
+        <option [value]="'visa-46'">Mi visa que termina en **46</option>
+      </select>
+    </div>
+
+    <div style="margin-top:12px; display:flex; gap:8px;">
+      <button class="btn-primary" (click)="confirmarPago()" [disabled]="!selectedCard">Pagar</button>
+      <button class="btn-ghost" (click)="cerrarCardModal()">Cancelar</button>
+    </div>
   </div>
 </div>

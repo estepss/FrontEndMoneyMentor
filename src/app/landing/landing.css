@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,200;0,300;0,400;0,500;0,600;1,200;1,300;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
 
 * {
   font-family: 'Poppins', sans-serif;
@@ -15,7 +15,7 @@
 }
 
 html {
-  font-size: 25.5%;
+  font-size: 62.5%;
   overflow-x: hidden;
 }
 
@@ -35,7 +35,7 @@ body {
 }
 
 .heading {
-  font-size: 3rem;
+  font-size: 4rem;
   color: #FBBD5D;
   text-align: center;
   padding: 6rem 1rem 0 0;
@@ -45,7 +45,7 @@ body {
 
 .title {
   padding: 0 1rem;
-  font-size: 1rem;
+  font-size: 2rem;
   text-align: center;
   font-weight: 400;
   color: #fff;
@@ -64,7 +64,7 @@ header .logo img {
   height: auto; /* Mantiene la proporción */
 }
 header .fa-bars {
-  font-size: 1rem;
+  font-size: 3rem;
   color: #FF8343;
   cursor: pointer;
   display: none;
@@ -72,8 +72,8 @@ header .fa-bars {
 }
 
 header {
-  width: 100%;
-  height: 90px;
+  width: 90%;
+  height: 80px;
   /* Altura del banner */
   background: #2B3D49;
   /*color del banner*/
@@ -116,7 +116,7 @@ header .navbar ul li a:hover {
 
 
 header .logo {
-  font-size: 5rem;
+  font-size: -5rem;
   /* Tamaño del logo */
   text-transform: uppercase;
   width: 2000px;
@@ -129,34 +129,39 @@ header .logo {
 .home {
   min-height: 100vh;
   background: linear-gradient(rgba(165, 165, 165, 0.267), rgba(165, 165, 165, 0.267)),
-  url('http://localhost:4200/Assets/Img/fondo_landing.jpg') no-repeat center center fixed;
+  url('../../assets/img/fondo_landing.jpg') no-repeat center center fixed;
   background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
   z-index: 0;
   overflow: hidden;
   position: relative;
 }
+
 .home .content {
   display: flex;
-  align-items: center;
+  align-items: left;
   justify-content: center;
   flex-flow: column;
-  padding-top: 20rem;
+  padding-top: -10rem;
   z-index: 2;
 }
 
 
 .home .content h1 {
-  font-size: 6rem;
+  font-size: 3rem;
   color: #fff;
-  padding: 0 1rem;
+  padding-top: -10rem;
   text-align: left;
-  padding: 1rem 25rem;
+  line-height: 1.1;
 }
 
 .home .content p {
-  font-size: 2rem;
+  font-size: 1.8rem;
   color: white;
-  padding: 1rem 25rem;
+  max-width: 150rem;
+  line-height: 1.6;
+  margin-top: 1rem;
 }
 
 
@@ -177,63 +182,66 @@ header .logo {
 }
 
 .download {
-  position: relative;
-  width: 100%;
-  height: 100vh;
-  background-color: white;
-  background-size: cover;
-  background-position: center;
   display: flex;
-  align-items: flex-end;
-  justify-content: flex-start;
-  padding: 2rem;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  flex-wrap: wrap; /* 🔹 Para que sea responsivo */
+  background-color: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  margin-top: 6rem;
+  padding: 3rem 2rem;
 }
 
-.top-right-image {
+.download .top-right-image {
   position: absolute;
-  top: 1rem;
+  top: 4rem;
   left: 1rem;
   width: 100%; /* Asegura que ocupe todo el ancho disponible */
-  max-width: 1400px; /* Tamaño máximo */
+  max-width: 1300px; /* Tamaño máximo */
   height: auto; /* Mantiene la proporción */
   border-radius: 8px;
   box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.3);
 }
 
-.content-box {
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  background-color: #179BAE;
-  /* */
-  padding: 2rem;
-  border-radius: 8px;
-  color: white;
-  min-height: 550px;
-  max-width: 1900px;
-  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.3);
+.download .content-box {
+  background-color: #0097A7;
+  color: #fff;
+  border-radius: 12px;
+  padding: 2.5rem 3rem;
+  flex: 1 1 300px;
+  min-height: 500px;
+  max-width: 1200px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: left;
 }
 
-.content-box h1 {
-  font-size: 5rem;
-  margin-bottom: 1rem;
-}
-
-.content-box p {
-  font-size: 2.3rem;
-  line-height: 1.5;
+.download .content-box h1 {
+  font-size: 3rem;
+  font-weight: 600;
+  padding-top: 1rem;
+  margin-top: -2rem;
   margin-bottom: 1.5rem;
+  line-height: 1.6;
 }
 
-.content-box img {
+.download .content-box p {
+  font-size: 1.4rem;
+  line-height: 1.7;
+  margin-bottom: 0.5rem;
+}
+
+.download .content-box img {
   width: 400px;
-  margin-bottom: 1.5rem;
+  margin-bottom: -2rem;
 }
 
 
 .home .content button:hover {
-  background: none;
-  border: .2rem solid #FBBD5D;
+  transform: scale(1.05);
 }
 
 #nosotros {
@@ -246,9 +254,10 @@ header .logo {
 }
 
 .nosotros h2 {
-  font-size: 3rem;
+  font-size: 5rem;
   margin-top: -70px;
-  padding-top: 2rem;
+  padding-top: 5rem;
+  margin-bottom: 4rem;
   text-align: center;
   color: #0A2B59;
 }
@@ -266,7 +275,8 @@ header .logo {
   justify-content: center;
   flex-wrap: wrap;
   text-align: center;
-  margin-top: 5rem;
+  margin-top: 2rem;
+  margin-bottom: 10rem;
 }
 
 .nosotros .box-container .box {
@@ -281,8 +291,8 @@ header .logo {
 }
 
 .nosotros .box-container .box img {
-  max-width: 85%;
-  max-height: 85%;
+  max-width: 95%;
+  max-height: 95%;
 }
 
 .nosotros .box-container .box h3 {
@@ -293,7 +303,8 @@ header .logo {
 }
 
 .nosotros .box-container .box p {
-  font-size: 1.3rem;
+  font-size: 1.25rem; /* tamaño más grande */
+  line-height: 1.4;   /* mejor separación entre líneas */
   padding: .7rem 2rem;
   color: #2B3D49;
 }
@@ -310,16 +321,17 @@ header .logo {
 }
 
 .servicios h2 {
-  font-size: 3rem;
+  font-size: 5rem;
   margin-top: -70px;
-  padding-top: 2rem;
+  padding-top: 5rem;
+  margin-bottom: 4rem;
   text-align: center;
   color: #0A2B59;
 }
 
 .servicios .content p {
   font-size: 1.5rem;
-  color: black;
+  color: #0A2B59;
   margin-bottom: 2rem;
   margin-top: 10px;
 }
@@ -329,7 +341,8 @@ header .logo {
   justify-content: center;
   flex-wrap: wrap;
   text-align: center;
-  margin-top: 5rem;
+  margin-top: 2rem;
+  margin-bottom: 10rem;
 }
 
 .servicios .box-container .box {
@@ -344,20 +357,21 @@ header .logo {
 }
 
 .servicios .box-container .box img {
-  max-width: 75%;
-  max-height: 85%;
+  max-width: 95%;
+  max-height: 95%;
 }
 
 .servicios .box-container .box h3 {
-  font-size: 1.8rem;
+  font-size: 2rem;
   color: #0A2B59;
   transition: .2s;
 }
 
 .servicios .box-container .box p {
-  font-size: 1.3rem;
+  font-size: 1.25rem; /* tamaño más grande */
+  line-height: 1.4;   /* mejor separación entre líneas */
   padding: .7rem 2rem;
-  color: black;
+  color: #2B3D49;
 }
 
 .servicios .box-container .box:hover h3 {
@@ -371,26 +385,28 @@ header .logo {
 .review {
   background: white;
   text-align: center;
-  padding-top: 3rem;
+  padding-top: 6.5rem;
 }
 
 .review h2 {
-  font-size: 3rem;
+  font-size: 5rem;
   color: #0A2B59;
-  margin-bottom: 2rem;
+  margin-bottom: 4rem;
   margin-top: -25px;
 }
 
 .review p {
   font-size: 1.5rem;
-  color: #000;
-  margin-bottom: 3rem;
+  color: #0A2B59;
+  margin-bottom: 1rem;
+  margin-top: 10px;
+  line-height: 1.4;
 }
 
 .review .box-container {
   display: flex;
   justify-content: center;
-  padding-top: 4rem;
+  padding-top: 0.5rem;
   flex-wrap: wrap;
 }
 
@@ -400,7 +416,7 @@ header .logo {
   box-shadow: 0px 4px 12px rgba(56, 56, 56, 0.1);
   padding: 1.5rem;
   text-align: center;
-  width: 500px;
+  width: 300px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -409,114 +425,133 @@ header .logo {
 }
 
 .review .box-container .box img {
-  width: 150px;
-  height: 150px;
+  width: 125px;
+  height: 125px;
   object-fit: cover;
   margin-bottom: 1rem;
 }
 
 .review .box-container .box h3 {
-  font-size: 2rem;
+  font-size: 1.8rem;
   color: #00BFB2;
   padding: 0 .5rem;
+  margin-top: 1.5rem;
 }
 
 .review .box-container .box p {
-  font-size: 1.2rem;
+  font-size: 1.3rem;
   color: #0B2860;
   padding: 1.3rem .1rem;
+  text-align: justify;
+  text-justify: inter-word;
+  max-width: 280px;
+  margin: 0 auto;
 }
 
-/* ===== FAQ (limpio y responsivo) ===== */
 .faq {
-  background-color: #fff;
+  background-color: white;
   text-align: center;
-  padding: 3rem 2rem;
+  padding: -5rem;
 }
-
 .faq h6 {
-  /* Si no lo usas como subtítulo, mejor ocultarlo o darle tamaño normal */
-  /* display: none; */
-  font-size: 1.2rem;          /* antes: 0.005rem (invisible) */
+  font-size: 0.005rem;
   color: #0A2B59;
-  margin: .5rem 0 1.5rem 0;
+  margin-bottom: 5rem;
+  margin: 7rem;
+  padding-top: 2.5rem;
 }
 
 .faq h2 {
+  font-size: 3rem;
   color: #0A2B59;
-  font-size: clamp(2rem, 4.2vw, 3rem);  /* ~20–30px */
-  margin: 1rem 0 1.6rem 0;              /* elimina doble margin */
+  margin-bottom: 2rem;
+  margin: 3rem;
 }
 
 .faq p {
-  font-size: clamp(1.3rem, 2vw, 1.6rem);
+  font-size: 1.5rem;
   color: #000;
   margin-bottom: 2rem;
 }
 
-/* Contenedor de tarjetas */
 .faq-container {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 2rem;                  /* antes: 6.3rem (muy grande) */
+  flex-direction: column; /* una debajo de otra */
+  align-items: center; /* centrado horizontal */
+  gap: 2rem; /* separación entre cajas */
+  width: 100%;
+  margin: 0 auto;
 }
 
-/* Tarjeta estándar */
-.faq-box,
-.faq-boxx {
-  background-color: #fff;
+.faq-box {
+  background-color: #ffffff;
   border: 1px solid #ddd;
-  border-radius: .8rem;
-  width: min(85rem, 92%);     /* evita desbordes; antes: 85rem/180rem fijos */
-  padding: 1.6rem;
+  border-radius: 0.8rem;
+  width: 85rem;
+  padding: 1.5rem;
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
   text-align: left;
-  box-shadow: 0 2px 5px rgba(0,0,0,.08);
-  transition: box-shadow .25s ease, transform .25s ease;
+  transition: 0.3s;
+}
+.faq-boxx {
+  background-color: #ffffff;
+  border: 1px solid #ddd;
+  border-radius: 0.8rem;
+  width: 180rem;
+  padding: 1.5rem;
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+  text-align: left;
+  transition: 0.3s;
 }
 
-.faq-box:hover,
-.faq-boxx:hover {
-  box-shadow: 0 6px 12px rgba(0,0,0,.18);
-  transform: translateY(-2px);
+.faq-box h3 {
+  font-size: 1.6rem;
+  color: #00C1D4;
+  margin-bottom: 1rem;
 }
 
-/* Títulos y párrafos de cada tarjeta */
-.faq-box h3,
+.faq-box p {
+  font-size: 1.4rem;
+  color: #333;
+  line-height: 1.5;
+  margin-bottom: 2rem;
+}
+
+.faq-box:hover {
+  box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.2);
+}
+
 .faq-boxx h3 {
   font-size: 1.6rem;
   color: #00C1D4;
-  margin-bottom: .8rem;
+  margin-bottom: 0.8rem;
 }
 
-.faq-box p,
 .faq-boxx p {
   font-size: 1.4rem;
   color: #333;
 }
 
-/* CTA / “ver más” */
-.faq-more {
-  text-align: right;
-  margin-top: 1.5rem;
+.faq-boxx:hover {
+  box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+section {
+  margin-bottom: 4rem;
 }
 
 .faq-more button {
   background-color: #ff6f47;
   color: #fff;
   border: none;
-  padding: .8rem 2rem;
-  border-radius: .5rem;
+  padding: 0.8rem 2rem;
+  border-radius: 0.5rem;
   font-size: 1.4rem;
   cursor: pointer;
-  transition: background-color .25s ease, transform .1s ease;
+  transition: background-color 0.3s;
 }
-.faq-more button:hover { background-color: #e65b37; }
-.faq-more button:active { transform: scale(.98); }
 
 
-
-/* ===== CONTACT SECTION FIX ===== */
 #contact {
   scroll-margin-top: 85px;
 }
@@ -524,80 +559,76 @@ header .logo {
 .contact {
   background: white;
   text-align: center;
-  padding: 4rem 2rem;
+  padding-top: 1rem;
 }
 
-/* Título */
 .contact h2 {
-  font-size: clamp(1.8rem, 2.8vw, 2.4rem); /* antes: 3rem */
+  font-size: 5rem;
   color: #0A2B59;
-  margin: 1rem 0 2rem 0;
+  margin-bottom: 4rem;
+  margin-top: -30px;
 }
 
-/* Subtexto */
+
 .contact p {
-  font-size: clamp(1.4rem, 2vw, 1.6rem); /* antes: 1.5rem */
-  color: #333;
-  margin-bottom: 1rem;
+  font-size: 1.5rem;
+  color: #0A2B59;
+  margin-bottom: -2rem;
 }
 
-/* Layout del formulario */
 .contact .row {
   display: flex;
-  flex-wrap: wrap; /* Permite que se adapte en móvil */
   align-items: center;
   justify-content: center;
-  gap: 3rem;
-  padding: 3rem 0;
+  padding: 5rem 0;
+  text-align: center;
 }
 
-/* Contenedor del formulario */
 .contact .row .form-container {
-  width: min(90%, 45rem); /* responsivo */
+  width: 50%;
+  padding-right: 6rem;
 }
 
-/* Inputs */
 .contact .row .form-container input,
 .contact .row .form-container textarea {
+  height: 4rem;
   width: 100%;
-  border: 1px solid #ddd;
   background: #fff;
-  border-radius: 1rem;
-  padding: 1.2rem 1.6rem;
+  border-radius: 5rem;
+  padding: 0 1rem;
   margin: 1rem 0;
-  font-size: 1.4rem; /* antes 1.7rem */
-  color: #333;
-  transition: border 0.2s linear;
+  color: #FF8343;
+  font-size: 1.7rem;
+  transition: .2s linear;
+  border: 1px solid #ccc;
 }
 
 .contact .row .form-container input:focus,
-.contact .row .form-container textarea:focus {
-  border: 1px solid #FF8343;
+textarea:focus {
+  border: .1rem solid #fff;
 }
 
-/* Área de texto */
 .contact .row .form-container textarea {
-  height: 12rem; /* antes 20rem */
-  resize: vertical;
+  height: 15rem;
+  border-radius: 1rem;
+  padding: 1rem;
+  resize: none;
 }
 
-/* Botón */
 .contact .row .form-container input[type="submit"] {
-  height: 4rem;
-  width: 14rem;
+  height: 5rem;
+  width: 17rem;
   background: #FF8343;
   color: #fff;
-  border: none;
-  border-radius: 2rem;
   cursor: pointer;
-  font-size: 1.5rem; /* antes 2rem */
-  transition: background 0.3s ease;
+  font-size: 2rem;
+  transition: .2s;
 }
 
 .contact .row .form-container input[type="submit"]:hover {
   background: none;
   color: #FF8343;
-  border: 1px solid #FF8343;
+  border: .1rem solid #FF8343;
 }
 
 footer {
@@ -609,7 +640,6 @@ footer {
   text-align: center;
 
 }
-
 
 * {
   font-family: 'Poppins', sans-serif;
@@ -708,7 +738,7 @@ header .navbar ul li {
 }
 
 header .navbar ul li a {
-  font-size: 1.5rem;
+  font-size: 2rem;
   color: #fff;
   transition: .2s;
 }
@@ -719,17 +749,28 @@ header .navbar ul li a:hover {
 }
 
 header .logo {
-  font-size: 2rem;
+  font-size: -5rem;
   text-transform: uppercase;
   width: 2000px;
   height: 150px;
 }
 
-
+/* Capa semi-transparente encima del fondo */
+.home {
+  min-height: 100vh;
+  background: linear-gradient(rgba(165, 165, 165, 0.267), rgba(165, 165, 165, 0.267)),
+  url('../../assets/img/fondo_landing.jpg') no-repeat center center fixed;
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  z-index: 0;
+  overflow: hidden;
+  position: relative;
+}
 
 .home .content {
   display: flex;
-  align-items: flex-end;
+  align-items: left;
   justify-content: center;
   flex-flow: column;
   padding-top: 20rem;
@@ -737,15 +778,15 @@ header .logo {
 }
 
 .home .content h1 {
-  font-size: 5rem;
+  font-size: 6rem;
   color: #fff;
   padding: 0 1rem;
-  text-align: center;
+  text-align: left;
   padding: 1rem 25rem;
 }
 
 .home .content p {
-  font-size: 1.5rem;
+  font-size: 2rem;
   color: white;
   padding: 1rem 25rem;
 }
@@ -758,67 +799,56 @@ header .logo {
   border-radius: 1rem;
   background: #179BAE;
   color: white;
-  font-size: 1.5rem;
+  font-size: 2rem;
   cursor: pointer;
   transition: .2s;
   box-shadow: 0 .3rem 1rem #179BAE;
   margin: 3rem 0;
   border: none;
 }
-/* ===== DOWNLOAD SECTION (versión corregida) ===== */
+
 .download {
   position: relative;
   width: 100%;
-  min-height: 100vh;
-  background-color: #fff;
+  height: 100vh;
+  background-color: white;
   background-size: cover;
   background-position: center;
   display: flex;
   align-items: flex-end;
   justify-content: flex-start;
   padding: 2rem;
-  overflow: hidden;
 }
 
-/* Caja flotante con texto e imagen */
 .content-box {
   position: absolute;
-  bottom: 2rem;
-  right: 2rem;
+  bottom: 0;
+  right: 0;
   background-color: #179BAE;
-  color: #fff;
-  border-radius: 1rem;
-  padding: 2.5rem;
-  width: min(90%, 45rem); /* antes: max-width 1900px */
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-  text-align: left;
-  z-index: 5;
+  padding: 2rem;
+  border-radius: 8px;
+  color: white;
+  min-height: 550px;
+  max-width: 1900px;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.3);
 }
 
-/* Título */
 .content-box h1 {
-  font-size: clamp(2rem, 3.5vw, 2.8rem); /* antes: 5rem */
-  font-weight: 700;
+  font-size: 5rem;
   margin-bottom: 1rem;
-  line-height: 1.2;
 }
 
-/* Texto descriptivo */
 .content-box p {
-  font-size: clamp(1.3rem, 2vw, 1.6rem); /* antes: 2.3rem */
+  font-size: 2.3rem;
   line-height: 1.5;
   margin-bottom: 1.5rem;
-  font-weight: 400;
 }
 
-/* Imagen dentro del box */
 .content-box img {
-  width: 100%;
-  max-width: 250px; /* antes 400px */
-  height: auto;
-  margin-top: 1rem;
-  border-radius: .5rem;
-}footer {
+  width: 400px;
+  margin-bottom: 1.5rem;
+}
+footer {
   background-color: #2B3D49; /* Fondo oscuro */
   color: #fff; /* Texto blanco */
   padding: 20px 0;

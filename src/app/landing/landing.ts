@@ -1,16 +1,17 @@
 import {Component, HostListener} from '@angular/core';
 import {RouterLink} from '@angular/router';
 
+
 @Component({
   selector: 'app-landing',
   imports: [
     RouterLink
   ],
   templateUrl: './landing.html',
-  styleUrl: './landing.css'
+  styleUrls: ['./landing.css'],
 })
 export class Landing {
-  bgUrl = 'http://localhost:4200/Assets/Img/fondo_landing.jpg';
+  bgUrl = 'assets/img/fondo_landing.jpg';
 
   isMenuOpen = false;
   currentSectionId = '';

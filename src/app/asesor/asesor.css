@@ -147,7 +147,7 @@
   box-shadow: 0 6px 10px rgba(23, 155, 174, 0.5);
 }
 
-/* --- MODAL --- */
+/* --- MODAL GENERAL --- */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -266,14 +266,186 @@
   width: 100%;
 }
 
-/* --- RESPONSIVIDAD --- */
-@media (max-width: 768px) {
-  .asesores-grid {
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
+/* ---------------- CALENDARIO ----------------- */
+.calendar-container {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+/* calendario lado izquierdo */
+.calendar {
+  background: white;
+  border-radius: 16px;
+  padding: 22px;
+  width: 420px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+}
+
+.calendar .month-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.month-title {
+  font-weight: 700;
+  color: var(--color-dark-blue);
+  font-size: 1.15rem;
+}
+
+.month-nav button {
+  background: var(--color-turquesa);
+  border: none;
+  cursor: pointer;
+  font-weight: 700;
+  color: white;
+  border-radius: 6px;
+  padding: 4px 10px;
+}
+
+.weekdays, .days-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+  text-align: center;
+}
+
+.weekdays div {
+  font-weight: 600;
+  color: #7a7a7a;
+  font-size: 1rem;
+}
+
+.day {
+  padding: 14px 0;
+  border-radius: 10px;
+  cursor: pointer;
+  user-select: none;
+  font-size: 1rem;
+}
+
+.day:hover {
+  background: #eef6f8;
+}
+
+.day.inactive {
+  color: #c9c9c9;
+  cursor: default;
+  background: transparent;
+}
+
+.day.selected {
+  background: var(--color-dark-blue);
+  color: white;
+  box-shadow: 0 6px 18px rgba(34, 49, 56, 0.16);
+}
+
+.day.today {
+  border: 2px solid var(--color-turquesa);
+  font-weight: 700;
+}
+
+/* panel derecho (seleccion y citas) */
+.calendar-right {
+  width: 440px;
+  background: #EFEDED;
+  padding: 22px;
+  border-radius: 16px;
+  min-height: 380px;
+}
+
+.calendar-right h4 {
+  color: var(--color-dark-blue);
+  margin-top: 0;
+  font-size: 1.25rem;
+}
+
+.selected-info {
+  margin: 14px 0;
+  color: #444;
+  font-size: 1rem;
+}
+
+/* slots */
+.slot-box {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.slot-pill {
+  background: white;
+  padding: 10px 16px;
+  border-radius: 14px;
+  font-weight: 600;
+  color: var(--color-dark-blue);
+  font-size: 1rem;
+}
+
+/* lista de citas registradas */
+.reserved-list {
+  margin-top: 14px;
+}
+
+.reserved-item {
+  background: #8b5a4a; /* parecido al mockup marron */
+  color: white;
+  padding: 12px 14px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* botones menores */
+.btn-primary {
+  background: var(--color-turquesa);
+  color: white;
+  padding: 10px 16px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.btn-ghost {
+  background: transparent;
+  border: 1px solid #ddd;
+  color: #333;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-weight: 600;
+}
+
+/* modal de tarjetas y reserva */
+.card-modal {
+  width: 940px;
+  padding: 32px;
+  max-width: 95%;
+  background: #f9fafc;
+  border-radius: 18px;
+  box-shadow: 0 8px 22px rgba(0,0,0,0.25);
+}
+
+/* responsive */
+@media (max-width: 900px) {
+  .calendar-container {
+    flex-direction: column;
+    align-items: stretch;
   }
 
-  .asesor-card {
-    padding: 1.2rem;
+  .calendar-right, .calendar {
+    width: 100%;
+  }
+
+  .card-modal {
+    width: 95%;
+    padding: 20px;
   }
 }

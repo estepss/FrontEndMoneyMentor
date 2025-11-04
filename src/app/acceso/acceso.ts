@@ -1,6 +1,3 @@
-import { Component, inject } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -9,7 +6,10 @@ import { MatButtonModule } from '@angular/material/button';
 
 import { PerfilService } from '../services/perfil-service';
 import { Perfil } from '../model/perfil';
-import {NgIf} from '@angular/common'; // <-- tu clase/Modelo
+import {ActivatedRoute, Router} from '@angular/router';
+import { NgIf } from '@angular/common';
+import {Component, inject} from '@angular/core';
+import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 
 @Component({
   selector: 'app-acceso',
@@ -21,6 +21,7 @@ import {NgIf} from '@angular/common'; // <-- tu clase/Modelo
     MatInputModule,
     MatSelectModule,
     MatButtonModule,
+    NgIf
   ],
   templateUrl: './acceso.html',
   styleUrl: './acceso.css'
@@ -30,7 +31,7 @@ export class Acceso {
   private perfilService = inject(PerfilService);
   private router = inject(Router);
 
-  isSignUpMode = true; // muestra primero Registro
+  isSignUpMode = false; // muestra primero Registro
   toggleSignUp() { this.isSignUpMode = true; }
   toggleSignIn() { this.isSignUpMode = false; }
   // Form de LOGIN (placeholder)
@@ -99,5 +100,12 @@ export class Acceso {
       alert('Credenciales inválidas (usa admin@gmail.com / 123456)');
     }
   }
+  private route = inject(ActivatedRoute);
 
+  constructor() {
+    this.route.queryParams.subscribe(params => {
+      const mode = params['mode'];
+      this.isSignUpMode = mode === 'signup'; // signup → Registro / login → Iniciar Sesión
+    });
+  }
 }

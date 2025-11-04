@@ -6,13 +6,78 @@
 /* ====== LAYOUT CON BLOB Y ANIMACIÓN ====== */
 .container{position:relative;width:100%;min-height:100vh;background:#fff;overflow:hidden}
 .forms-container{position:absolute;width:100%;height:100%;top:0;left:0}
-.signin-signup{
-  position:absolute;top:50%;left:75%;transform:translate(-50%,-50%);
-  width:50%;display:grid;grid-template-columns:1fr;z-index:5;transition:1s .7s ease-in-out;
+.signin-signup {
+  position: absolute;
+  top: 50vh;
+  left: 60vw;
+  transform: translate(-50%, -50%);
+  width: 60vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 20;
 }
-form{display:flex;flex-direction:column;align-items:center;gap:12px;padding:0 5rem;transition:all .2s .7s;overflow:hidden}
-form.sign-up-form{opacity:0;z-index:1}
-form.sign-in-form{z-index:2}
+
+/* INICIAR SESIÓN */
+.sign-in-form {
+  position: relative;
+  top: -4vh;
+  left: 32vw;
+  z-index: 20;
+}
+
+/* REGISTRO */
+.sign-up-form {
+  position: relative;
+  top: -1vh;
+  left: -10vw;
+  z-index: 20;
+}
+
+/* === LOGIN VISIBLE === */
+.container:not(.sign-up-mode) .sign-in-form {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
+  transition-delay: 1.4s;
+}
+.container:not(.sign-up-mode) .sign-up-form {
+  opacity: 0;
+  transform: translateX(60px);
+  pointer-events: none;
+}
+
+/* === REGISTRO VISIBLE === */
+.container.sign-up-mode .sign-up-form {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
+  transition-delay: 1.4s;
+}
+.container.sign-up-mode .sign-in-form {
+  opacity: 0;
+  transform: translateX(-60px);
+  pointer-events: none;
+}
+
+/* Oculta LOGIN cuando estamos en REGISTRO */
+.container.sign-up-mode .sign-in-form {
+  opacity: 0;
+  transform: translateX(-60px);
+  pointer-events: none;
+  transition-delay: -1s;
+}
+
+/* Oculta REGISTRO cuando estamos en LOGIN */
+.container:not(.sign-up-mode) .sign-up-form {
+  opacity: 0;
+  transform: translateX(60px);
+  pointer-events: none;
+  transition-delay: -1s;
+}
+
+form{display:flex;flex-direction:column;align-items:center;gap:12px;padding:0 5rem;transition:all .2s .7s;overflow:visible}
+
 .title{font-size:2rem;color:#2b3d49;margin-bottom:10px;font-weight:700}
 
 .panels-container{
@@ -21,16 +86,16 @@ form.sign-in-form{z-index:2}
 .container:before{
   content:"";
   position:absolute;
-  height:2000px;
-  width:2000px;
-  top:-10%;
-  right:48%;         /*anclado a la derecha */
-  left:auto;
+  width:120vw;        /* Se adapta al ancho de la pantalla */
+  height:120vw;       /* Se adapta al alto manteniendo proporción */
+  top:-20vh;          /* Ajuste vertical responsivo */
+  left:-55vw;         /* Ajuste horizontal responsivo */
   transform:translateY(-50%);
   background-image:linear-gradient(-45deg,#243845,#243845);
-  border-radius:50%;
-  transition:1.8s ease-in-out;
+  border-radius:60%;
+  transition: 1.8s ease-in-out; /* ← suaviza animación */
   z-index:6;
+  pointer-events:none;
 }
 
 .image
@@ -54,7 +119,14 @@ form.sign-in-form{z-index:2}
   padding:3rem 17% 2rem 12%
 }
 .right-panel{pointer-events:none;padding:3rem 12% 2rem 17%}
-.panel .content{color:#fff;transition:transform .9s ease-in-out;transition-delay:.6s}
+.panel .content{
+  color:#fff;
+  transition:transform .9s ease-in-out;
+  transition-delay:.6s;
+  text-align:center;
+  margin-top:200px;     /* sube el texto */
+  margin-left:40px;
+}
 .panel h3{font-weight:700;line-height:1;font-size:1.6rem}
 .panel p{font-size:.95rem;padding:.7rem 0}
 .btn.transparent{
@@ -64,12 +136,10 @@ form.sign-in-form{z-index:2}
 .right-panel .image,.right-panel .content{transform:translateX(800px)}
 
 /* Modo registro activo -> el blob se mueve */
-  .container.sign-up-mode::before{
-    left:48%;          /* 👈 cambia el anclaje */
-    right:auto;
-    transform:translateY(-50%); /* sin translateX extra */
-  }
-  .container.sign-up-mode .left-panel .image,
+.container.sign-up-mode::before{
+  left:41%;
+}
+.container.sign-up-mode .left-panel .image,
 .container.sign-up-mode .left-panel .content{transform:translateX(-800px)}
 .container.sign-up-mode .signin-signup{left:25%}
 .container.sign-up-mode form.sign-up-form{opacity:1;z-index:2}
@@ -134,7 +204,8 @@ form.sign-in-form{z-index:2}
 
 /* Cuando debe flotar, súbelo lo justo para que NO se corte */
 :host ::ng-deep .form-container .mat-mdc-form-field-should-float .mdc-floating-label{
-  transform:translateY(-22px) scale(0.75);
+  transform:translateY(-30px) scale(0.78);
+  letter-spacing: .5px;
 }
 
 /* Fondo y pill */
@@ -149,8 +220,9 @@ form.sign-in-form{z-index:2}
 
 /* Ajustar alto y centrado vertical */
 :host ::ng-deep .form-container .mat-mdc-form-field-infix{
-  min-height:46px;display:flex;align-items:center;
-  padding-top:0!important;padding-bottom:0!important
+  min-height:50px !important;
+  padding-top:9px !important;
+  padding-bottom:5px !important;
 }
 
 /* Tipografía */
@@ -173,7 +245,38 @@ form.sign-in-form{z-index:2}
   background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 10 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23999' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
   background-repeat:no-repeat;background-size:12px 8px
 }
+/* Ajuste específico solo para <mat-select> */
+:host ::ng-deep .form-container .mat-mdc-select-trigger {
+  padding-top: 6px !important;
+  padding-bottom: 6px !important;
+  min-height: 44px !important;
+  display: flex;
+  align-items: center;
+}
 
+/* Subir label flotado solo para <mat-select> */
+:host ::ng-deep .form-container .mat-mdc-form-field-type-mat-select .mat-mdc-form-field-should-float .mdc-floating-label {
+  transform: translateY(-32px) scale(0.78) !important;
+}
+
+/* Separar un poco el texto del valor seleccionado */
+:host ::ng-deep .form-container .mat-mdc-select-value {
+  padding-top: 2px;
+  display: flex;
+  align-items: center;
+  font-weight: 600;
+  color: #35424a;
+}
+:host ::ng-deep .form-container .mdc-text-field__input {
+  font-weight: 400 !important;  /* 400 = normal suave */
+  color: #35424a;
+}
+
+/* Texto del select (valor elegido) */
+:host ::ng-deep .form-container .mat-mdc-select-value {
+  font-weight: 400 !important;
+  color: #35424a;
+}
 /* Botones */
 button[mat-raised-button]{
   width:160px;height:36px;border-radius:18px;background:#243845;color:#fff;

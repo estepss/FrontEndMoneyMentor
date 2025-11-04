@@ -12,7 +12,7 @@
         <h2 class="title">Iniciar sesión</h2>
 
         <mat-form-field appearance="fill">
-          <mat-label>Usuario</mat-label>
+          <mat-label>Correo</mat-label>
           <input matInput formControlName="email" />
         </mat-form-field>
 
@@ -69,21 +69,32 @@
   <!-- Paneles laterales con el “blob” -->
   <div class="panels-container">
     <!-- Panel izquierdo (Registro visible, invitar a Iniciar sesión) -->
+    <!-- PANEL IZQUIERDO (se muestra cuando estás en LOGIN) -->
     <div class="panel left-panel">
       <div class="content">
-        <h3>¿Ya tienes cuenta?</h3>
-        <p>Ingresa para seguir gestionando tus finanzas de manera eficiente.</p>
-        <button class="btn transparent" type="button" (click)="toggleSignIn()">Iniciar sesión</button>
+
+        <h3 *ngIf="!isSignUpMode">¿Eres nuevo?</h3>
+        <p *ngIf="!isSignUpMode">Únete a nuestra comunidad y comienza a mejorar tus finanzas hoy.</p>
+        <button class="btn transparent" type="button"
+                (click)="toggleSignUp()" *ngIf="!isSignUpMode">
+          Regístrate
+        </button>
+
       </div>
       <img class="image" src="assets/img/illustration.svg" alt="" />
     </div>
 
-    <!-- Panel derecho (Login visible, invitar a Registrarse) -->
+    <!-- PANEL DERECHO (se muestra cuando estás en REGISTRO) -->
     <div class="panel right-panel">
       <div class="content">
-        <h3>¿Eres nuevo?</h3>
-        <p>Únete a nuestra comunidad y comienza a mejorar tus finanzas hoy.</p>
-        <button class="btn transparent" type="button" (click)="toggleSignUp()">Regístrate</button>
+
+        <h3 *ngIf="isSignUpMode">¿Ya tienes cuenta?</h3>
+        <p *ngIf="isSignUpMode">Ingresa para seguir gestionando tus finanzas de manera eficiente.</p>
+        <button class="btn transparent" type="button"
+                (click)="toggleSignIn()" *ngIf="isSignUpMode">
+          Iniciar sesión
+        </button>
+
       </div>
       <img class="image" src="assets/img/illustration.svg" alt="" />
     </div>

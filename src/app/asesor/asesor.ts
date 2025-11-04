@@ -17,6 +17,14 @@ interface Reserva {
   nota?: string;
 }
 
+interface ReservaListItem {
+  id: number;
+  nombre: string;
+  descripcion: string;
+  imagenUrl: string;
+  fechas: string[];
+}
+
 @Component({
   selector: 'app-asesor',
   standalone: true,
@@ -25,6 +33,7 @@ interface Reserva {
   styleUrls: ['./asesor.css'],
 })
 export class AsesorComponent {
+
   asesores: Asesor[] = [
     {
       id: 1,
@@ -75,6 +84,7 @@ export class AsesorComponent {
     },
   ];
 
+
   resenas: Record<number, any[]> = {
     1: [
       {
@@ -95,12 +105,14 @@ export class AsesorComponent {
     6: [],
   };
 
+
   mostrarModal = false;
   asesorSeleccionado: Asesor | null = null;
   nuevaResena = { puntuacion: 0, comentario: '' };
 
   mostrarReservaModal = false;
   asesorReserva: Asesor | null = null;
+
 
   reservas: Record<number, Reserva[]> = {
     1: [],
@@ -110,6 +122,7 @@ export class AsesorComponent {
     5: [],
     6: [],
   };
+
 
   currentYear = new Date().getFullYear();
   currentMonth = new Date().getMonth();
@@ -136,6 +149,40 @@ export class AsesorComponent {
 
   mostrarCardModal = false;
   selectedCard: string | null = null;
+
+
+  mostrarListaReservas = false;
+
+
+  reservasList: ReservaListItem[] = [
+    {
+      id: 1,
+      nombre: 'Eleanor Villanueva',
+      descripcion:
+        'Soy asesora financiera y mi pasión es ayudar a los jóvenes a organizar sus finanzas de manera clara y práctica. Creo que la educación financiera no debería ser complicada ni intimidante, por eso me enfoco en explicar con ejemplos sencillos.',
+      imagenUrl: 'https://placehold.co/120x120/faf3d7/0f172a?text=E',
+      fechas: [
+        '10:00 am - 12:00 pm del 26 de junio de 2024',
+        '5:00 pm - 7:00 pm del 26 de junio de 2024',
+      ],
+    },
+    {
+      id: 5,
+      nombre: 'Roberto Saenz',
+      descripcion:
+        'Soy asesor financiero especializado en planificación para emprendedores y profesionales independientes. Creo firmemente que una buena educación financiera transforma vidas, por eso me enfoco en acompañar con estrategias claras, realistas y aplicables.',
+      imagenUrl: 'https://placehold.co/120x120/f6f9fb/0f172a?text=R',
+      fechas: [
+        '9:00 am - 10:30 am del 3 de julio de 2024',
+        '4:00 pm - 6:00 pm del 5 de julio de 2024',
+      ],
+    },
+  ];
+
+  // ---------------- Reprogramar modal (pequeño) ----------------
+  mostrarReprogramar = false;
+  reprogramarTarget: ReservaListItem | null = null;
+  horarioSeleccionado = '10-12'; // la única opción visual
 
   constructor() {
     this.buildCalendar(this.currentYear, this.currentMonth);
@@ -187,6 +234,7 @@ export class AsesorComponent {
     }
   }
 
+  // ------------------ CALENDARIO ------------------
   buildCalendar(year: number, month: number) {
     this.calendarDays = [];
     const firstDay = new Date(year, month, 1);
@@ -262,6 +310,7 @@ export class AsesorComponent {
     return `${this.monthNames[this.currentMonth]} ${this.currentYear}`;
   }
 
+  // ------------------ RESERVA / CALENDAR ------------------
   abrirReserva(asesor: Asesor | null) {
     if (!asesor) return;
     this.asesorReserva = asesor;
@@ -288,6 +337,7 @@ export class AsesorComponent {
     const m = String(day.date.getMonth() + 1).padStart(2, '0');
     const d = String(day.date.getDate()).padStart(2, '0');
     this.selectedDateStr = `${d} - ${this.monthNames[day.date.getMonth()]} - ${y}`;
+    // sólo el slot visible que pediste
     this.availableSlots = [{ label: '10 am - 12pm', start: '10:00', end: '12:00' }];
   }
 
@@ -371,4 +421,60 @@ export class AsesorComponent {
   }
 
 
+  abrirListaReservas() {
+    this.mostrarListaReservas = true;
+  }
+
+  cerrarListaReservas() {
+    this.mostrarListaReservas = false;
+  }
+
+  abrirReprogramar(item: ReservaListItem) {
+
+    this.reprogramarTarget = item;
+    this.horarioSeleccionado = '10-12';
+    this.mostrarReprogramar = true;
+  }
+
+  cerrarReprogramar() {
+    this.reprogramarTarget = null;
+    this.mostrarReprogramar = false;
+    this.horarioSeleccionado = '10-12';
+  }
+
+  registrarReprogramacion() {
+
+    if (!this.reprogramarTarget) return;
+
+
+    if (this.reprogramarTarget.fechas && this.reprogramarTarget.fechas.length > 0) {
+
+      const original = this.reprogramarTarget.fechas[0];
+
+      let nuevaFechaTexto = '10:00 am - 12:00 pm (reprogramado)';
+      try {
+
+        const idx = original.indexOf('del');
+        if (idx !== -1) {
+          const suf = original.substring(idx);
+          nuevaFechaTexto = '10:00 am - 12:00 pm ' + suf;
+        } else {
+
+          nuevaFechaTexto = '10:00 am - 12:00 pm (reprogramado)';
+        }
+      } catch (e) {
+        nuevaFechaTexto = '10:00 am - 12:00 pm (reprogramado)';
+      }
+
+
+      this.reprogramarTarget.fechas[0] = nuevaFechaTexto;
+    }
+
+    // cerramos modal
+    this.cerrarReprogramar();
+  }
+
+  eliminarReservaVisual(item: ReservaListItem) {
+    this.reservasList = this.reservasList.filter(r => r.id !== item.id);
+  }
 }

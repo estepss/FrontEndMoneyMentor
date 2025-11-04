@@ -1,6 +1,6 @@
 <header>
   <a href="#" class="logo">
-    <img src="Assets/Img/logocortado.png" alt="Nombre del Logo">
+    <img src="../../assets/img/logocortado.png" alt="Nombre del Logo">
   </a>
 
   <nav class="navbar">
@@ -12,9 +12,23 @@
       <li><a href="#questions">Preguntas</a></li>
       <li><a href="#contact">Contacto</a></li>
       <li><a href="#download">Descargar</a></li>
-      <li><a [routerLink]="'/Acceso'" (click)="closeMenu()">Inicio sesión</a></li>
-      <li><a>|</a></li>
-      <li><a [routerLink]="'/Acceso'" (click)="closeMenu()">Registro</a></li>
+      <!-- Ir a Iniciar Sesión -->
+      <li>
+        <a [routerLink]="'/Acceso'"
+           [queryParams]="{mode: 'login'}"
+           (click)="closeMenu()">
+          Inicio sesión
+        </a>
+      </li>
+
+      <!-- Ir a Registro -->
+      <li>
+        <a [routerLink]="'/Acceso'"
+           [queryParams]="{mode: 'signup'}"
+           (click)="closeMenu()">
+          Registro
+        </a>
+      </li>
 
     </ul>
   </nav>
@@ -29,7 +43,7 @@
 
   <div class="content">
     <h1>Bienvenido(a) a Moneymentor</h1>
-    <p>¡Tu futuro financiero comienza hoy!<br>Descubre cómo tomar el control de tus finanzas, ahorrar con propósito y alcanzar tus<br>
+    <p>¡Tu futuro financiero comienza hoy!<br>Descubre cómo tomar el control de tus finanzas, ahorrar con propósito y alcanzar tus
       metas. ¡Es hora de hacer crecer tu dinero de forma inteligente y divertida!
     </p>
     <button onclick="location.href='#nosotros'" id="ali"> Empezar</button>
@@ -48,7 +62,7 @@
 
     <div class="box-container">
       <div class="box">
-        <img src="Assets/Img/ayudamos.png" alt="">
+        <img src="../../assets/img/ayudamos.png" alt="">
         <h3>Cómo ayudamos </h3>
         <p>
           Simplificamos la gestión financiera de los jóvenes ofreciendo herramientas
@@ -58,7 +72,7 @@
       </div>
 
       <div class="box">
-        <img src="Assets/Img/hacemos.png" alt="">
+        <img src="../../assets/img/hacemos.png" alt="">
         <h3>Qué hacemos</h3>
         <p>
           Creamos una plataforma innovadora que combina tecnología y asesoría
@@ -69,7 +83,7 @@
       </div>
 
       <div class="box">
-        <img src="Assets/Img/final.png" alt="">
+        <img src="../../assets/img/final.png" alt="">
         <h3>Misión y Visión</h3>
         <p>
           Nuestra misión es empoderar a los jóvenes para tomar el control de su futuro
@@ -93,7 +107,7 @@
 
     <div class="box-container">
       <div class="box">
-        <img src="Assets/Img/planeacion.png" alt="">
+        <img src="../../assets/img/planeacion.png" alt="">
         <h3>Presupuestos personalizados</h3>
         <p>
           Diseña presupuestos a tu medida para gestionar tus ingresos y gastos
@@ -103,7 +117,7 @@
       </div>
 
       <div class="box">
-        <img src="Assets/Img/seguimiento.png" alt="">
+        <img src="../../assets/img/seguimiento.png" alt="">
         <h3>Seguimiento de gastos </h3>
         <p>
           Registra tus ingresos y gastos con análisis detallados y visualizaciones
@@ -113,7 +127,7 @@
       </div>
 
       <div class="box">
-        <img src="Assets/Img/ahorro.png" alt="">
+        <img src="../../assets/img/ahorro.png" alt="">
         <h3>Cosejos de ahorro</h3>
         <p>
           Recibe y da recomendaciones prácticas y asesoría experta para ahorrar,
@@ -139,12 +153,12 @@
 
     <!--bir-->
     <div class="box">
-      <img src="Assets/Img/TestimonioPersona2%20(1).jpg" alt="">
+      <img src="../../assets/img/TestimonioPersona2%20(1).jpg" alt="">
       <h3>Alejandro R.</h3>
       <p> “MoneyMentor me ha permitido organizar
         mis finanzas de una manera que nunca
-        pensé posible. Ahora puedo ahorrar para <br>
-        mis metas sin sentir que me estoy <br>
+        pensé posible. Ahora puedo ahorrar para
+        mis metas sin sentir que me estoy
         privando de lo esencial”
       </p>
 
@@ -152,12 +166,12 @@
 
     <!--daf-->
     <div class="box">
-      <img src="Assets/Img/TestimonioPersona2%20(1).jpg" alt="">
+      <img src="../../assets/img/TestimonioPersona2%20(1).jpg" alt="">
       <h3>Katy P.</h3>
       <p> "Con MoneyMentor, finalmente entiendo
         cómo gestionar mi presupuesto mensual.
         Antes siempre llegaba a fin de mes con
-        dificultades, pero ahora tengo un plan claro <br>
+        dificultades, pero ahora tengo un plan claro
         y me siento en control."
       </p>
 
@@ -168,12 +182,12 @@
     <!--otra-->
 
     <div class="box">
-      <img src="Assets/Img/TestimonioPersona3%20(1).jpg" alt="">
+      <img src="../../assets/img/TestimonioPersona3%20(1).jpg" alt="">
       <h3>Pedro Pablo K.</h3>
-      <p> "Gracias a MoneyMentor, logré salir de <br>
-        mis deudas más rápido de lo que <br>
-        esperaba. Sus alertas y consejos <br>
-        personalizados han sido clave para <br>
+      <p> "Gracias a MoneyMentor, logré salir de
+        mis deudas más rápido de lo que
+        esperaba. Sus alertas y consejos
+        personalizados han sido clave para
         tomar mejores decisiones financieras."
       </p>
 
@@ -207,7 +221,7 @@
       </p>
     </div>
 
-    <div class="faq-boxx">
+    <div class="faq-box">
       <h3>¿Cómo funciona Moneymentor?</h3>
       <p>
         Si eres <b>cliente</b>, podrás crear tu perfil, organizar tu presupuesto y recibir recomendaciones de ahorro.
@@ -217,19 +231,16 @@
     </div>
 
   </div>
-  <div class="faq-more">
-    <button onclick="window.location.href='#'">Ver más</button>
-  </div>
 </section>
 
 <section class="download" id="download">
-  <img src="Assets/Img/descargarApp1.jpeg" alt="Imagen superior derecha" class="top-right-image">
+  <img src="../../assets/img/descargarApp1.jpeg" alt="Imagen superior derecha" class="top-right-image">
   <div class="content-box">
     <h1>Descarga MoneyMentor y mejora tus <br>finanzas</h1>
-    <p>Accede a herramientas avanzadas de planificación financiera y alertas en tiempo real directamente desde tu <br>
-      celular. Disponible para iOS y Android, MoneyMentor te guía en cada paso para que puedas administrar tus <br>
+    <p>Accede a herramientas avanzadas de planificación financiera y alertas en tiempo real directamente desde tu
+      celular. Disponible para iOS y Android, MoneyMentor te guía en cada paso para que puedas administrar tus
       finanzas con confianza. ¡Descargala gratis y comienza a tomar control de tu futuro financiero hoy mismo!</p>
-    <img src="Assets/Img/decargarApp2.png" alt="Google Play">
+    <img src="../../assets/img/decargarApp2.png" alt="Google Play">
   </div>
 </section>
 
@@ -260,7 +271,7 @@
     <div class="footer-content">
       <!-- Logo y descripción -->
       <div class="footer-logo-description">
-        <img src="Assets/Img/logomm.png" alt="MoneyMentor Logo" class="footer-logo">
+        <img src="../../assets/img/logomm.png" alt="MoneyMentor Logo" class="footer-logo">
         <p>
           Con MoneyMentor, gestiona tus finanzas con confianza y seguridad en cada decisión que tomas.
           Tu bienestar financiero es nuestra prioridad, 24/7.
@@ -296,4 +307,3 @@
   </div>
 </footer>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-

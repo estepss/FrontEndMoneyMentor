@@ -1,60 +1,86 @@
-git merge master<main class="page">
-  <section class="Gestion">
-    <h1 class="title">Gestión Financiera</h1>
-    <p class="subtitle">Introduzca nuevo ingreso o egreso</p>
+<mat-card class="shell">
+  <h1 class="title">Gestión Financiera</h1>
+  <p class="subtitle">Introduzca nuevo ingreso o egreso</p>
 
-    <!-- Fila de 3 campos -->
-    <form class="grid3">
-      <div class="field">
-        <label for="ingreso">Titulo</label>
-        <input type="text" id="ingreso" class="input" />
-      </div>
+  <form [formGroup]="gestionForm" (ngSubmit)="onSubmit()">
+    <div class="grid">
+      <mat-form-field appearance="outline">
+        <mat-label>Título</mat-label>
+        <input matInput formControlName="titulo" placeholder="Descripción del movimiento">
+      </mat-form-field>
 
-      <div class="field">
-        <label for="tipo">Tipo</label>
-        <div class="select-wrap">
-          <select id="tipo" class="input select">
-            <option>Ingreso</option>
-            <option selected>Egreso</option>
-          </select>
-          <span class="chev">▾</span>
-        </div>
-      </div>
+      <mat-form-field appearance="outline">
+        <mat-label>Tipo</mat-label>
+        <mat-select formControlName="tipo">
+          <mat-option value="Ingreso">Ingreso</mat-option>
+          <mat-option value="Egreso">Egreso</mat-option>
+        </mat-select>
+      </mat-form-field>
 
-      <div class="field">
-        <label for="monto">Monto</label>
-        <input type="number" id="monto" class="input" />
-      </div>
+      <mat-form-field appearance="outline">
+        <mat-label>Monto</mat-label>
+        <input matInput type="number" step="0.01" formControlName="monto" placeholder="0.00">
+        <span matTextPrefix>S/ </span>
+      </mat-form-field>
 
-      <div class="actions">
-        <button type="button" class="btn btn-primary">Registrar</button>
-        <button
-          type="button"
-          class="btn btn-secondary"
-          [routerLink]="'/Análisis'">
-          Análisis
-        </button>
+      <mat-form-field appearance="fill">
+        <mat-label>Fecha</mat-label>
+        <input matInput [matDatepicker]="picker" formControlName="fecha" placeholder=“Fecha“/>
+        <mat-hint>DD/MM/YYYY</mat-hint>
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+      </mat-form-field>
 
-      </div>
-    </form>
-
-    <!-- Listado -->
-    <h3 class="list-title">Listado de gestión</h3>
-    <div class="table-wrap">
-      <div class="row head">
-        <div class="cell">ID</div>
-        <div class="cell">Titulo</div>
-        <div class="cell">Tipo</div>
-        <div class="cell">Monto</div>
-      </div>
-      <!-- filas de ejemplo -->
-      <div class="row">
-        <div class="cell">1</div>
-        <div class="cell">Compra libros</div>
-        <div class="cell">Egreso</div>
-        <div class="cell">120.00</div>
-      </div>
     </div>
-  </section>
-  <router-outlet/>
-</main>
+
+    <div class="actions">
+      <button
+        mat-raised-button
+        color="primary"
+        class="btn-registrar"
+        type="submit"
+        [disabled]="gestionForm.invalid">
+        Registrar
+      </button>
+
+      <button
+        mat-raised-button
+        color="accent"
+        type="button" [routerLink]="['/Análisis']">
+        Análisis
+      </button>
+    </div>
+  </form>
+</mat-card>
+<div class="mat-elevation-z8">
+  <table mat-table [dataSource]="dataSource" matSort>
+    <!-- Position Column -->
+    <ng-container matColumnDef="idGestion">
+      <th mat-header-cell *matHeaderCellDef> No. </th>
+      <td mat-cell *matCellDef="let element"> {{element.idGestion}} </td>
+    </ng-container>
+    <!-- Name Column -->
+    <ng-container matColumnDef="titulo">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header> Titulo </th>
+      <td mat-cell *matCellDef="let element"> {{element.titulo}} </td>
+    </ng-container>
+    <!-- Symbol Column -->
+    <ng-container matColumnDef="tipo">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header> Tipo </th>
+      <td mat-cell *matCellDef="let element"> {{element.tipo}} </td>
+    </ng-container>
+    <!-- Symbol Column -->
+    <ng-container matColumnDef="monto">
+      <th mat-header-cell *matHeaderCellDef> Monto </th>
+      <td mat-cell *matCellDef="let element"> {{element.monto}} </td>
+    </ng-container>
+    <ng-container matColumnDef="fecha">
+      <th mat-header-cell *matHeaderCellDef> Fecha  </th>
+      <td mat-cell *matCellDef="let element"> {{element.fecha|date:'dd/MM/yyyy'}} </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+  </table>
+
+</div>

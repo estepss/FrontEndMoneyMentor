@@ -3,6 +3,7 @@ import {environment} from '../../environments/environment';
 import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {Perfil} from '../model/perfil';
+import {Credenciales} from '../model/credenciales';
 
 @Injectable({
   providedIn: 'root'
@@ -23,5 +24,12 @@ export class PerfilService {
   list() : Observable<any> {
     console.log(this.url + "/Login");
     return this.httpClient.get<Perfil[]>(this.url + "/Login"); //aqui toy llamando al endpoint
+  }
+
+  //auth
+  auth(credenciales:Credenciales)
+  {
+    console.log(this.url + "/authenticate");
+    return this.httpClient.post(this.url + "authenticate", credenciales);
   }
 }

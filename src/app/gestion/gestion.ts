@@ -26,6 +26,8 @@ import {DatePipe} from '@angular/common';
 import {GestionService} from '../services/gestion-service';
 import {GestionFinanciera} from '../model/gestion-financiera';
 import {MatSelect, MatSelectModule} from '@angular/material/select';
+import {Cliente} from '../model/cliente';
+import {interval, switchMap} from 'rxjs';
 
 @Component({
   selector: 'app-gestion',
@@ -70,7 +72,8 @@ export class Gestion {
   private fb = inject(FormBuilder);
   private gestionService = inject(GestionService);
   private router = inject(Router);
-
+  Cliente : Cliente = new Cliente();
+  //id
   constructor() {
     this.gestionForm = this.fb.group({
       idGestion: [''],
@@ -78,26 +81,30 @@ export class Gestion {
       tipo: ['', Validators.required],                     // 'Ingreso' | 'Egreso'
       monto: [null, [Validators.required, Validators.min(0.01)]],
       fecha: ['', Validators.required],                     // Date
-      idCliente:[1]
     });
   }
 
   onSubmit() {
-    if (this.gestionForm.invalid) {
-
-      this.gestionForm.markAllAsTouched();
-      return;
+    if (!this.gestionForm.invalid) {
+      const idCliente = Number(localStorage.getItem('idCliente'));//obtengo el numero
+      const gestionFinanciera: GestionFinanciera = new GestionFinanciera();
+      gestionFinanciera.idGestion = this.gestionForm.controls['idGestion'].value;
+      gestionFinanciera.titulo = this.gestionForm.controls['titulo'].value;
+      gestionFinanciera.tipo = this.gestionForm.controls['tipo'].value;
+      gestionFinanciera.monto = this.gestionForm.controls['monto'].value;
+      gestionFinanciera.fecha = this.gestionForm.controls['fecha'].value;
+      gestionFinanciera.cliente = this.Cliente;
+      //
+      gestionFinanciera.cliente.idCliente = idCliente; //id
+      console.log("Gestion enviado", gestionFinanciera);
+      this.gestionService.insert(gestionFinanciera).subscribe({
+        next: (data: any) => {
+          console.log("Se registró", data);
+          alert("Gestion registrada");
+          this.router.navigate(['/Gestión']);
+        }
+      })
     }
-
-    const mov: GestionFinanciera = this.gestionForm.value;
-    this.gestionService.insert(mov).subscribe({
-      next: () => {
-        // navega al listado o limpia el form, como prefieras
-        this.router.navigate(['Gestión']); // ajusta ruta si tu listado es otra
-        // this.gestionForm.reset(); // alternativa si te quedas en la misma vista
-      },
-      error: (e) => console.error('Error al registrar gestión:', e)
-    });
   }
 
   //lista
@@ -109,14 +116,18 @@ export class Gestion {
 
   //cuando carga
   ngOnInit() {
-    console.log('Component ngOnInit llamando al API Get');
-    this.gestionService.list().subscribe({
-      next: (data) => {
-        this.dataSource.data = data;
-        console.log("API List trae:", data);
-        this.dataSource._updateChangeSubscription();
-      },
-    })
+    console.log('ngOnInit: actualizando tabla automáticamente');
+
+    interval(5000) // cada 5 segundos
+      .pipe(switchMap(() => this.gestionService.list()))
+      .subscribe({
+        next: (data) => {
+          this.dataSource.data = data;
+          this.dataSource._updateChangeSubscription();
+          console.log('Tabla actualizada automáticamente', data);
+        },
+        error: (err) => console.error('Error al refrescar', err)
+      });
   }
 
 

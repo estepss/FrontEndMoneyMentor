@@ -1,162 +1,135 @@
-:root{
-  --header-h:70px;
-  --surface:#fff;
-  --ink:#24343c;
-  --muted:#6b7b86;
-  --bg:#f1f4f6;            /* gris suave del fondo */
-  --accent:#ff7f45;        /* naranja botón Registrar */
-  --accent-2:#179bae;      /* celeste botón Análisis */
-  --shadow:0 10px 24px rgba(0,0,0,.08);
-  --radius:14px;
+/* ===== Fondo y layout general ===== */
+:host {
+  display: block;
+  background: #f2f5f7; /* fondo claro del mock */
+  min-height: 100vh;
+  padding: 24px 12px;
 }
 
-/* Centra el contenido del main respecto al sidebar */
-.page{
-  display:flex;
-  justify-content:center;
-  padding: 2rem;
-  margin-top: var(--header-h);
-  background:var(--bg);
-}
-
-/* Card central */
-.Gestion{
-  width:min(100%, 980px);
-  background:var(--surface);
-  border-radius:20px;
-  padding: 2.5rem 2rem 2rem;
-  box-shadow: var(--shadow);
-  text-align:center;
-}
-.Gestion .form-control,
-.Gestion select,
-.Gestion .input {
-  height: 48px;
-  padding: 0 16px;
-  border-radius: 14px;
-  border: 1px solid #d6dde3;        /* borde gris suave */
-  background-color: #f3f3f3; /* Fondo gris claro */
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1); /* Sombra interna */              /* fondo claro */
-  color: #24343c;
-  outline: none;
-  transition: box-shadow .2s ease, border-color .2s ease;
-  -webkit-appearance: none;
-  appearance: none;
-}
-/* Focus: un poco más de realce, sin “azul chillón” */
-.Gestion .form-control:focus,
-.Gestion select:focus {
-  border-color: #c7d7e2;
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,1),
-    0 0 0 3px rgba(23,155,174,.12),     /* halo suave */
-    0 10px 22px rgba(22,34,44,.12);
-  background: #f7f9fb;
-}
-/* Placeholders más tenues */
-.Gestion .form-control::placeholder { color: #98a7b3; }
-
-/* Select con chevron (si usas el nativo) */
-.Gestion select {
-  padding-right: 34px;
-  background-image: linear-gradient(45deg, transparent 50%, #6c7a83 50%),
-  linear-gradient(135deg, #6c7a83 50%, transparent 50%);
-  background-position: calc(100% - 18px) 20px, calc(100% - 12px) 20px;
-  background-size: 6px 6px;
-  background-repeat: no-repeat;
-}
-/* Título + subtítulo */
-.title{
-  margin:0 0 .25rem;
-  font-size: clamp(1.6rem, 1.1rem + 1.5vw, 2.2rem);
-  color: var(--ink);
-  font-weight: 800;
-}
-.subtitle{
-  margin:0 0 1.8rem;
-  color: var(--muted);
-}
-
-/* Grid de 3 columnas para los campos */
-.grid3{
-  display:grid;
-  grid-template-columns: repeat(3, minmax(220px, 1fr));
-  gap: 1.25rem 1.5rem;
-  justify-items:center;
-  margin-bottom: 1.5rem;
-}
-.field{ width:100%; text-align:left; }
-.field label{ display:block; margin:0 0 .5rem; color:var(--ink); font-weight:600; }
-
-/* Inputs redondeados grandes como en el mock */
-.input{
-  width:100%;
-  height: 48px;
-  padding: 0 16px;
-  border: 0;
-  border-radius: 14px;
-  background: #eef2f5;
-  box-shadow: inset 0 2px 0 rgba(255,255,255,.7), 0 2px 0 #d6dde3, 0 6px 14px rgba(22,34,44,.08);
-  font: 500 15px 'Poppins', sans-serif;
-  color: var(--ink);
-}
-.input:focus{ outline: 2px solid #E8E8E8; }
-
-/* Select con chevron */
-.select-wrap{ position:relative; }
-.select{ appearance:none; padding-right: 34px; }
-.chev{
-  position:absolute; right:12px; top:50%; transform:translateY(-50%);
-  font-size: 18px; color:#6c7a83; pointer-events:none;
-}
-
-/* Acciones centradas bajo los 3 campos */
-.actions{
-  grid-column: 1 / -1;            /* ocupa las 3 columnas */
-  display:flex; gap: .8rem; justify-content:center; margin-top:.25rem;
-}
-.btn{
-  height:44px; min-width: 160px; padding: 0 18px;
-  border:0; border-radius: 12px; font-weight:700; cursor:pointer;
-  color:#fff; box-shadow: 0 6px 14px rgba(0,0,0,.12);
-}
-.btn-primary{ background: #FF8343; }
-.btn-primary:hover{ filter: brightness(.95); }
-.btn-secondary{ background: #179BAE; }
-.btn-secondary:hover{ filter: brightness(.85); }
-
-/* Listado */
-.list-title{
-  text-align:left; margin: 1.8rem 0 .75rem; color: var(--ink);
-}
-.table-wrap{
-  background:#e9eef1;
+/* ===== Card ===== */
+.shell {
+  max-width: 980px;
+  margin: 16px auto 32px;
+  padding: 28px 32px;
   border-radius: 16px;
-  padding: 14px;
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1); /* Sombra interna */              /* fondo claro */
-  color: #24343c;
-}
-.row{
-  display:grid;
-  grid-template-columns: 120px 1fr 160px 160px;
-  gap: 10px;
-  margin-bottom:10px;
-}
-.row.head .cell{
-  font-weight:700; color: var(--ink);
-}
-.cell{
-  background:#f5f8fa;
-  border-radius: 12px;
-  padding: 12px 14px;
-  text-align:left;
-  color: var(--ink);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.7), 0 1px 0 #d6dde3;
+  box-shadow: 0 6px 18px rgba(24, 39, 75, 0.08);
+  display: block;
 }
 
-/* Responsive */
-@media (max-width: 900px){
-  .grid3{ grid-template-columns: 1fr; }
-  .actions{ grid-column: 1; }
-  .row{ grid-template-columns: 1fr 1fr; }
+.title {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 800;
+  color: #21323b;
+  text-align: center;
+}
+
+.subtitle {
+  margin: 6px 0 18px;
+  font-size: 13px;
+  color: #6a7a84;
+  text-align: center;
+}
+
+/* ===== Grid de campos ===== */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+/* Angular Material (MDC) — radios y densidad tipo mock */
+.mat-mdc-form-field {
+  width: 100%;
+  /* redondeo de outline */
+  --mdc-outlined-text-field-container-shape: 12px;
+  /* compactar un poco */
+  --mdc-outlined-text-field-container-height: 56px;
+  --mdc-typography-body2-font-size: 14px;
+}
+
+.mat-mdc-form-field .mdc-notched-outline__leading,
+.mat-mdc-form-field .mdc-notched-outline__trailing {
+  border-color: #d6dee3;
+}
+.mat-mdc-form-field.mat-focused .mdc-notched-outline__leading,
+.mat-mdc-form-field.mat-focused .mdc-notched-outline__trailing {
+  border-color: #2e8798; /* acorde al teal del mock */
+}
+
+/* Prefijo S/ separado como en el mock */
+.mat-mdc-form-field .mat-mdc-form-field-text-prefix {
+  margin-right: 4px;
+  color: #7c8a92;
+}
+
+/* ===== Botones: naranja y teal ===== */
+.actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-top: 6px;
+}
+
+/* Registrar (naranja pastilla) */
+button.mat-mdc-raised-button.btn-registrar {
+  background: #ff874a;
+  color: #fff;
+  border-radius: 22px;
+  padding: 0 22px;
+  font-weight: 700;
+  letter-spacing: .2px;
+  box-shadow: 0 4px 10px rgba(255, 135, 74, .3);
+}
+button.mat-mdc-raised-button.btn-registrar:hover {
+  filter: brightness(0.98);
+}
+
+/* Análisis (teal pastilla) */
+.actions button.mat-mdc-raised-button[color="accent"] {
+  background: #2ea8b4;
+  color: #fff;
+  border-radius: 22px;
+  padding: 0 22px;
+  font-weight: 700;
+  box-shadow: 0 4px 10px rgba(46, 168, 180, .25);
+}
+
+/* ===== Tabla ===== */
+.mat-elevation-z8 {
+  margin: 18px auto 0;
+  max-width: 980px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 6px 18px rgba(24, 39, 75, 0.06);
+}
+
+table[mat-table] { width: 100%; }
+
+.mat-mdc-table thead tr {
+  background: #eef3f6; /* cabecera gris suave */
+}
+th[mat-header-cell] {
+  color: #3f4f58;
+  font-weight: 700;
+  font-size: 13px;
+}
+td[mat-cell], th[mat-header-cell] {
+  padding: 12px 16px;
+  border-bottom-color: #edf1f4;
+}
+.mat-mdc-row:hover {
+  background: #f7fbfc;
+}
+
+/* ===== Responsivo ===== */
+@media (max-width: 1024px) {
+  .grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 600px) {
+  .shell { margin: 12px; padding: 20px; }
+  .grid { grid-template-columns: 1fr; }
+  .actions { flex-direction: column; }
+  .actions button { width: 100%; }
 }

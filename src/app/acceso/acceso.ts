@@ -11,6 +11,9 @@ import { PerfilService } from '../services/perfil-service';
 import { Perfil } from '../model/perfil';
 import { ActivatedRoute } from '@angular/router';
 import { NgIf } from '@angular/common';
+import {ClienteService} from '../services/cliente-service';
+import {of, switchMap, tap} from 'rxjs';
+import {AsesorService} from '../services/asesor-service';
 
 @Component({
   selector: 'app-acceso',
@@ -31,6 +34,8 @@ export class Acceso {
   private fb = inject(FormBuilder);
   private perfilService = inject(PerfilService);
   private router = inject(Router);
+  private clienteService = inject(ClienteService);
+  private asesorService = inject(AsesorService);
 
   isSignUpMode = false; // muestra primero Registro
   toggleSignUp() { this.isSignUpMode = true; }
@@ -83,24 +88,55 @@ export class Acceso {
     });
   }
 
-  // === LOGIN FICTICIO (sin backend) ===
+  // === LOGIN ===
   onLogin() {
-    if (this.loginForm.invalid) {
-      alert('Por favor completa los campos correctamente');
-      return;
-    }
+    if (this.loginForm.invalid) return;
 
     const { email, password } = this.loginForm.value;
 
-    // Ejemplo simple: validamos con valores fijos
-    if (email === 'admin@gmail.com' && password === '123456') {
-      alert('Inicio de sesión exitoso');
-      localStorage.setItem('usuario', email!);
-      this.router.navigate(['/Inicio']); // redirige a la página deseada
-    } else {
-      alert('Credenciales inválidas (usa admin@gmail.com / 123456)');
-    }
+    this.perfilService.auth({ username: email, password })
+      .pipe(
+        tap((res: any) => {
+          localStorage.setItem('token', res.jwt);
+        }),
+        switchMap((res: any) => {
+          // normaliza roles
+          const roles: string[] = (res.roles ?? [])
+            .map(String)
+            .map((r: string) => r.toUpperCase().trim());
+          const role = roles[0] ?? '';
+          console.log('roles', roles, 'role elegido =>', role);
+
+          localStorage.setItem('rol', role);
+
+          if (role === 'ROLE_CLIENTE') {
+            // CLIENTE
+            return this.clienteService.obtenerclienteporEmail(email).pipe(
+              tap((cli: any) => {
+                localStorage.setItem('idCliente', String(cli.idCliente));
+              })
+            );
+          } else if (role === 'ROLE_ASESOR') {
+            // ASESOR
+            return this.asesorService.obtenerasesoreporemail(email).pipe(
+              tap((ase: any) => {
+                localStorage.setItem('idAsesor', String(ase.idAsesor));
+              })
+            );
+          }
+          // rol desconocido → no hagas segunda llamada
+          return of(null);
+        })
+      )
+      .subscribe({
+        next: () => this.router.navigate(['/Inicio']),
+        error: (e) => {
+          console.error('Login error:', e);
+          alert(e?.error?.message ?? 'Error en login / carga de perfil');
+        }
+      });
   }
+
   private route = inject(ActivatedRoute);
 
   constructor() {

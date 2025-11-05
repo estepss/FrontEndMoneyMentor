@@ -27,9 +27,10 @@ export class PerfilService {
   }
 
   //auth
-  auth(credenciales:Credenciales)
-  {
-    console.log(this.url + "/authenticate");
-    return this.httpClient.post(this.url + "authenticate", credenciales);
+  auth(credenciales: { username: string; password: string }) {
+    return this.httpClient.post<{ jwt: string; roles: string[] }>(
+      `${this.url}/authenticate`,
+      credenciales
+    );
   }
 }

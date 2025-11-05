@@ -15,17 +15,21 @@ export class MainLayout {
   public rol: string = '';
 
   ngOnInit(): void {
-    // Obtenemos el usuario actual guardado en localStorage
-    const currentUserKey = localStorage.getItem('currentUser');
+    this.cargarUsuario();
 
-    if (currentUserKey) {
-      const stored = localStorage.getItem(currentUserKey);
-      if (stored) {
-        const data = JSON.parse(stored);
-        // Asignamos los valores
-        this.nombre = data.name || '(Sin nombre)';
-        this.rol = data.rol || '(Sin rol)';
-      }
+    // 🔹 escucha cambios en localStorage (desde otros componentes)
+    window.addEventListener('storage', () => this.cargarUsuario());
+  }
+
+  cargarUsuario() {
+    const stored = localStorage.getItem('currentUser');
+    if (stored) {
+      const data = JSON.parse(stored);
+      this.nombre = data.name || '(Sin nombre)';
+      this.rol = data.rol || '(Sin rol)';
+    } else {
+      this.nombre = '(Invitado)';
+      this.rol = '( rol)';
     }
   }
 }

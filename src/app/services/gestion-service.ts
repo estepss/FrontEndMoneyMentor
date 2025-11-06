@@ -21,9 +21,9 @@ export class GestionService {
   }
 
   //  Buscar por ID
-  listId(id: number): Observable<GestionFinanciera> {
+  listId(id: number): Observable<GestionFinanciera[]> {
     console.log(`${this.url}/gestionfinanciera/listar/${id}`);
-    return this.httpClient.get<GestionFinanciera>(`${this.url}/gestionfinanciera/listar/${id}`);
+    return this.httpClient.get<GestionFinanciera[]>(`${this.url}/gestionfinanciera/listar/${id}`);
   }
 
   //  Registrar nueva gestión

@@ -4,6 +4,7 @@ import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {Perfil} from '../model/perfil';
 import {Credenciales} from '../model/credenciales';
+import {Cliente} from '../model/cliente';
 
 @Injectable({
   providedIn: 'root'
@@ -33,4 +34,20 @@ export class PerfilService {
       credenciales
     );
   }
+
+  update(userid:number, perfil: Perfil): Observable<any> {
+    return this.httpClient.put(`${this.url}/Login/actualizar/${userid}`, perfil);
+  }
+  //  Buscar por ID
+  listId(id: number): Observable<Perfil> {
+    console.log(`${this.url}/Login/listarid/${id}`);
+    return this.httpClient.get<Perfil>(`${this.url}/Login/listarid/${id}`);
+  }
+
+  //email
+  obtenerclienteporEmail(email: string) {
+    const enc = encodeURIComponent(email);
+    return this.httpClient.get<Perfil>(`${this.url}/Login/email/${enc}`);
+  }
+
 }

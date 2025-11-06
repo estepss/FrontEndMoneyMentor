@@ -5,11 +5,12 @@ import {Analisis} from './analisis/analisis';
 import {Gestion} from './gestion/gestion';
 import {AsesorComponent} from './asesor/asesor';
 import {Chat} from './chat/chat';
-import {Perfil} from './perfil/perfil';
 import {Tarjeta} from './tarjeta/tarjeta';
 import {Landing} from './landing/landing';
 import {Acceso} from './acceso/acceso';
 import {MainLayout} from './main-layout/main-layout';
+import {Perfil} from './model/perfil';
+import {PerfilComponent} from './perfil/perfil';
 
 export const routes: Routes = [
   //Landing
@@ -26,7 +27,7 @@ export const routes: Routes = [
       {path: 'Gestión', component: Gestion},
       {path: 'Asesor', component:  AsesorComponent},
       {path: 'Chat', component: Chat},
-      {path: 'Perfil', component: Perfil},
+      {path: 'Perfil', component: PerfilComponent},
       {path: 'Tarjeta', component: Tarjeta},
     ],
   },

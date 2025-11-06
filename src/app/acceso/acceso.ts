@@ -55,7 +55,8 @@ export class Acceso {
     password: ['', [Validators.required, Validators.minLength(6)]],
     telefono: [''],
     sobreMi: [''],
-    rol: ['', Validators.required] // 'CLIENTE' | 'ASESOR'
+    rol: ['', Validators.required], // 'CLIENTE' | 'ASESOR'
+    idUser: ['']
   });
 
   // === REGISTRO ===
@@ -114,6 +115,9 @@ export class Acceso {
             return this.clienteService.obtenerclienteporEmail(email).pipe(
               tap((cli: any) => {
                 localStorage.setItem('idCliente', String(cli.idCliente));
+                localStorage.setItem('userId', String(res.userId));   // 👈 CLAVE CORRECTA
+                console.log('userId guardado =', localStorage.getItem('userId'));
+
               })
             );
           } else if (role === 'ROLE_ASESOR') {

@@ -125,6 +125,8 @@ export class Acceso {
             return this.asesorService.obtenerasesoreporemail(email).pipe(
               tap((ase: any) => {
                 localStorage.setItem('idAsesor', String(ase.idAsesor));
+                localStorage.setItem('userId', String(res.userId));   // 👈 CLAVE CORRECTA
+                console.log('userId guardado =', localStorage.getItem('userId'));
               })
             );
           }

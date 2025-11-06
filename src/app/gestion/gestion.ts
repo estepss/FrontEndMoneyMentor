@@ -102,6 +102,7 @@ export class Gestion {
           console.log("Se registró", data);
           alert("Gestion registrada");
           this.router.navigate(['/Gestión']);
+          this.cargarTabla()
         }
       })
     }
@@ -117,18 +118,24 @@ export class Gestion {
   //cuando carga
   ngOnInit() {
     console.log('ngOnInit: actualizando tabla automáticamente');
-
-    interval(5000) // cada 5 segundos
-      .pipe(switchMap(() => this.gestionService.list()))
+    const idCliente = Number(localStorage.getItem('idCliente'));//obtengo el numero
+    this.gestionService.listId(idCliente)
       .subscribe({
         next: (data) => {
           this.dataSource.data = data;
           this.dataSource._updateChangeSubscription();
           console.log('Tabla actualizada automáticamente', data);
+          this.router.navigate(['/Gestión'])
         },
         error: (err) => console.error('Error al refrescar', err)
       });
   }
 
-
+  cargarTabla() {
+    const idCliente = Number(localStorage.getItem('idCliente'));
+    this.gestionService.listId(idCliente).subscribe({
+      next: (data) => this.dataSource.data = data,
+      error: (err) => console.error('Error al refrescar tabla', err)
+    });
+  }
 }

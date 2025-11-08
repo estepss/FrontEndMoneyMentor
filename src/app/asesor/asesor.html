@@ -139,9 +139,9 @@
         class="reseña-item"
         *ngFor="let r of resenas[asesorSeleccionado.id]"
       >
-        <div class="avatar-mini">{{ getIniciales(r.cliente) }}</div>
+        <div class="avatar-mini">{{ getIniciales(r.nombreCliente || 'C') }}</div>
         <div>
-          <strong>{{ r.cliente }}</strong>
+          <strong>{{ r.nombreCliente }}</strong>
           <span class="estrellas">{{ '★'.repeat(r.puntuacion) }}</span>
           <p>{{ r.comentario }}</p>
         </div>

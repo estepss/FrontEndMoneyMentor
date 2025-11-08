@@ -1,6 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { AsesorService } from '../services/asesor-service';
+import { CalificacionService } from '../services/calificacion-asesor-service';
 
 interface Asesor {
   id: number;
@@ -11,9 +13,9 @@ interface Asesor {
 }
 
 interface Reserva {
-  fecha: string; // YYYY-MM-DD
-  horaInicio: string; // HH:mm
-  horaFin: string; // HH:mm
+  fecha: string;
+  horaInicio: string;
+  horaFin: string;
   nota?: string;
 }
 
@@ -25,6 +27,16 @@ interface ReservaListItem {
   fechas: string[];
 }
 
+interface Calificacion {
+  idCalificacion?: number;
+  puntuacion: number;
+  comentario: string;
+  clienteNombre?: string;
+  idAsesor: number;
+  idCliente: number;
+  nombreCliente?: string;
+}
+
 @Component({
   selector: 'app-asesor',
   standalone: true,
@@ -32,8 +44,7 @@ interface ReservaListItem {
   templateUrl: './asesor.html',
   styleUrls: ['./asesor.css'],
 })
-export class AsesorComponent {
-
+export class AsesorComponent implements OnInit {
   asesores: Asesor[] = [
     {
       id: 1,
@@ -84,63 +95,22 @@ export class AsesorComponent {
     },
   ];
 
-
-  resenas: Record<number, any[]> = {
-    1: [
-      {
-        cliente: 'Alejandro Almonte',
-        puntuacion: 5,
-        comentario: 'Muy recomendada, me ayudó en todo.',
-      },
-      {
-        cliente: 'Sonia Soto',
-        puntuacion: 4,
-        comentario: 'Me ayudó a registrar mis ingresos y gastos en Excel.',
-      },
-    ],
-    2: [],
-    3: [],
-    4: [],
-    5: [],
-    6: [],
-  };
-
-
+  resenas: Record<number, Calificacion[]> = {};
   mostrarModal = false;
   asesorSeleccionado: Asesor | null = null;
-  nuevaResena = { puntuacion: 0, comentario: '' };
+  nuevaResena: Calificacion = { puntuacion: 0, comentario: '', idAsesor: 0, idCliente: 0 };
 
   mostrarReservaModal = false;
   asesorReserva: Asesor | null = null;
 
-
-  reservas: Record<number, Reserva[]> = {
-    1: [],
-    2: [],
-    3: [],
-    4: [],
-    5: [],
-    6: [],
-  };
-
-
+  reservas: Record<number, Reserva[]> = {};
   currentYear = new Date().getFullYear();
   currentMonth = new Date().getMonth();
   calendarDays: { date: Date; inCurrentMonth: boolean }[] = [];
   weekDays = ['Dom', 'Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab'];
   monthNames = [
-    'Enero',
-    'Febrero',
-    'Marzo',
-    'Abril',
-    'Mayo',
-    'Junio',
-    'Julio',
-    'Agosto',
-    'Setiembre',
-    'Octubre',
-    'Noviembre',
-    'Diciembre',
+    'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+    'Julio', 'Agosto', 'Setiembre', 'Octubre', 'Noviembre', 'Diciembre'
   ];
 
   selectedDate: Date | null = null;
@@ -150,16 +120,14 @@ export class AsesorComponent {
   mostrarCardModal = false;
   selectedCard: string | null = null;
 
-
   mostrarListaReservas = false;
-
 
   reservasList: ReservaListItem[] = [
     {
       id: 1,
       nombre: 'Eleanor Villanueva',
       descripcion:
-        'Soy asesora financiera y mi pasión es ayudar a los jóvenes a organizar sus finanzas de manera clara y práctica. Creo que la educación financiera no debería ser complicada ni intimidante, por eso me enfoco en explicar con ejemplos sencillos.',
+        'Soy asesora financiera y mi pasión es ayudar a los jóvenes a organizar sus finanzas de manera clara y práctica.',
       imagenUrl: 'https://placehold.co/120x120/faf3d7/0f172a?text=E',
       fechas: [
         '10:00 am - 12:00 pm del 26 de junio de 2024',
@@ -170,7 +138,7 @@ export class AsesorComponent {
       id: 5,
       nombre: 'Roberto Saenz',
       descripcion:
-        'Soy asesor financiero especializado en planificación para emprendedores y profesionales independientes. Creo firmemente que una buena educación financiera transforma vidas, por eso me enfoco en acompañar con estrategias claras, realistas y aplicables.',
+        'Soy asesor financiero especializado en planificación para emprendedores y profesionales independientes.',
       imagenUrl: 'https://placehold.co/120x120/f6f9fb/0f172a?text=R',
       fechas: [
         '9:00 am - 10:30 am del 3 de julio de 2024',
@@ -179,15 +147,22 @@ export class AsesorComponent {
     },
   ];
 
-  // ---------------- Reprogramar modal (pequeño) ----------------
   mostrarReprogramar = false;
   reprogramarTarget: ReservaListItem | null = null;
-  horarioSeleccionado = '10-12'; // la única opción visual
+  horarioSeleccionado = '10-12';
 
-  constructor() {
+  constructor(
+    private asesorService: AsesorService,
+    private calificacionService: CalificacionService
+  ) {
     this.buildCalendar(this.currentYear, this.currentMonth);
   }
 
+  ngOnInit(): void {
+    this.asesores.forEach(a => this.cargarResenas(a.id));
+  }
+
+  // ====================== CALIFICACIONES ======================
   abrirModal(asesor: Asesor) {
     this.asesorSeleccionado = asesor;
     this.mostrarModal = true;
@@ -195,36 +170,48 @@ export class AsesorComponent {
 
   cerrarModal() {
     this.mostrarModal = false;
-    this.nuevaResena = { puntuacion: 0, comentario: '' };
+    this.nuevaResena = { puntuacion: 0, comentario: '', idAsesor: 0, idCliente: 0 };
+  }
+
+  cargarResenas(idAsesor: number) {
+    this.calificacionService.listarPorAsesor(idAsesor).subscribe({
+      next: (data) => (this.resenas[idAsesor] = data),
+      error: (err) => console.error('Error cargando calificaciones:', err),
+    });
   }
 
   enviarResena() {
-    if (
-      !this.nuevaResena.puntuacion ||
-      this.nuevaResena.puntuacion < 1 ||
-      this.nuevaResena.puntuacion > 5
-    ) {
+    if (!this.asesorSeleccionado) return;
+
+    const { puntuacion, comentario } = this.nuevaResena;
+    if (!puntuacion || puntuacion < 1 || puntuacion > 5) {
       alert('Debe seleccionar una calificación del 1 al 5.');
       return;
     }
 
-    if (!this.nuevaResena.comentario || this.nuevaResena.comentario.length < 5) {
+    if (!comentario || comentario.length < 5) {
       alert('El comentario debe tener al menos 5 caracteres.');
       return;
     }
 
-    if (!this.asesorSeleccionado) return;
-
-    const nueva = {
-      cliente: 'Usuario Actual',
-      puntuacion: this.nuevaResena.puntuacion,
-      comentario: this.nuevaResena.comentario,
+    const dto: Calificacion = {
+      puntuacion,
+      comentario,
+      idAsesor: this.asesorSeleccionado.id,
+      idCliente: 1,
     };
 
-    const id = this.asesorSeleccionado.id;
-    if (!this.resenas[id]) this.resenas[id] = [];
-    this.resenas[id].push(nueva);
-    this.nuevaResena = { puntuacion: 0, comentario: '' };
+    this.calificacionService.insertar(dto).subscribe({
+      next: () => {
+        alert('Calificación registrada correctamente.');
+        this.cargarResenas(this.asesorSeleccionado!.id);
+        this.cerrarModal();
+      },
+      error: (err) => {
+        console.error(err);
+        alert('Error al registrar la calificación.');
+      },
+    });
   }
 
   onImageError(event: Event) {
@@ -234,18 +221,17 @@ export class AsesorComponent {
     }
   }
 
-  // ------------------ CALENDARIO ------------------
+  // =================== CALENDARIO ===================
   buildCalendar(year: number, month: number) {
     this.calendarDays = [];
     const firstDay = new Date(year, month, 1);
     const startWeek = firstDay.getDay();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
-
     const prevMonthLastDay = new Date(year, month, 0).getDate();
+
     for (let i = 0; i < startWeek; i++) {
       const dayNum = prevMonthLastDay - startWeek + 1 + i;
-      const d = new Date(year, month - 1, dayNum);
-      this.calendarDays.push({ date: d, inCurrentMonth: false });
+      this.calendarDays.push({ date: new Date(year, month - 1, dayNum), inCurrentMonth: false });
     }
 
     for (let d = 1; d <= daysInMonth; d++) {
@@ -263,9 +249,7 @@ export class AsesorComponent {
     if (this.currentMonth === 0) {
       this.currentMonth = 11;
       this.currentYear--;
-    } else {
-      this.currentMonth--;
-    }
+    } else this.currentMonth--;
     this.buildCalendar(this.currentYear, this.currentMonth);
   }
 
@@ -273,9 +257,7 @@ export class AsesorComponent {
     if (this.currentMonth === 11) {
       this.currentMonth = 0;
       this.currentYear++;
-    } else {
-      this.currentMonth++;
-    }
+    } else this.currentMonth++;
     this.buildCalendar(this.currentYear, this.currentMonth);
   }
 
@@ -310,18 +292,14 @@ export class AsesorComponent {
     return `${this.monthNames[this.currentMonth]} ${this.currentYear}`;
   }
 
-  // ------------------ RESERVA / CALENDAR ------------------
+  // =================== RESERVAS ===================
   abrirReserva(asesor: Asesor | null) {
     if (!asesor) return;
     this.asesorReserva = asesor;
     this.mostrarReservaModal = true;
     this.selectedDate = null;
     this.selectedDateStr = '';
-    this.availableSlots = [];
-    const today = new Date();
-    this.currentYear = today.getFullYear();
-    this.currentMonth = today.getMonth();
-    this.buildCalendar(this.currentYear, this.currentMonth);
+    this.availableSlots = [{ label: '10 am - 12pm', start: '10:00', end: '12:00' }];
   }
 
   cerrarReservaModal() {
@@ -337,8 +315,6 @@ export class AsesorComponent {
     const m = String(day.date.getMonth() + 1).padStart(2, '0');
     const d = String(day.date.getDate()).padStart(2, '0');
     this.selectedDateStr = `${d} - ${this.monthNames[day.date.getMonth()]} - ${y}`;
-    // sólo el slot visible que pediste
-    this.availableSlots = [{ label: '10 am - 12pm', start: '10:00', end: '12:00' }];
   }
 
   registrarSlot(slot: { label: string; start: string; end: string }) {
@@ -347,18 +323,13 @@ export class AsesorComponent {
     const nueva: Reserva = { fecha, horaInicio: slot.start, horaFin: slot.end };
     const id = this.asesorReserva.id;
     if (!this.reservas[id]) this.reservas[id] = [];
-
     const collision = this.reservas[id].some(
-      (r) =>
-        r.fecha === fecha &&
-        !(r.horaFin <= nueva.horaInicio || r.horaInicio >= nueva.horaFin)
+      (r) => r.fecha === fecha && !(r.horaFin <= nueva.horaInicio || r.horaInicio >= nueva.horaFin)
     );
-
     if (collision) {
       alert('El slot ya está ocupado para esa fecha.');
       return;
     }
-
     this.reservas[id].push(nueva);
     this.availableSlots = [];
   }
@@ -370,24 +341,8 @@ export class AsesorComponent {
     return `${y}-${m}-${day}`;
   }
 
-  getReservasForAsesor(asesorId?: number) {
-    if (!asesorId) return [];
-    return this.reservas[asesorId] || [];
-  }
-
-  eliminarReserva(asesorId?: number, reserva?: Reserva) {
-    if (!asesorId || !reserva) return;
-    this.reservas[asesorId] = (this.reservas[asesorId] || []).filter(
-      (r) =>
-        !(
-          r.fecha === reserva.fecha &&
-          r.horaInicio === reserva.horaInicio &&
-          r.horaFin === reserva.horaFin
-        )
-    );
-  }
-
-  openCardModal(reserva?: Reserva) {
+  // =================== PAGO MOCK ===================
+  openCardModal(reserva?: any) {
     this.selectedCard = null;
     this.mostrarCardModal = true;
   }
@@ -399,16 +354,9 @@ export class AsesorComponent {
 
   confirmarPago() {
     if (!this.selectedCard) return;
-    alert('Pago realizado con éxito. (Mock)');
+    alert('Pago realizado con éxito (mock).');
     this.cerrarCardModal();
     this.cerrarReservaModal();
-  }
-
-  hasAnyReservaForSelectedDate(): boolean {
-    if (!this.asesorReserva || !this.selectedDate) return false;
-    const fecha = this.formatDate(this.selectedDate);
-    const id = this.asesorReserva.id;
-    return (this.reservas[id] || []).some(r => r.fecha === fecha);
   }
 
   getIniciales(nombre: string): string {
@@ -420,7 +368,7 @@ export class AsesorComponent {
       .toUpperCase();
   }
 
-
+  // =================== LISTA DE RESERVAS ===================
   abrirListaReservas() {
     this.mostrarListaReservas = true;
   }
@@ -430,7 +378,6 @@ export class AsesorComponent {
   }
 
   abrirReprogramar(item: ReservaListItem) {
-
     this.reprogramarTarget = item;
     this.horarioSeleccionado = '10-12';
     this.mostrarReprogramar = true;
@@ -443,38 +390,50 @@ export class AsesorComponent {
   }
 
   registrarReprogramacion() {
-
     if (!this.reprogramarTarget) return;
-
-
     if (this.reprogramarTarget.fechas && this.reprogramarTarget.fechas.length > 0) {
-
       const original = this.reprogramarTarget.fechas[0];
-
       let nuevaFechaTexto = '10:00 am - 12:00 pm (reprogramado)';
       try {
-
         const idx = original.indexOf('del');
         if (idx !== -1) {
           const suf = original.substring(idx);
           nuevaFechaTexto = '10:00 am - 12:00 pm ' + suf;
-        } else {
-
-          nuevaFechaTexto = '10:00 am - 12:00 pm (reprogramado)';
         }
-      } catch (e) {
+      } catch {
         nuevaFechaTexto = '10:00 am - 12:00 pm (reprogramado)';
       }
-
-
       this.reprogramarTarget.fechas[0] = nuevaFechaTexto;
     }
-
-    // cerramos modal
     this.cerrarReprogramar();
   }
 
   eliminarReservaVisual(item: ReservaListItem) {
-    this.reservasList = this.reservasList.filter(r => r.id !== item.id);
+    this.reservasList = this.reservasList.filter((r) => r.id !== item.id);
+  }
+
+  // =================== 🔧 MÉTODOS FALTANTES (NUEVOS) ===================
+  getReservasForAsesor(asesorId?: number) {
+    if (!asesorId) return [];
+    return this.reservas[asesorId] || [];
+  }
+
+  eliminarReserva(asesorId?: number, reserva?: any) {
+    if (!asesorId || !reserva) return;
+    this.reservas[asesorId] = (this.reservas[asesorId] || []).filter(
+      (r) =>
+        !(
+          r.fecha === reserva.fecha &&
+          r.horaInicio === reserva.horaInicio &&
+          r.horaFin === reserva.horaFin
+        )
+    );
+  }
+
+  hasAnyReservaForSelectedDate(): boolean {
+    if (!this.asesorReserva || !this.selectedDate) return false;
+    const fecha = this.formatDate(this.selectedDate);
+    const id = this.asesorReserva.id;
+    return (this.reservas[id] || []).some(r => r.fecha === fecha);
   }
 }

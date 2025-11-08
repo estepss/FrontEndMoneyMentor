@@ -1,21 +1,34 @@
-import {inject, Injectable} from '@angular/core';
-import {environment} from '../../environments/environment';
-import {HttpClient} from '@angular/common/http';
-import {Observable} from 'rxjs';
-import {Cliente} from '../model/cliente';
-import {AsesorFinanciero} from '../model/asesor-financiero';
+import { inject, Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../environments/environment';
+import { Observable } from 'rxjs';
+import { AsesorFinanciero } from '../model/asesor-financiero';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AsesorService {
-  private url = environment.apiUrl;
-  private httpClient: HttpClient = inject(HttpClient);
-  constructor() { }
+  private url = environment.apiUrl + '/asesores';
+  private httpClient = inject(HttpClient);
 
+  constructor() {}
 
-  obtenerasesoreporemail(email: string) {
+  // 🔹 Listar todos los asesores
+  obtenerTodosLosAsesores(): Observable<AsesorFinanciero[]> {
+    console.log(`${this.url}/listar`);
+    return this.httpClient.get<AsesorFinanciero[]>(`${this.url}/listar`);
+  }
+
+  // 🔹 Buscar asesor por email
+  obtenerAsesorPorEmail(email: string): Observable<AsesorFinanciero> {
     const enc = encodeURIComponent(email);
-    return this.httpClient.get<AsesorFinanciero>(`${this.url}/asesores/email/${enc}`);
+    console.log(`${this.url}/email/${enc}`);
+    return this.httpClient.get<AsesorFinanciero>(`${this.url}/email/${enc}`);
+  }
+
+  // 🔹 Buscar asesor por ID (opcional, si lo necesitas)
+  obtenerAsesorPorId(id: number): Observable<AsesorFinanciero> {
+    console.log(`${this.url}/${id}`);
+    return this.httpClient.get<AsesorFinanciero>(`${this.url}/${id}`);
   }
 }

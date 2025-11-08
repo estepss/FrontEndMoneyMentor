@@ -122,7 +122,7 @@ export class Acceso {
             );
           } else if (role === 'ROLE_ASESOR') {
             // ASESOR
-            return this.asesorService.obtenerasesoreporemail(email).pipe(
+            return this.asesorService.obtenerAsesorPorEmail(email).pipe(
               tap((ase: any) => {
                 localStorage.setItem('idAsesor', String(ase.idAsesor));
                 localStorage.setItem('userId', String(res.userId));   // 👈 CLAVE CORRECTA

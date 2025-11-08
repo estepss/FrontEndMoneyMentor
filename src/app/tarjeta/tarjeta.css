@@ -5,15 +5,36 @@
   min-height: 80vh;
 }
 
+/* ELIMINAMOS .content-aligner ya que vamos a centrar los títulos */
 .page-title {
   color: #2B3D49;
   font-size: 2rem;
   margin-bottom: 1.5rem;
+  /* CAMBIO CLAVE: Centrar el título "Tarjeta" */
+  text-align: center;
 }
+
+/* --- ESTILOS DEL TÍTULO DE LA LISTA --- */
+.list-title {
+  color: #2B3D49;
+  font-size: 1.5rem; /* Un poco más pequeño que el título principal */
+  font-weight: 600;
+  margin-top: 2.5rem; /* Espacio superior después del formulario */
+  margin-bottom: 1.5rem; /* Espacio antes de la lista */
+  /* CAMBIO CLAVE: Centrar el título "Tarjetas agregadas" */
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+}
+
 
 /* --- ESTILOS DEL FORMULARIO (Agregar Tarjeta) --- */
 .card-form-container {
-  max-width: 600px;
+  /* Mantenemos el ancho máximo y el centrado */
+  max-width: 900px;
+  /* Asegura que el contenedor esté centrado */
+  margin: 0 auto;
   background-color: #ffffff;
   border-radius: 15px;
   /* Sombra más marcada en el mockup */
@@ -131,7 +152,11 @@
   display: flex;
   flex-direction: column;
   gap: 1.5rem; /* Espaciado entre tarjetas en la lista */
-  max-width: 600px;
+  /* Mantenemos el ancho máximo y el centrado */
+  max-width: 900px;
+  /* Asegura que el contenedor esté centrado */
+  margin: 0 auto;
+  /* ELIMINAMOS EL MARGEN SUPERIOR para que el list-title controle el espaciado */
 }
 
 .list-card-item {
@@ -141,10 +166,22 @@
   padding: 1.5rem;
   border-radius: 10px;
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08); /* Sombra ligera */
+  /* CAMBIO CLAVE: Usamos grid para que los datos se muestren en dos columnas grandes */
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: 1fr 1fr; /* Dos columnas de igual ancho */
   gap: 1rem;
 }
+/* Aseguramos que el Nombre y el Número sigan en una columna completa si es necesario */
+.list-card-item .data-group:nth-child(2),
+.list-card-item .data-group:nth-child(3) {
+  grid-column: span 2;
+}
+
+/* Aseguramos que los datos inline (Fecha y CVC) se organicen bien */
+.list-card-item .data-group-inline {
+  grid-column: span 2;
+}
+
 
 .delete-button {
   position: absolute;
@@ -255,3 +292,43 @@
   cursor: pointer;
   text-decoration: underline;
 }
+
+/* MEDIA QUERY para responsividad en móviles */
+@media (max-width: 768px) {
+  /* Ya que los títulos están centrados, solo necesitamos asegurar que los contenedores
+     de tarjetas ocupen todo el ancho en móvil si es necesario */
+  .card-form-container, .cards-list-container {
+    /* Permite que ocupe todo el ancho en móviles */
+    max-width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+  }
+  .tarjeta-page-container {
+    padding: 1rem;
+  }
+  .input-group-inline {
+    /* Apila los campos de expiración y CVC en móviles */
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .form-actions {
+    /* Apila los botones en móviles */
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .action-button {
+    min-width: 100%;
+  }
+  .list-card-item {
+    /* Vuelve a una sola columna en móviles para mejor lectura */
+    grid-template-columns: 1fr;
+  }
+  .list-card-item .data-group:nth-child(2),
+  .list-card-item .data-group:nth-child(3) {
+    grid-column: span 1;
+  }
+  /* Aseguramos que el título de lista también se vea bien en móvil */
+  .list-title {
+    max-width: 100%;
+  }
+}q

@@ -3,9 +3,9 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 // 1. Importamos el NUEVO SERVICIO y el MODELO (Clase)
-import { TarjetaService } from '../services/tarjeta-service';
 // Esta importación ya no causará conflicto
 import { Tarjeta } from '../model/tarjeta';
+import {TarjetaService} from '../services/tarjeta-service';
 
 @Component({
   selector: 'app-tarjeta',
@@ -14,7 +14,6 @@ import { Tarjeta } from '../model/tarjeta';
   templateUrl: './tarjeta.html',
   styleUrl: './tarjeta.css'
 })
-// ⭐️ SOLUCIÓN: Renombramos la clase a "TarjetaComponent"
 export class TarjetaComponent implements OnInit {
 
   // 2. Inyectamos el servicio (como tu profesor)

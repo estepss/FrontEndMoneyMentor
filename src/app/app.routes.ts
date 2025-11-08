@@ -5,7 +5,7 @@ import {Analisis} from './analisis/analisis';
 import {Gestion} from './gestion/gestion';
 import {AsesorComponent} from './asesor/asesor';
 import {Chat} from './chat/chat';
-import {Tarjeta} from './tarjeta/tarjeta';
+import {TarjetaComponent} from './tarjeta/tarjeta';
 import {Landing} from './landing/landing';
 import {Acceso} from './acceso/acceso';
 import {MainLayout} from './main-layout/main-layout';
@@ -28,7 +28,7 @@ export const routes: Routes = [
       {path: 'Asesor', component:  AsesorComponent},
       {path: 'Chat', component: Chat},
       {path: 'Perfil', component: PerfilComponent},
-      {path: 'Tarjeta', component: Tarjeta},
+      {path: 'Tarjeta', component: TarjetaComponent},
     ],
   },
   {path: '**', redirectTo: ''}, //re dirige a home

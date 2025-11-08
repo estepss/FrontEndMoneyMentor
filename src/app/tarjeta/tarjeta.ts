@@ -1,78 +1,149 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms'; // Necesario para ngModel
+import { FormsModule } from '@angular/forms';
+import { HttpClientModule } from '@angular/common/http';
+// 1. Importamos el NUEVO SERVICIO y el MODELO (Clase)
+import { TarjetaService } from '../services/tarjeta-service';
+// Esta importación ya no causará conflicto
+import { Tarjeta } from '../model/tarjeta';
 
-// Interfaz para el objeto Tarjeta
-interface Tarjeta2 {
-  nombre: string;
-  numero: string;
-  mesExpiracion: string;
-  anioExpiracion: string;
-  cvc: string;
-}
 @Component({
   selector: 'app-tarjeta',
   standalone: true,
-  imports: [CommonModule, FormsModule], // Importamos FormsModule
+  imports: [CommonModule, FormsModule, HttpClientModule],
   templateUrl: './tarjeta.html',
   styleUrl: './tarjeta.css'
 })
-export class Tarjeta {
-  // Estado para la nueva tarjeta que se va a agregar
-  nuevaTarjeta: Tarjeta2 = { // Tipo Tarjeta2
-    nombre: 'Fernando Velarde', // Rellenado inicial basado en el mockup
-    numero: '3333 4444 5555 6666',
-    mesExpiracion: 'Septiembre',
-    anioExpiracion: '2025',
-    cvc: '111',
-  };
+// ⭐️ SOLUCIÓN: Renombramos la clase a "TarjetaComponent"
+export class TarjetaComponent implements OnInit {
 
-  // Lista de tarjetas añadidas (Almacenamiento temporal)
-  tarjetasAgregadas: Tarjeta2[] = []; // <-- CORRECCIÓN: Ahora es Tarjeta2[]
+  // 2. Inyectamos el servicio (como tu profesor)
+  private tarjetaService = inject(TarjetaService);
 
-  // Estado para controlar qué vista mostrar: 'agregar' o 'lista'
+  // 3. 'nuevaTarjeta' ahora es una instancia de la CLASE Tarjeta
+  nuevaTarjeta: Tarjeta = new Tarjeta();
+
+  // 4. 'tarjetasAgregadas' usará la CLASE Tarjeta
+  tarjetasAgregadas: Tarjeta[] = [];
+
   vistaActual: 'agregar' | 'lista' = 'agregar';
 
-  // Opciones para los select (basado en el mockup)
-  meses: string[] = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
-  anios: string[] = ['2024', '2025', '2026', '2027', '2028'];
+  // (Tus arrays de meses y años para los <select> están perfectos)
+  meses: number[] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+  anios: number[] = [2024, 2025, 2026, 2027, 2028];
+  mesesNombres: { [key: number]: string } = {
+    1: 'Enero', 2: 'Febrero', 3: 'Marzo', 4: 'Abril', 5: 'Mayo', 6: 'Junio',
+    7: 'Julio', 8: 'Agosto', 9: 'Septiembre', 10: 'Octubre', 11: 'Noviembre', 12: 'Diciembre'
+  };
 
+  constructor() {
+    // 5. Asignamos los valores por defecto del mockup al formulario
+    this.resetearFormulario();
+  }
+
+  ngOnInit(): void {
+    // Al iniciar, cargamos la lista de tarjetas (si la vista es 'lista')
+    // Opcionalmente, puedes mover cargarTarjetas() a mostrarLista()
+    this.cargarTarjetas();
+  }
 
   /**
-   * Agrega la tarjeta actual a la lista y limpia el formulario.
+   * NUEVO: Carga la lista de tarjetas desde el backend
+   */
+  cargarTarjetas(): void {
+    this.tarjetaService.list().subscribe({
+      next: (tarjetas) => {
+        this.tarjetasAgregadas = tarjetas;
+        console.log('Tarjetas cargadas desde la BD:', tarjetas);
+      },
+      error: (err) => {
+        console.error('Error al cargar la lista de tarjetas:', err);
+      }
+    });
+  }
+
+  /**
+   * MODIFICADO: Llama al servicio 'insert()'
    */
   agregarTarjeta(): void {
-    // Aquí puedes añadir lógica de validación real (ej. número de 16 dígitos)
-    if (this.nuevaTarjeta.nombre && this.nuevaTarjeta.numero) {
-      // Usamos el operador spread para clonar el objeto y evitar problemas de referencia
-      this.tarjetasAgregadas.push({...this.nuevaTarjeta});
-
-      // Mostrar la lista después de agregar la tarjeta
-      this.vistaActual = 'lista';
-    } else {
+    // Validaciones básicas (tu DTO de Java manejará el resto)
+    if (!this.nuevaTarjeta.nombreTarjeta || !this.nuevaTarjeta.numeroTarjeta) {
       console.error('Por favor, complete los campos obligatorios.');
+      return;
     }
+
+    // Quitamos espacios del número de tarjeta antes de enviar
+    this.nuevaTarjeta.numeroTarjeta = this.nuevaTarjeta.numeroTarjeta.replace(/\s/g, '');
+
+    this.tarjetaService.insert(this.nuevaTarjeta).subscribe({
+      next: (tarjetaGuardada) => {
+        console.log('Tarjeta guardada exitosamente en BD:', tarjetaGuardada);
+        // Si se guarda, recargamos la lista desde la BD
+        this.cargarTarjetas();
+        this.vistaActual = 'lista';
+        this.resetearFormulario(); // Limpiamos el formulario
+      },
+      error: (err) => {
+        console.error('Error al guardar la tarjeta en el backend:', err);
+        // Aquí puedes manejar errores de validación (ej. 400 Bad Request)
+        if (err.status === 400) {
+          // err.error contiene los mensajes de @NotBlank, @Pattern, etc.
+          console.error('Errores de validación:', err.error);
+        }
+      }
+    });
   }
 
   /**
-   * Elimina una tarjeta de la lista.
+   * MODIFICADO: Llama al servicio 'delete()'
    */
   eliminarTarjeta(index: number): void {
-    this.tarjetasAgregadas.splice(index, 1);
+    const tarjetaAEliminar = this.tarjetasAgregadas[index];
+
+    if (!tarjetaAEliminar.idTarjeta) {
+      console.error('Error: No se puede eliminar una tarjeta sin ID.');
+      return;
+    }
+
+    this.tarjetaService.delete(tarjetaAEliminar.idTarjeta).subscribe({
+      next: () => {
+        console.log(`Tarjeta ${tarjetaAEliminar.idTarjeta} eliminada de la BD.`);
+        // Si se borra de la BD, la quitamos del array local (o recargamos la lista)
+        this.tarjetasAgregadas.splice(index, 1);
+      },
+      error: (err) => {
+        console.error(`Error al eliminar la tarjeta ${tarjetaAEliminar.idTarjeta}:`, err);
+      }
+    });
   }
 
   /**
-   * Cambia la vista a la lista de tarjetas.
+   * MODIFICADO: Carga los datos al cambiar de vista
    */
   mostrarLista(): void {
     this.vistaActual = 'lista';
+    this.cargarTarjetas(); // Carga los datos frescos de la BD
+  }
+
+  mostrarAgregar(): void {
+    this.vistaActual = 'agregar';
+    this.resetearFormulario(); // Resetea el formulario si vuelve a agregar
   }
 
   /**
-   * Cambia la vista al formulario de agregar tarjeta.
+   * NUEVO: Resetea el formulario a los valores del mockup
    */
-  mostrarAgregar(): void {
-    this.vistaActual = 'agregar';
+  resetearFormulario(): void {
+    this.nuevaTarjeta = new Tarjeta(); // Llama al constructor
+    // Sobrescribimos con los datos del mockup
+    this.nuevaTarjeta.nombreTarjeta = 'Fernando Velarde';
+    this.nuevaTarjeta.numeroTarjeta = '3333 4444 5555 6666';
+    this.nuevaTarjeta.mesExpiracion = 9;
+    this.nuevaTarjeta.anioExpiracion = 2025;
+    this.nuevaTarjeta.cvc = '111';
   }
 
+  getNombreMes(mes: number): string {
+    return this.mesesNombres[mes] || mes.toString();
+  }
 }

@@ -17,26 +17,26 @@
 
       <form class="form-body">
 
-        <!-- Campo Nombre -->
+        <!-- Campo Nombre (CORREGIDO) -->
         <div class="input-group">
           <label for="nombre">Nombre</label>
           <input
             id="nombre"
             type="text"
-            [(ngModel)]="nuevaTarjeta.nombre"
+            [(ngModel)]="nuevaTarjeta.nombreTarjeta"
             name="nombre"
             required
             placeholder="Nombre en la tarjeta"
           />
         </div>
 
-        <!-- Campo Número de Tarjeta -->
+        <!-- Campo Número de Tarjeta (CORREGIDO) -->
         <div class="input-group">
           <label for="numero">Número de Tarjeta</label>
           <input
             id="numero"
             type="text"
-            [(ngModel)]="nuevaTarjeta.numero"
+            [(ngModel)]="nuevaTarjeta.numeroTarjeta"
             name="numero"
             required
             placeholder="XXXX XXXX XXXX XXXX"
@@ -50,8 +50,9 @@
             <label>Fecha de expiración</label>
             <div class="inline-fields">
               <select [(ngModel)]="nuevaTarjeta.mesExpiracion" name="mes" required>
+                <!-- (CORREGIDO) Usamos getNombreMes() -->
                 @for (mes of meses; track mes) {
-                  <option [value]="mes">{{ mes }}</option>
+                  <option [value]="mes">{{ getNombreMes(mes) }}</option>
                 }
               </select>
               <select [(ngModel)]="nuevaTarjeta.anioExpiracion" name="anio" required>
@@ -75,7 +76,7 @@
           </div>
         </div>
 
-        <!-- Botones de Acción -->
+        <!-- Botones de Acción (Funciones ya coinciden) -->
         <div class="form-actions">
           <button
             type="button"
@@ -110,21 +111,20 @@
         @for (tarjeta of tarjetasAgregadas; track $index) {
           <div class="list-card-item">
             <div class="delete-button" (click)="eliminarTarjeta($index)">
-              <!-- Icono de Bote de Basura/Eliminar (material-icons-sharp) -->
               <span class="material-icons-sharp">delete</span>
             </div>
 
-            <!-- Nombre -->
+            <!-- Nombre (CORREGIDO) -->
             <div class="data-group">
               <span class="label">Nombre</span>
-              <span class="value">{{ tarjeta.nombre }}</span>
+              <span class="value">{{ tarjeta.nombreTarjeta }}</span>
               <hr/>
             </div>
 
-            <!-- Número de Tarjeta -->
+            <!-- Número de Tarjeta (CORREGIDO) -->
             <div class="data-group">
               <span class="label">Número de Tarjeta</span>
-              <span class="value">{{ tarjeta.numero }}</span>
+              <span class="value">{{ tarjeta.numeroTarjeta }}</span>
               <hr/>
             </div>
 
@@ -132,7 +132,8 @@
             <div class="data-group-inline">
               <div class="inline-data expiration-info">
                 <span class="label">Fecha de expiración</span>
-                <span class="value">{{ tarjeta.mesExpiracion }} / {{ tarjeta.anioExpiracion }}</span>
+                <!-- (CORREGIDO) Usamos getNombreMes() -->
+                <span class="value">{{ getNombreMes(tarjeta.mesExpiracion) }} / {{ tarjeta.anioExpiracion }}</span>
               </div>
               <div class="inline-data cvc-info">
                 <span class="label">CVC</span>
@@ -155,5 +156,4 @@
 
     </div>
   }
-
 </div>

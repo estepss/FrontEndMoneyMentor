@@ -1,0 +1,67 @@
+<main class="perfil-page">
+  <section class="perfil-container">
+    <!-- Columna izquierda -->
+    <div class="perfil-card">
+      <h3 class="perfil-title">Profile Details</h3>
+      <div class="perfil-avatar">
+        <img src="../../assets/img/daf.jpg" alt="Foto de perfil" />
+      </div>
+
+      <h2 class="perfil-name">{{perfil.nombres}}</h2>
+
+      <div class="perfil-info">
+        <div><span class="material-icons-sharp">mail</span> {{ perfil.email }}</div>
+        <div><span class="material-icons-sharp">phone</span> {{ perfil.telefono }}</div>
+      </div>
+
+      <div class="perfil-about">
+        <h4>Sobre mí</h4>
+        <p>{{ perfil.sobreMi }}</p>
+      </div>
+    </div>
+
+    <!-- Columna derecha -->
+    <form>
+      <div class="perfil-edit" [formGroup]="perfilForm">
+        <h3>Editar datos</h3>
+
+        <div class="edit-group">
+          <label>Correo electrónico</label>
+          <div class="edit-field">
+            <input type="email" formControlName="email" />
+            <span class="material-icons-sharp">edit</span>
+          </div>
+        </div>
+
+        <div class="edit-group">
+          <label>Número telefónico</label>
+          <div class="edit-field">
+            <input type="tel" formControlName="telefono" />
+            <span class="material-icons-sharp">edit</span>
+          </div>
+        </div>
+
+        <div class="edit-group">
+          <label>Contraseña</label>
+          <div class="edit-field">
+            <input type="password" formControlName="password" />
+            <span class="material-icons-sharp">edit</span>
+          </div>
+        </div>
+
+        <div class="edit-group">
+          <label>Sobre mí</label>
+          <div class="edit-field">
+            <input type="text" formControlName="sobreMi" />
+            <span class="material-icons-sharp">edit</span>
+          </div>
+        </div>
+
+        <button mat-raised-button color="primary"
+                (click)="onSubmit()"
+                [disabled]="perfilForm.invalid">Guardar cambios
+        </button>
+      </div>
+    </form>
+  </section>
+</main>

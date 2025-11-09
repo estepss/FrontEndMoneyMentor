@@ -12,7 +12,7 @@ import { Perfil } from '../model/perfil';
 import { ActivatedRoute } from '@angular/router';
 import { NgIf } from '@angular/common';
 import {ClienteService} from '../services/cliente-service';
-import {of, switchMap, tap} from 'rxjs';
+import {catchError, EMPTY, of, switchMap, tap} from 'rxjs';
 import {AsesorService} from '../services/asesor-service';
 
 @Component({
@@ -89,15 +89,17 @@ export class Acceso {
     });
   }
 
-  // === LOGIN ===
+// === LOGIN ===
   onLogin() {
     if (this.loginForm.invalid) return;
 
     const { email, password } = this.loginForm.value;
+    // this.loading = true; // si usas spinner
 
     this.perfilService.auth({ username: email, password })
       .pipe(
         tap((res: any) => {
+          // guarda token
           localStorage.setItem('token', res.jwt);
         }),
         switchMap((res: any) => {
@@ -115,9 +117,9 @@ export class Acceso {
             return this.clienteService.obtenerclienteporEmail(email).pipe(
               tap((cli: any) => {
                 localStorage.setItem('idCliente', String(cli.idCliente));
-                localStorage.setItem('userId', String(res.userId));   // 👈 CLAVE CORRECTA
+                localStorage.setItem('userId', String(res.userId)); // OK: viene del auth
                 console.log('userId guardado =', localStorage.getItem('userId'));
-
+                this.router.navigate(['/Inicio']);
               })
             );
           } else if (role === 'ROLE_ASESOR') {
@@ -125,24 +127,33 @@ export class Acceso {
             return this.asesorService.obtenerAsesorPorEmail(email).pipe(
               tap((ase: any) => {
                 localStorage.setItem('idAsesor', String(ase.idAsesor));
-                localStorage.setItem('userId', String(res.userId));   // 👈 CLAVE CORRECTA
+                localStorage.setItem('userId', String(res.userId)); // OK
                 console.log('userId guardado =', localStorage.getItem('userId'));
+                this.router.navigate(['/InicioAsesor']);
               })
             );
           }
-          // rol desconocido → no hagas segunda llamada
+
+          // rol desconocido: no hagas 2da llamada
+          console.warn('Rol desconocido o vacío, no se realizará llamada adicional');
           return of(null);
-        })
-      )
-      .subscribe({
-        next: () => this.router.navigate(['/Inicio']),
-        error: (e) => {
+        }),
+        catchError((e) => {
           console.error('Login error:', e);
           alert(e?.error?.message ?? 'Error en login / carga de perfil');
+          return EMPTY; // corta la cadena
+        }),
+        // finalize(() => this.loading = false)
+      )
+      .subscribe({
+        next: () => {
+          // opcional: ya navegaste dentro de los taps de cada rama
+        },
+        complete: () => {
+          // opcional: lógica al completar
         }
       });
   }
-
   private route = inject(ActivatedRoute);
 
   constructor() {

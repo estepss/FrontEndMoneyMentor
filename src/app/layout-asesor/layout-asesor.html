@@ -1,0 +1,66 @@
+<header>
+  <div class="toggle">
+    <div class="logo">
+      <img src="../../assets/img/logocortado.png" />
+    </div>
+  </div>
+
+  <div class="right-section">
+    <div class="nav">
+      <button id="menu-btn">
+        <span class="material-icons-sharp">menu</span>
+      </button>
+
+      <div class="profile">
+        <div class="info">
+          <p>Hola, {{nombre}} <b><span id="username-display"></span></b></p>
+          <small class="text-muted">{{rol}}</small>
+        </div>
+        <div class="profile-photo">
+          <img src="../../assets/img/daf.jpg" />
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="mm-layout">
+  <aside>
+    <nav class="sidebar">
+      <a [routerLink]="'/InicioAsesor'">
+        <span class="material-icons-sharp">home</span>
+        <h3>Inicio</h3>
+      </a>
+
+      <a [routerLink]="'/Clientes'">
+        <span class="material-icons-sharp">person</span>
+        <h3>Clientes</h3>
+      </a>
+
+      <a [routerLink]="'/ChatAsesor'">
+        <span class="material-icons-sharp">chat</span>
+        <h3>Chat</h3>
+      </a>
+
+      <a [routerLink]="'/CalendarioAsesor'">
+        <span class="material-icons-sharp">calendar_today</span>
+        <h3>Calendario</h3>
+      </a>
+
+      <a [routerLink]="'/PerfilAsesor'">
+        <span class="material-icons-sharp">account_circle</span>
+        <h3>Perfil</h3>
+      </a>
+
+      <a [routerLink]="'/Logout'">
+        <span class="material-icons-sharp">logout</span>
+        <h3>Logout</h3>
+      </a>
+
+    </nav>
+  </aside>
+  <!--a-->
+  <main>
+    <router-outlet/>
+  </main>
+</div>

@@ -1,1 +1,125 @@
-<p>calendario-asesor works!</p>
+<div class="calendario-page-container">
+  <h1 class="page-title">Calendario</h1>
+
+  <div class="calendario-layout">
+
+    <!-- 1. CONTENEDOR DEL CALENDARIO -->
+    <div class="calendar-container">
+      <!-- Encabezado del Calendario (Mes y Navegación) -->
+      <div class="calendar-header">
+        <button (click)="cambiarMes(-1)" class="nav-arrow">&lt;</button>
+        <span class="mes-anio">{{ getMesAnio() | titlecase }}</span>
+        <button (click)="cambiarMes(1)" class="nav-arrow">&gt;</button>
+      </div>
+
+      <!-- Encabezado de Días de la Semana -->
+      <div class="dias-semana-grid">
+        @for (dia of nombresDias; track dia) {
+          <div class="dia-semana-header">{{ dia.substring(0, 3) }}</div>
+        }
+      </div>
+
+      <!-- Cuadrícula de Días del Mes -->
+      <div class="dias-mes-grid">
+        @for (dia of diasDelMes; track dia.fecha) {
+          <div
+            class="dia-celda"
+            [class.no-mes-actual]="!dia.esMesActual"
+            [class.dia-hoy]="dia.esHoy"
+            [class.dia-seleccionado]="dia.fecha === diaSeleccionado?.fecha"
+            (click)="seleccionarDia(dia)">
+            <span class="numero-dia">{{ dia.numero }}</span>
+            <!-- Indicador si hay disponibilidad -->
+            @if (dia.disponibilidades.length > 0 && dia.esMesActual) {
+              <div class="disponibilidad-dot"></div>
+            }
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- 2. BARRA LATERAL (Horarios y Acciones) -->
+    <div class="sidebar-container">
+      <h2 class="sidebar-title">Día y horarios seleccionados</h2>
+
+      <!-- Lista de Horarios -->
+      <div class="horarios-lista">
+        @if (!diaSeleccionado) {
+          <p class="horario-placeholder">-- Seleccione un día --</p>
+        } @else if (horariosDelDiaSeleccionado.length === 0) {
+          <p class="horario-placeholder">-- No hay horarios registrados --</p>
+        } @else {
+          @for (horario of horariosDelDiaSeleccionado; track horario.idDisponibilidad) {
+            <div
+              class="horario-item"
+              [class.horario-seleccionado]="horario.idDisponibilidad === horarioSeleccionado?.idDisponibilidad"
+              (click)="seleccionarHorario(horario)">
+              <!-- Formato: 10am - 12pm -->
+              {{ formatoHoraAmPm(horario.horaInicio) }} - {{ formatoHoraAmPm(horario.horaFin) }}
+            </div>
+          }
+        }
+      </div>
+
+      <!-- Botones de Acción -->
+      <div class="sidebar-actions">
+        <button class="btn btn-primary" (click)="abrirModalRegistrar()">Registrar</button>
+        <button class="btn btn-secondary" (click)="abrirModalEditar()">Editar</button>
+        <button class="btn btn-danger" (click)="eliminarDisponibilidad()">Eliminar</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 3. MODALES (Ocultos por defecto) -->
+
+  <!-- Modal para REGISTRAR Disponibilidad -->
+  @if (showModalRegistrar) {
+    <div class="modal-overlay" (click)="showModalRegistrar = false">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <h3 class="modal-title">Registrar disponibilidad</h3>
+        <p>Selecciona el nuevo horario para el <strong>{{ diaSeleccionado?.fecha | date:'d/MM/yyyy' }}</strong></p>
+
+        <div class="form-group">
+          <label for="horario-registrar">Selecciona nuevo horario</label>
+          <select id="horario-registrar" [(ngModel)]="horarioFormulario" [compareWith]="compararHorarios">
+            @for (slot of horariosPredefinidos; track slot.inicio) {
+              <option [ngValue]="{ inicio: slot.inicio, fin: slot.fin }">{{ slot.texto }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="modal-actions">
+          <button class="btn btn-secondary" (click)="showModalRegistrar = false">Cancelar</button>
+          <button class="btn btn-primary" (click)="registrarDisponibilidad()">Registrar</button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Modal para EDITAR Disponibilidad -->
+  @if (showModalEditar) {
+    <div class="modal-overlay" (click)="showModalEditar = false">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <h3 class="modal-title">Editar disponibilidad</h3>
+        <p>Editando horario del <strong>{{ horarioSeleccionado?.fecha | date:'d/MM/yyyy' }}</strong></p>
+
+        <div class="form-group">
+          <label for="horario-editar">Selecciona nuevo horario</label>
+          <!-- Usamos ngModel para el objeto {inicio, fin} -->
+          <select id="horario-editar" [(ngModel)]="horarioFormulario" [compareWith]="compararHorarios">
+            @for (slot of horariosPredefinidos; track slot.inicio) {
+              <option [ngValue]="{ inicio: slot.inicio, fin: slot.fin }">{{ slot.texto }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="modal-actions">
+          <button class="btn btn-secondary" (click)="showModalEditar = false">Cancelar</button>
+          <button class="btn btn-primary" (click)="actualizarDisponibilidad()">Editar</button>
+        </div>
+      </div>
+    </div>
+  }
+</div>
+

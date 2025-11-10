@@ -14,9 +14,9 @@ import {PerfilComponent} from './perfil/perfil';
 import {LayoutAsesor} from './layout-asesor/layout-asesor';
 import {InicioAsesor} from './inicio-asesor/inicio-asesor';
 import {ChatAsesor} from './chat-asesor/chat-asesor';
-import {CalendarioAsesor} from './calendario-asesor/calendario-asesor';
 import {PerfilAsesor} from './perfil-asesor/perfil-asesor';
 import {Clientes} from './clientes/clientes';
+import {CalendarioAsesorComponent} from './calendario-asesor/calendario-asesor';
 
 export const routes: Routes = [
   //Landing
@@ -45,7 +45,7 @@ export const routes: Routes = [
       {path: 'InicioAsesor', component: InicioAsesor}, // primera pagina que se mostrará
       {path: 'Clientes', component: Clientes},
       {path: 'ChatAsesor', component: ChatAsesor}, //en esta en el path si se pone algo porque nos re dirigirá
-      {path: 'CalendarioAsesor', component: CalendarioAsesor}, // lo mismo que con about
+      {path: 'CalendarioAsesor', component: CalendarioAsesorComponent}, // lo mismo que con about
       {path: 'PerfilAsesor', component: PerfilAsesor},
     ],
   },

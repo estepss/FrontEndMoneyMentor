@@ -2,76 +2,88 @@
 :host {
   --color-dark-blue: #2B3D49;
   --color-turquesa: #179BAE;
-  --color-light-background: #f0f9ff;
-  --color-text-dark: #333333;
-  --card-border-radius: 1.0rem;
+  --color-brown: #935B44;
+  --color-naranja: #FF8343;
+  --color-gris-fondo: #f4f7f6;
+  --color-sombra: rgba(0, 0, 0, 0.1);
 }
 
-/* --- PÁGINA PRINCIPAL --- */
 .asesor-page-container {
-  padding: 0.5rem;
+  padding: 2rem;
+  max-width: 1600px;
+  margin: 0 auto;
 }
 
 .page-title {
   text-align: center;
-  color: var(--color-text-dark);
-  margin-bottom: 1.5rem;
-  font-weight: 1000;
+  color: var(--color-dark-blue);
+  font-size: 2rem;
+  margin-bottom: 2rem;
 }
 
-/* --- GRID LAYOUT --- */
+/* --- ESTILOS DE LA LISTA DE ASESORES --- */
 .asesores-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-  gap: 2.5rem;
-  max-width: 1500px;
-  margin: 0 auto 1rem auto;
+  /* Columnas responsivas */
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  gap: 2rem;
 }
 
-/* --- TARJETA DEL ASESOR --- */
+.empty-state {
+  text-align: center;
+  padding: 4rem;
+  color: #777;
+  font-size: 1.2rem;
+  grid-column: 1 / -1; /* Ocupa todo el ancho del grid */
+}
+
 .asesor-card {
-  background: white;
-  padding: 1rem;
-  border-radius: var(--card-border-radius);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  transition: transform 0.2s;
+  background: #ffffff;
+  border-radius: 15px;
+  box-shadow: 0 5px 15px var(--color-sombra);
   display: flex;
   flex-direction: column;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
-
 .asesor-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
 }
 
 .card-header {
+  position: relative;
+  padding: 1rem 1.5rem;
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 1rem;
+  align-items: center;
 }
 
 .header-name-box {
   background-color: var(--color-dark-blue);
   color: white;
   padding: 0.5rem 1rem;
-  border-radius: 8px;
-  font-weight: 500;
-  font-size: 1rem;
-  max-width: 70%;
+  border-radius: 20px;
+  font-weight: 600;
+  z-index: 2;
 }
 
-/* Foto de Perfil */
 .profile-photo {
-  width: 60px;
-  height: 60px;
+  width: 70px;
+  height: 70px;
   border-radius: 50%;
+  border: 4px solid var(--color-turquesa);
   overflow: hidden;
-  border: 3px solid var(--color-turquesa);
-  box-shadow: 0 0 0 2px white;
-  flex-shrink: 0;
+  z-index: 2;
+  background-color: var(--color-gris-fondo);
+  /* Estilo para el texto de placeholder si la imagen falla */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-dark-blue);
 }
-
 .profile-photo img {
   width: 100%;
   height: 100%;
@@ -79,373 +91,163 @@
 }
 
 .card-body {
+  padding: 1.5rem;
   flex-grow: 1;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
 }
 
-/* Contenido */
 .content-text {
-  font-size: 1.05rem;
-  line-height: 1.5;
-  color: var(--color-text-dark);
+  color: #333;
+  font-size: 1rem;
+  line-height: 1.6;
+  min-height: 60px;
   margin-bottom: 1.5rem;
-  font-style: italic;
-  padding-top: 0.5rem;
 }
 
-.question-text {
-  font-weight: 500;
-  font-style: normal;
+.card-actions {
+  display: grid;
+  /* Se centra el único botón */
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  margin-top: auto; /* Empuja los botones al fondo */
 }
 
-/* --- BOTONES --- */
 .action-button {
-  background-color: var(--color-turquesa);
-  color: white;
-  border: none;
-  padding: 0.6rem 1rem;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 600;
-  font-size: 0.9rem;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  transition: background-color 0.2s;
-  align-self: flex-end;
+  padding: 0.75rem;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.2s;
 }
-
 .action-button:hover {
-  background-color: #12798e;
+  transform: scale(1.03);
 }
 
-.reservas-container {
-  text-align: center;
-  margin-top: 2rem;
-  margin-bottom: 3rem;
-}
-
-.reservas-button {
+.btn-reservar {
   background-color: var(--color-turquesa);
   color: white;
-  border: none;
-  padding: 0.8rem 3rem;
-  border-radius: 12px;
-  font-size: 1.2rem;
-  font-weight: 700;
-  cursor: pointer;
-  box-shadow: 0 4px 6px rgba(23, 155, 174, 0.4);
-  transition: all 0.2s ease;
+  /* Ocupa todo el ancho si es el único botón */
+  grid-column: 1 / -1;
 }
 
-.reservas-button:hover {
-  background-color: #12798e;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 10px rgba(23, 155, 174, 0.5);
-}
 
-/* --- MODAL GENERAL --- */
+/* --- ESTILOS DE MODALES (Solo Reserva) --- */
 .modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.6);
   display: flex;
-  align-items: center;
   justify-content: center;
-  z-index: 999;
-}
-
-.modal {
-  background: #f2f2f2;
-  border-radius: 12px;
-  padding: 20px;
-  width: 420px;
-  position: relative;
-  font-family: 'Poppins', sans-serif;
-}
-
-.cerrar-modal {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background: var(--color-turquesa);
-  color: white;
-  border: none;
-  border-radius: 50%;
-  width: 28px;
-  height: 28px;
-  cursor: pointer;
-}
-
-.modal-header {
-  display: flex;
   align-items: center;
-  margin-bottom: 10px;
+  z-index: 1000;
 }
 
-.avatar-modal {
-  background: #c5e1f0;
-  border-radius: 50%;
-  width: 60px;
-  height: 60px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
-  font-size: 20px;
-  margin-right: 12px;
-}
-
-.descripcion-asesor {
-  font-size: 0.9rem;
-  color: #444;
-}
-
-.form-reseña input,
-.form-reseña textarea {
-  width: 100%;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  margin-bottom: 8px;
-  padding: 8px;
-}
-
-.btn-enviar {
-  background: #F37C4A;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  width: 100%;
-  padding: 8px;
-  cursor: pointer;
-}
-
-.reseñas-previas {
-  margin-top: 15px;
-  max-height: 200px;
-  overflow-y: auto;
-}
-
-.reseña-item {
-  display: flex;
-  align-items: flex-start;
-  margin-bottom: 10px;
-}
-
-.avatar-mini {
-  background: #c5e1f0;
-  border-radius: 50%;
-  width: 35px;
-  height: 35px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
-  margin-right: 8px;
-}
-
-.estrellas {
-  color: #FFD700;
-  font-size: 18px;
-}
-
-.btn-reservar {
-  margin-top: 10px;
-  background: #5EA8C1;
-  color: white;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 6px;
-  cursor: pointer;
-  width: 100%;
-}
-
-/* ---------------- CALENDARIO ----------------- */
-.calendar-container {
-  display: flex;
-  gap: 24px;
-  align-items: flex-start;
-  justify-content: center;
-}
-
-/* calendario lado izquierdo */
-.calendar {
+.modal-content {
   background: white;
-  border-radius: 16px;
-  padding: 22px;
-  width: 420px;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+  padding: 2rem;
+  border-radius: 15px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+  width: 90%;
+  max-width: 500px;
+  z-index: 1001;
 }
 
-.calendar .month-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 14px;
-}
-
-.month-title {
-  font-weight: 700;
-  color: var(--color-dark-blue);
-  font-size: 1.15rem;
-}
-
-.month-nav button {
-  background: var(--color-turquesa);
-  border: none;
-  cursor: pointer;
-  font-weight: 700;
-  color: white;
-  border-radius: 6px;
-  padding: 4px 10px;
-}
-
-.weekdays, .days-grid {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 8px;
+.modal-title {
   text-align: center;
-}
-
-.weekdays div {
-  font-weight: 600;
-  color: #7a7a7a;
-  font-size: 1rem;
-}
-
-.day {
-  padding: 14px 0;
-  border-radius: 10px;
-  cursor: pointer;
-  user-select: none;
-  font-size: 1rem;
-}
-
-.day:hover {
-  background: #eef6f8;
-}
-
-.day.inactive {
-  color: #c9c9c9;
-  cursor: default;
-  background: transparent;
-}
-
-.day.selected {
-  background: var(--color-dark-blue);
-  color: white;
-  box-shadow: 0 6px 18px rgba(34, 49, 56, 0.16);
-}
-
-.day.today {
-  border: 2px solid var(--color-turquesa);
-  font-weight: 700;
-}
-
-/* panel derecho (seleccion y citas) */
-.calendar-right {
-  width: 440px;
-  background: #EFEDED;
-  padding: 22px;
-  border-radius: 16px;
-  min-height: 380px;
-}
-
-.calendar-right h4 {
+  font-size: 1.5rem;
   color: var(--color-dark-blue);
   margin-top: 0;
-  font-size: 1.25rem;
+  margin-bottom: 1.5rem;
 }
 
-.selected-info {
-  margin: 14px 0;
-  color: #444;
-  font-size: 1rem;
+.modal-content p {
+  text-align: center;
+  color: #555;
+  margin-top: -1rem;
+  margin-bottom: 1.5rem;
 }
 
-/* slots */
-.slot-box {
+.modal-actions {
   display: flex;
-  gap: 10px;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 10px;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 2rem;
 }
 
-.slot-pill {
-  background: white;
-  padding: 10px 16px;
-  border-radius: 14px;
-  font-weight: 600;
-  color: var(--color-dark-blue);
-  font-size: 1rem;
-}
-
-/* lista de citas registradas */
-.reserved-list {
-  margin-top: 14px;
-}
-
-.reserved-item {
-  background: #8b5a4a; /* parecido al mockup marron */
-  color: white;
-  padding: 12px 14px;
-  border-radius: 8px;
-  margin-bottom: 10px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-/* botones menores */
-.btn-primary {
-  background: var(--color-turquesa);
-  color: white;
-  padding: 10px 16px;
-  border-radius: 10px;
+.btn {
   border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
   cursor: pointer;
+  transition: background-color 0.2s;
+}
+.btn-primary {
+  background-color: var(--color-turquesa);
+  color: white;
+}
+.btn-secondary {
+  background-color: #ccc;
+  color: #333;
+}
+.btn-primary:disabled {
+  background-color: #aaa;
+  cursor: not-allowed;
+}
+
+/* Modal de Reserva (Slots de Horarios) */
+.horarios-disponibles-lista {
+  max-height: 300px;
+  overflow-y: auto;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  padding: 0.5rem;
+}
+
+.horario-placeholder {
+  text-align: center;
+  color: #888;
+  padding: 2rem;
+}
+
+.slot-item {
+  padding: 1rem;
+  border-bottom: 1px solid #f0f0f0;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.slot-item:last-child {
+  border-bottom: none;
+}
+.slot-item:hover {
+  background-color: #f9f9f9;
+}
+.slot-item.slot-seleccionado {
+  background-color: var(--color-turquesa);
+  color: white;
+  border-radius: 4px;
+}
+
+.slot-fecha {
+  font-weight: 600;
+  text-transform: capitalize;
+}
+.slot-hora {
+  font-family: monospace;
+  font-size: 1.1rem;
   font-weight: 700;
 }
 
-.btn-ghost {
-  background: transparent;
-  border: 1px solid #ddd;
-  color: #333;
-  padding: 8px 12px;
-  border-radius: 8px;
-  font-weight: 600;
-}
-
-/* modal de tarjetas y reserva */
-.card-modal {
-  width: 940px;
-  padding: 32px;
-  max-width: 95%;
-  background: #f9fafc;
-  border-radius: 18px;
-  box-shadow: 0 8px 22px rgba(0,0,0,0.25);
-}
-
-/* responsive */
-@media (max-width: 900px) {
-  .calendar-container {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .calendar-right, .calendar {
-    width: 100%;
-  }
-
-  .card-modal {
-    width: 95%;
-    padding: 20px;
-  }
-}

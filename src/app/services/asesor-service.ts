@@ -15,8 +15,8 @@ export class AsesorService {
 
   // 🔹 Listar todos los asesores
   obtenerTodosLosAsesores(): Observable<AsesorFinanciero[]> {
-    console.log(`${this.url}/listar`);
-    return this.httpClient.get<AsesorFinanciero[]>(`${this.url}/listar`);
+    console.log(this.url);
+    return this.httpClient.get<AsesorFinanciero[]>(this.url);
   }
 
   // 🔹 Buscar asesor por email

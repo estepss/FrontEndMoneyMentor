@@ -31,18 +31,18 @@ export class CalendarioAsesorComponent implements OnInit {
   public nombresDias = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
 
   // --- ESTADO DE DISPONIBILIDAD ---
-  private idAsesorLogueado = 1; // IMPORTANTE: Debes reemplazar esto con el ID real del asesor logueado
+  // Inicializamos a 0 por seguridad, el valor real se lee en ngOnInit.
+  private idAsesorLogueado: number = 0;
   private disponibilidadesDelMes: Disponibilidad[] = [];
   public horariosDelDiaSeleccionado: Disponibilidad[] = [];
   public diaSeleccionado: DiaCalendario | null = null;
   public horarioSeleccionado: Disponibilidad | null = null;
 
-  // --- ESTADO DE MODALES (Como en los mockups) ---
+  // --- ESTADO DE MODALES ---
   public showModalRegistrar = false;
   public showModalEditar = false;
 
   // --- FORMULARIO DE MODAL ---
-  // Opciones de horarios (basado en el mockup)
   public horariosPredefinidos = [
     { texto: '9am-11am', inicio: '09:00', fin: '11:00' },
     { texto: '11am-1pm', inicio: '11:00', fin: '13:00' },
@@ -52,6 +52,17 @@ export class CalendarioAsesorComponent implements OnInit {
   public horarioFormulario: { inicio: string, fin: string } = { inicio: '09:00', fin: '11:00' };
 
   ngOnInit(): void {
+    // ⬇️ MODIFICACIÓN: Leer 'idAsesor' que es la clave que tu Login.ts usa
+    const storedId = localStorage.getItem('idAsesor');
+
+    if (storedId) {
+      this.idAsesorLogueado = parseInt(storedId, 10);
+      console.log(`Calendario cargado para Asesor ID: ${this.idAsesorLogueado}`);
+    } else {
+      console.error("¡Error Crítico! No se encontró el ID del asesor ('idAsesor') en localStorage.");
+      return;
+    }
+
     this.generarCalendario();
     this.cargarDisponibilidadesDelAsesor();
   }
@@ -92,7 +103,7 @@ export class CalendarioAsesorComponent implements OnInit {
         numero: i,
         esHoy: esHoy,
         esMesActual: true,
-        disponibilidades: this.filtrarDisponibilidadPorDia(fecha)
+        disponibilidades: this.filtrarDisponibilidadPorDia(fecha) // Rellenado con datos cargados
       });
     }
 
@@ -114,8 +125,10 @@ export class CalendarioAsesorComponent implements OnInit {
   /** Cambia al mes anterior o siguiente */
   cambiarMes(offset: number): void {
     this.fechaActual.setMonth(this.fechaActual.getMonth() + offset);
-    this.generarCalendario();
-    this.cargarDisponibilidadesDelAsesor(); // Volver a cargar disponibilidades para el nuevo mes
+    this.diaSeleccionado = null;
+    this.horariosDelDiaSeleccionado = [];
+    this.horarioSeleccionado = null;
+    this.cargarDisponibilidadesDelAsesor();
   }
 
   /** Formatea el título del mes (ej: "Junio 2024") */
@@ -127,30 +140,39 @@ export class CalendarioAsesorComponent implements OnInit {
   // MÉTODOS DE LÓGICA DE DISPONIBILIDAD (CONEXIÓN AL SERVICIO)
   // ------------------------------------------------------------------
 
-  /** Carga todas las disponibilidades del asesor (se podría filtrar por mes) */
+  /** Carga todas las disponibilidades del asesor (filtradas por el ID logueado) */
   cargarDisponibilidadesDelAsesor(): void {
+    if (this.idAsesorLogueado === 0) return;
+
     this.disponibilidadService.listByAsesor(this.idAsesorLogueado).subscribe(data => {
       this.disponibilidadesDelMes = data;
-      // Actualizar el calendario con los datos frescos
-      this.generarCalendario();
+      this.generarCalendario(); // Re-renderizar el calendario con los datos nuevos
+
+      // Si había un día seleccionado, actualizar su lista de horarios
+      if (this.diaSeleccionado) {
+        const diaActualizado = this.diasDelMes.find(d => d.fecha.toDateString() === this.diaSeleccionado?.fecha.toDateString());
+        if (diaActualizado) {
+          this.seleccionarDia(diaActualizado);
+        }
+      }
     });
   }
 
   /** Filtra las disponibilidades cargadas para un día específico */
   filtrarDisponibilidadPorDia(fecha: Date): Disponibilidad[] {
-    const fechaStr = this.formatoFechaISO(fecha); // "YYYY-MM-DD"
+    const fechaStr = this.formatoFechaISO(fecha);
     return this.disponibilidadesDelMes
       .filter(d => d.fecha === fechaStr)
-      .sort((a, b) => a.horaInicio.localeCompare(b.horaInicio)); // Ordenar por hora
+      .sort((a, b) => a.horaInicio.localeCompare(b.horaInicio));
   }
 
   /** Maneja el clic en un día del calendario */
   seleccionarDia(dia: DiaCalendario): void {
-    if (!dia.esMesActual) return; // No seleccionar días fuera del mes
+    if (!dia.esMesActual) return;
 
     this.diaSeleccionado = dia;
     this.horariosDelDiaSeleccionado = dia.disponibilidades;
-    this.horarioSeleccionado = null; // Resetear horario seleccionado
+    this.horarioSeleccionado = null;
   }
 
   /** Maneja el clic en un horario de la barra lateral */
@@ -158,45 +180,30 @@ export class CalendarioAsesorComponent implements OnInit {
     this.horarioSeleccionado = horario;
   }
 
-  /**
-   * REGISTRAR: Llama al servicio para guardar la nueva disponibilidad
-   */
+  /** REGISTRAR: Llama al servicio para guardar la nueva disponibilidad */
   registrarDisponibilidad(): void {
     if (!this.diaSeleccionado) return;
 
     const nuevaDisp = new Disponibilidad();
     nuevaDisp.idAsesor = this.idAsesorLogueado;
-    nuevaDisp.fecha = this.formatoFechaISO(this.diaSeleccionado.fecha); // "YYYY-MM-DD"
-    nuevaDisp.horaInicio = this.horarioFormulario.inicio; // "HH:mm"
+    nuevaDisp.fecha = this.formatoFechaISO(this.diaSeleccionado.fecha);
+    nuevaDisp.horaInicio = this.horarioFormulario.inicio;
     nuevaDisp.horaFin = this.horarioFormulario.fin;
     nuevaDisp.disponible = true;
 
     this.disponibilidadService.insert(nuevaDisp).subscribe({
       next: () => {
-        this.cargarDisponibilidadesDelAsesor(); // Recargar datos
         this.showModalRegistrar = false;
-        // Actualizar la vista lateral
-        setTimeout(() => {
-          if (this.diaSeleccionado) {
-            // Re-seleccionar el día para actualizar la lista
-            const diaActualizado = this.diasDelMes.find(d => d.fecha.toDateString() === this.diaSeleccionado?.fecha.toDateString());
-            if (diaActualizado) {
-              this.seleccionarDia(diaActualizado);
-            }
-          }
-        }, 100); // Pequeña espera para que los datos se refresquen
+        this.cargarDisponibilidadesDelAsesor(); // Recargar datos, lo que actualiza automáticamente la vista
       },
       error: (err) => console.error("Error al registrar:", err)
     });
   }
 
-  /**
-   * EDITAR: Llama al servicio para actualizar la disponibilidad
-   */
+  /** EDITAR: Llama al servicio para actualizar la disponibilidad */
   actualizarDisponibilidad(): void {
     if (!this.horarioSeleccionado) return;
 
-    // Actualizamos solo las horas (la fecha y el ID no cambian)
     const dispActualizada: Disponibilidad = {
       ...this.horarioSeleccionado,
       horaInicio: this.horarioFormulario.inicio,
@@ -205,43 +212,23 @@ export class CalendarioAsesorComponent implements OnInit {
 
     this.disponibilidadService.update(dispActualizada).subscribe({
       next: () => {
-        this.cargarDisponibilidadesDelAsesor();
         this.showModalEditar = false;
         this.horarioSeleccionado = null;
-        // Actualizar vista lateral (similar a registrar)
-        setTimeout(() => {
-          if (this.diaSeleccionado) {
-            const diaActualizado = this.diasDelMes.find(d => d.fecha.toDateString() === this.diaSeleccionado?.fecha.toDateString());
-            if (diaActualizado) {
-              this.seleccionarDia(diaActualizado);
-            }
-          }
-        }, 100);
+        this.cargarDisponibilidadesDelAsesor(); // Recargar datos
       },
       error: (err) => console.error("Error al actualizar:", err)
     });
   }
 
-  /**
-   * ELIMINAR: Llama al servicio para borrar la disponibilidad
-   */
+  /** ELIMINAR: Llama al servicio para borrar la disponibilidad */
   eliminarDisponibilidad(): void {
     if (!this.horarioSeleccionado || !this.horarioSeleccionado.idDisponibilidad) return;
 
     const idParaEliminar = this.horarioSeleccionado.idDisponibilidad;
     this.disponibilidadService.delete(idParaEliminar).subscribe({
       next: () => {
-        this.cargarDisponibilidadesDelAsesor();
         this.horarioSeleccionado = null;
-        // Actualizar vista lateral (similar a registrar)
-        setTimeout(() => {
-          if (this.diaSeleccionado) {
-            const diaActualizado = this.diasDelMes.find(d => d.fecha.toDateString() === this.diaSeleccionado?.fecha.toDateString());
-            if (diaActualizado) {
-              this.seleccionarDia(diaActualizado);
-            }
-          }
-        }, 100);
+        this.cargarDisponibilidadesDelAsesor(); // Recargar datos
       },
       error: (err) => console.error("Error al eliminar:", err)
     });
@@ -251,10 +238,9 @@ export class CalendarioAsesorComponent implements OnInit {
   // MÉTODOS DE UTILIDAD Y MODALES
   // ------------------------------------------------------------------
 
-  /** Abre el modal de Registrar (basado en el mockup) */
+  /** Abre el modal de Registrar */
   abrirModalRegistrar(): void {
     if (!this.diaSeleccionado) {
-      // Usamos console.error o un modal custom, no alert()
       console.error("Por favor, seleccione un día del calendario primero.");
       return;
     }
@@ -263,10 +249,9 @@ export class CalendarioAsesorComponent implements OnInit {
     this.showModalRegistrar = true;
   }
 
-  /** Abre el modal de Editar (basado en el mockup) */
+  /** Abre el modal de Editar */
   abrirModalEditar(): void {
     if (!this.horarioSeleccionado) {
-      // Usamos console.error o un modal custom, no alert()
       console.error("Por favor, seleccione un horario de la lista primero.");
       return;
     }
@@ -278,25 +263,19 @@ export class CalendarioAsesorComponent implements OnInit {
     this.showModalEditar = true;
   }
 
-  /**
-   * Función de comparación para el select con ngModel de objetos.
-   * Esto asegura que el valor seleccionado en el dropdown se muestre correctamente.
-   */
+  /** Función de comparación para el select de horarios */
   compararHorarios(o1: { inicio: string, fin: string }, o2: { inicio: string, fin: string }): boolean {
-    // Si uno de los objetos es nulo o indefinido, retornar falso (o verdadero si ambos lo son)
     if (!o1 || !o2) return o1 === o2;
-    // Comparamos si la hora de inicio Y la hora de fin coinciden.
     return o1.inicio === o2.inicio && o1.fin === o2.fin;
   }
 
-
   /** Convierte una hora (ej: "09:00:00") a formato 12h (ej: "9am") */
   formatoHoraAmPm(hora: string): string {
+    if (!hora) return '';
     const [h, m] = hora.split(':');
     const horaNum = parseInt(h, 10);
     const ampm = horaNum >= 12 ? 'pm' : 'am';
     const hora12 = horaNum % 12 === 0 ? 12 : horaNum % 12;
-    // Quitamos los minutos si son 00 para mantenerlo limpio (ej: 9am vs 9:30am)
     if (m === '00' || !m) {
       return `${hora12}${ampm}`;
     }
@@ -305,6 +284,8 @@ export class CalendarioAsesorComponent implements OnInit {
 
   /** Convierte un objeto Date a "YYYY-MM-DD" */
   formatoFechaISO(date: Date): string {
-    return date.toISOString().split('T')[0];
+    const offset = date.getTimezoneOffset();
+    const adjustedDate = new Date(date.getTime() - (offset*60*1000));
+    return adjustedDate.toISOString().split('T')[0];
   }
 }

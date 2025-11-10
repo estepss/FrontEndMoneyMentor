@@ -1,265 +1,91 @@
 <div class="asesor-page-container">
   <h1 class="page-title">Lista de asesores</h1>
 
+  <!-- 1. CONTENEDOR DE LA LISTA DE ASESORES -->
   <div class="asesores-grid">
-    <div class="asesor-card" *ngFor="let asesor of asesores; let i = index">
-      <div class="card-header">
-        <div class="header-name-box">{{ asesor.nombre }}</div>
-        <div class="profile-photo">
-          <img
-            [src]="asesor.imagenUrl"
-            [alt]="'Foto de ' + asesor.nombre"
-            (error)="onImageError($event)"
-          />
+
+    <!-- Mensaje si no hay asesores -->
+    @if (asesores.length === 0) {
+      <p class="empty-state">No hay asesores registrados actualmente.</p>
+    }
+
+    <!-- Loop de Asesores Reales -->
+    @for (asesor of asesores; track asesor.idAsesor) {
+      <div class="asesor-card">
+        <div class="card-header">
+          <!-- Nombre del Asesor -->
+          <div class="header-name-box">
+            {{ asesor.nombre }}
+          </div>
+
+          <!-- Foto de perfil del Asesor (usando placeholder) -->
+          <div class="profile-photo">
+            <img
+              [src]="getPlaceholderAvatar(asesor.nombre)"
+              [alt]="'Foto de ' + asesor.nombre"
+            />
+          </div>
+        </div>
+
+        <div class="card-body">
+          <!-- Contenido: Usamos 'sobreMi' del backend -->
+          <p class="content-text">
+            {{ asesor.sobreMi || 'Este asesor aún no ha añadido una descripción.' }}
+          </p>
+
+          <!-- Botones de acción (Solo Reservar) -->
+          <div class="card-actions">
+            <button class="action-button btn-reservar" (click)="abrirReserva(asesor)">
+              Reservar
+              <span class="material-icons-sharp">event_available</span>
+            </button>
+          </div>
+
         </div>
       </div>
+    }
+  </div>
 
-      <div class="card-body">
-        <p class="content-text question-text">
-          {{ asesor.textoPrincipal }}
-        </p>
+</div>
 
-        <button class="action-button" (click)="abrirModal(asesor)">
-          Revisar
-          <span class="material-icons-sharp">rate_review</span>
+
+<!-- 2. MODAL PARA RESERVA (CON HORARIOS REALES) -->
+@if (mostrarReservaModal && asesorReserva) {
+  <div class="modal-overlay" (click)="cerrarReservaModal()">
+    <div class="modal-content reserva-modal" (click)="$event.stopPropagation()">
+      <h3 class="modal-title">Reservar cita con {{ asesorReserva.nombre }}</h3>
+
+      <p>Selecciona un horario disponible:</p>
+
+      <!-- Lista de Horarios Reales -->
+      <div class="horarios-disponibles-lista">
+        @if (horariosVisibles.length === 0) {
+          <p class="horario-placeholder">No hay horarios disponibles para este asesor.</p>
+        } @else {
+          @for (slot of horariosVisibles; track slot.idDisponibilidad) {
+            <div
+              class="slot-item"
+              [class.slot-seleccionado]="slot.idDisponibilidad === slotSeleccionado?.idDisponibilidad"
+              (click)="seleccionarSlot(slot)">
+              <!-- Formato: "Jueves 9 de Noviembre" -->
+              <span class="slot-fecha">{{ slot.fecha | date:'EEEE d \'de\' MMMM' }}</span>
+              <!-- Formato: "9am - 11am" -->
+              <span class="slot-hora">{{ formatoHoraAmPm(slot.horaInicio) }} - {{ formatoHoraAmPm(slot.horaFin) }}</span>
+            </div>
+          }
+        }
+      </div>
+
+      <!-- Acciones del Modal -->
+      <div class="modal-actions">
+        <button class="btn btn-secondary" (click)="cerrarReservaModal()">Cancelar</button>
+        <button
+          class="btn btn-primary"
+          (click)="confirmarReserva()"
+          [disabled]="!slotSeleccionado">
+          Confirmar Reserva
         </button>
       </div>
     </div>
   </div>
-
-  <!-- Botón inferior -->
-  <div class="reservas-container">
-    <button class="reservas-button" (click)="abrirListaReservas()">Reservas</button>
-  </div>
-</div>
-
-<div class="modal-overlay" *ngIf="mostrarListaReservas">
-  <div class="modal card-modal" style="max-width:1000px;">
-    <button class="cerrar-modal" (click)="cerrarListaReservas()">×</button>
-
-    <h2 style="color:var(--color-dark-blue); margin-top:2px;">Reservas</h2>
-
-    <div class="asesores-grid" style="margin-top:16px;">
-      <div class="reserva-card" *ngFor="let item of reservasList">
-        <div style="display:flex; gap:12px; align-items:flex-start;">
-          <div style="width:86px; height:86px; border-radius:12px; overflow:hidden; background:#fff; display:flex; align-items:center; justify-content:center; border:6px solid #f6f0da;">
-            <img [src]="item.imagenUrl" alt="{{item.nombre}}" style="width:100%; height:100%; object-fit:cover;" />
-          </div>
-
-          <div style="flex:1; text-align:left;">
-            <h3 style="margin:0; font-size:1.45rem; font-weight:800;">{{ item.nombre }}</h3>
-            <p style="margin:8px 0; color:#444; font-size:0.95rem;">
-              {{ item.descripcion }}
-            </p>
-
-            <div style="margin-top:10px; border-top:1px solid #ddd; padding-top:10px;">
-              <strong>Fechas reservadas</strong>
-              <div style="margin-top:8px; color:#333; font-size:0.9rem;">
-                <div *ngFor="let f of item.fechas">{{ f }}</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div style="margin-top:14px; display:flex; gap:12px; justify-content:center;">
-          <button class="btn-primary" (click)="abrirReprogramar(item)">Reprogramar</button>
-          <button class="btn-eliminar" (click)="eliminarReservaVisual(item)">Eliminar</button>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-
-<div class="modal-overlay" *ngIf="mostrarReprogramar">
-  <div class="modal" style="width:420px;">
-    <button class="cerrar-modal" (click)="cerrarReprogramar()">×</button>
-    <div class="modal-header">
-      <div class="avatar-modal">{{ getIniciales(reprogramarTarget?.nombre || '') }}</div>
-      <div>
-        <h3>Horarios Disponibles para el Asesor</h3>
-        <p class="descripcion-asesor">{{ reprogramarTarget?.nombre }}</p>
-      </div>
-    </div>
-
-    <div style="margin-top:12px;">
-      <label for="horarioSelect" style="display:block; margin-bottom:8px; font-weight:700;">Selecciona un horario</label>
-      <select id="horarioSelect" [(ngModel)]="horarioSeleccionado" style="width:100%; padding:8px; border-radius:8px; border:1px solid #ccc;">
-        <!-- Sólo la opción que pediste -->
-        <option value="10-12">10 am - 12 pm</option>
-      </select>
-
-      <div style="margin-top:12px; display:flex; gap:8px;">
-        <button class="btn-registrar" (click)="registrarReprogramacion()">Registrar</button>
-        <button class="btn-ghost" (click)="cerrarReprogramar()">Cancelar</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="modal-overlay" *ngIf="mostrarModal">
-  <div class="modal">
-    <button class="cerrar-modal" (click)="cerrarModal()">X</button>
-
-    <div class="modal-header" *ngIf="asesorSeleccionado">
-      <div class="avatar-modal">
-        {{ getIniciales(asesorSeleccionado.nombre) }}
-      </div>
-      <div>
-        <h3>{{ asesorSeleccionado.nombre }}</h3>
-        <p class="descripcion-asesor">
-          Hola, soy
-          {{
-            asesorSeleccionado.nombre
-              ? asesorSeleccionado.nombre.split(' ')[0]
-              : ''
-          }}
-          y tengo {{ asesorSeleccionado.experiencia }} años de experiencia
-        </p>
-      </div>
-    </div>
-
-    <div class="form-reseña">
-      <input
-        type="number"
-        placeholder="Da una calificación del 1 al 5"
-        [(ngModel)]="nuevaResena.puntuacion"
-        min="1"
-        max="5"
-      />
-      <textarea
-        placeholder="Escribir un comentario"
-        [(ngModel)]="nuevaResena.comentario"
-      ></textarea>
-      <button class="btn-enviar" (click)="enviarResena()">Enviar</button>
-    </div>
-
-    <div class="reseñas-previas" *ngIf="asesorSeleccionado">
-      <div
-        class="reseña-item"
-        *ngFor="let r of resenas[asesorSeleccionado.id]"
-      >
-        <div class="avatar-mini">{{ getIniciales(r.nombreCliente || 'C') }}</div>
-        <div>
-          <strong>{{ r.nombreCliente }}</strong>
-          <span class="estrellas">{{ '★'.repeat(r.puntuacion) }}</span>
-          <p>{{ r.comentario }}</p>
-        </div>
-      </div>
-    </div>
-
-    <button class="btn-reservar" (click)="abrirReserva(asesorSeleccionado)">
-      Reservar
-    </button>
-  </div>
-</div>
-
-<!-- MODAL CALENDARIO / RESERVAS (tu código existente, sin cambios funcionales) -->
-<div class="modal-overlay" *ngIf="mostrarReservaModal">
-  <div class="modal card-modal">
-    <button class="cerrar-modal" (click)="cerrarReservaModal()">X</button>
-
-    <h3 style="color:var(--color-dark-blue); margin-top: 6px;">Calendario</h3>
-
-    <div class="calendar-container">
-      <!-- calendario izquierdo -->
-      <div class="calendar">
-        <div class="month-header">
-          <div class="month-nav">
-            <button (click)="prevMonth()">&lt;</button>
-          </div>
-          <div class="month-title">
-            {{ monthNames[currentMonth] }} {{ currentYear }}
-          </div>
-          <div class="month-nav">
-            <button (click)="nextMonth()">&gt;</button>
-          </div>
-        </div>
-
-        <div class="weekdays">
-          <div *ngFor="let wd of weekDays">{{ wd }}</div>
-        </div>
-
-        <div class="days-grid">
-          <div
-            *ngFor="let day of calendarDays"
-            [class.day]="true"
-            [class.inactive]="!day.inCurrentMonth"
-            [class.selected]="isSelected(day)"
-            [class.today]="isToday(day)"
-            (click)="selectDay(day)"
-          >
-            {{ day.date.getDate() }}
-          </div>
-        </div>
-
-        <div style="margin-top: 12px; display:flex; gap:8px;">
-          <input type="text" [value]="inputMonthYear" readonly style="flex:1; padding:8px; border-radius:8px; border:1px solid #ddd;"/>
-          <button class="btn-ghost" (click)="goToToday()">Hoy</button>
-        </div>
-      </div>
-
-      <!-- panel derecho -->
-      <div class="calendar-right">
-        <h4>Día y hora seleccionada</h4>
-
-        <div class="selected-info">
-          <div *ngIf="selectedDateStr; else noSelection">
-            <div style="font-weight:700; margin-bottom:6px;">-- {{ selectedDateStr }} --</div>
-            <div style="color:#777; margin-bottom:8px;">-- {{ asesorReserva?.nombre }} --</div>
-
-            <div *ngIf="availableSlots.length">
-              <div *ngFor="let s of availableSlots" class="slot-box">
-                <div class="slot-pill">{{ s.label }}</div>
-                <div>
-                  <button class="btn-primary" (click)="registrarSlot(s)">Registrar</button>
-                </div>
-              </div>
-            </div>
-
-            <div class="reserved-list">
-              <div *ngFor="let r of getReservasForAsesor(asesorReserva?.id)" class="reserved-item">
-                <div>
-                  • Cita con {{ asesorReserva?.nombre }}<br/>
-                  <small>{{ r.fecha }} — {{ r.horaInicio }} - {{ r.horaFin }}</small>
-                </div>
-                <div style="display:flex; gap:8px; align-items:center;">
-                  <button class="btn-ghost" (click)="openCardModal(r)">+</button>
-                  <button class="btn-ghost" (click)="eliminarReserva(asesorReserva?.id, r)">🗑</button>
-                </div>
-              </div>
-            </div>
-
-            <div style="margin-top: 12px;">
-              <button class="btn-primary" (click)="openCardModal()" [disabled]="!hasAnyReservaForSelectedDate()">Seleccionar tarjeta</button>
-            </div>
-          </div>
-
-          <ng-template #noSelection>
-            <div style="color:#666;">-- Selecciona un día a la izquierda --</div>
-          </ng-template>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- MODAL TARJETA / PAGO -->
-<div class="modal-overlay" *ngIf="mostrarCardModal">
-  <div class="modal card-modal">
-    <button class="cerrar-modal" (click)="cerrarCardModal()">X</button>
-    <h4>Seleccionar tarjetas registradas</h4>
-
-    <div style="margin-top:10px;">
-      <select style="width:100%; padding:8px; border-radius:8px; border:1px solid #ccc;" [(ngModel)]="selectedCard">
-        <option [ngValue]="null">Seleccione tarjeta...</option>
-        <option [value]="'visa-46'">Mi visa que termina en **46</option>
-      </select>
-    </div>
-
-    <div style="margin-top:12px; display:flex; gap:8px;">
-      <button class="btn-primary" (click)="confirmarPago()" [disabled]="!selectedCard">Pagar</button>
-      <button class="btn-ghost" (click)="cerrarCardModal()">Cancelar</button>
-    </div>
-  </div>
-</div>
+}

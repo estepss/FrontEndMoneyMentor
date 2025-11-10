@@ -4,12 +4,12 @@ import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 
 // Modelos Reales que SÍ tienes
-import { AsesorFinanciero } from '../model/asesor-financiero';
-import { Disponibilidad } from '../model/disponibilidad';
+import { AsesorFinanciero } from '../../model/asesor-financiero';
+import { Disponibilidad } from '../../model/disponibilidad';
 
 // Servicios Reales que SÍ tienes
-import { AsesorService } from '../services/asesor-service';
-import { DisponibilidadService } from '../services/disponibilidad-service';
+import { AsesorService } from '../../services/asesor-service';
+import { DisponibilidadService } from '../../services/disponibilidad-service';
 
 @Component({
   selector: 'app-asesor',

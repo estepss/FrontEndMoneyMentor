@@ -1,13 +1,13 @@
 import {Component, inject, OnInit} from '@angular/core';
-import {GestionService} from '../services/gestion-service';
-import {ClienteService} from '../services/cliente-service';
-import { Cliente } from '../model/cliente';
+import {GestionService} from '../../services/gestion-service';
+import {ClienteService} from '../../services/cliente-service';
+import { Cliente } from '../../model/cliente';
 import {FormBuilder, FormGroup, ReactiveFormsModule} from '@angular/forms';
-import {PerfilService} from '../services/perfil-service';
-import {Perfil, Rol} from '../model/perfil';
+import {PerfilService} from '../../services/perfil-service';
+import {Perfil, Rol} from '../../model/perfil';
 import {ActivatedRoute, Router} from '@angular/router';
 import {MatButton} from '@angular/material/button';
-import {Credenciales} from '../model/credenciales';
+import {Credenciales} from '../../model/credenciales';
 import {tap} from 'rxjs';
 
 @Component({

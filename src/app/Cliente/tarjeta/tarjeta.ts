@@ -4,8 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 // 1. Importamos el NUEVO SERVICIO y el MODELO (Clase)
 // Esta importación ya no causará conflicto
-import { Tarjeta } from '../model/tarjeta';
-import {TarjetaService} from '../services/tarjeta-service';
+import { Tarjeta } from '../../model/tarjeta';
+import {TarjetaService} from '../../services/tarjeta-service';
 
 @Component({
   selector: 'app-tarjeta',

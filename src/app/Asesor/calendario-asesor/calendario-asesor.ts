@@ -2,8 +2,8 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
-import { Disponibilidad } from '../model/disponibilidad';
-import { DisponibilidadService } from '../services/disponibilidad-service';
+import { Disponibilidad } from '../../model/disponibilidad';
+import { DisponibilidadService } from '../../services/disponibilidad-service';
 
 // Tipo para la celda del calendario
 type DiaCalendario = {

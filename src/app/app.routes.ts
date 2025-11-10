@@ -1,22 +1,22 @@
 import { Routes } from '@angular/router';
-import {Inicio} from './inicio/inicio';
-import {Calculadora} from './calculadora/calculadora';
-import {Analisis} from './analisis/analisis';
-import {Gestion} from './gestion/gestion';
-import {AsesorComponent} from './asesor/asesor';
-import {Chat} from './chat/chat';
-import {TarjetaComponent} from './tarjeta/tarjeta';
+import {Inicio} from './Cliente/inicio/inicio';
+import {Calculadora} from './Cliente/calculadora/calculadora';
+import {Analisis} from './Cliente/analisis/analisis';
+import {Gestion} from './Cliente/gestion/gestion';
+import {AsesorComponent} from './Cliente/asesor/asesor';
+import {Chat} from './Cliente/chat/chat';
+import {TarjetaComponent} from './Cliente/tarjeta/tarjeta';
 import {Landing} from './landing/landing';
 import {Acceso} from './acceso/acceso';
-import {MainLayout} from './main-layout/main-layout';
+import {MainLayout} from './Cliente/main-layout/main-layout';
 import {Perfil} from './model/perfil';
-import {PerfilComponent} from './perfil/perfil';
-import {LayoutAsesor} from './layout-asesor/layout-asesor';
-import {InicioAsesor} from './inicio-asesor/inicio-asesor';
-import {ChatAsesor} from './chat-asesor/chat-asesor';
-import {PerfilAsesor} from './perfil-asesor/perfil-asesor';
-import {Clientes} from './clientes/clientes';
-import {CalendarioAsesorComponent} from './calendario-asesor/calendario-asesor';
+import {PerfilComponent} from './Cliente/perfil/perfil';
+import {LayoutAsesor} from './Asesor/layout-asesor/layout-asesor';
+import {InicioAsesor} from './Asesor/inicio-asesor/inicio-asesor';
+import {ChatAsesor} from './Asesor/chat-asesor/chat-asesor';
+import {PerfilAsesor} from './Asesor/perfil-asesor/perfil-asesor';
+import {Clientes} from './Asesor/clientes/clientes';
+import {CalendarioAsesorComponent} from './Asesor/calendario-asesor/calendario-asesor';
 
 export const routes: Routes = [
   //Landing

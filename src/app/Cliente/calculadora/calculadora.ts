@@ -1,6 +1,6 @@
 import {Component, inject} from '@angular/core';
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
-import {CalculadoraService} from '../services/calculadora-service';
+import {CalculadoraService} from '../../services/calculadora-service';
 
 
 interface CalculoResultado {

@@ -1,8 +1,8 @@
 import {Component, inject} from '@angular/core';
 import {MatButton} from "@angular/material/button";
 import {FormBuilder, ReactiveFormsModule} from "@angular/forms";
-import {Perfil} from '../model/perfil';
-import {PerfilService} from '../services/perfil-service';
+import {Perfil} from '../../model/perfil';
+import {PerfilService} from '../../services/perfil-service';
 
 @Component({
   selector: 'app-perfil-asesor',

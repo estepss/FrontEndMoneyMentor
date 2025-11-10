@@ -23,10 +23,10 @@ import {
 import {MatPaginator} from '@angular/material/paginator';
 import {MatSort} from '@angular/material/sort';
 import {DatePipe} from '@angular/common';
-import {GestionService} from '../services/gestion-service';
-import {GestionFinanciera} from '../model/gestion-financiera';
+import {GestionService} from '../../services/gestion-service';
+import {GestionFinanciera} from '../../model/gestion-financiera';
 import {MatSelect, MatSelectModule} from '@angular/material/select';
-import {Cliente} from '../model/cliente';
+import {Cliente} from '../../model/cliente';
 import {interval, switchMap} from 'rxjs';
 
 @Component({

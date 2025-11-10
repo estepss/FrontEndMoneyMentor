@@ -2,7 +2,7 @@ import {inject, Injectable} from '@angular/core';
 import {environment} from '../../environments/environment';
 import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
-import {Gestion} from '../gestion/gestion';
+import {Gestion} from '../Cliente/gestion/gestion';
 import {GestionFinanciera} from '../model/gestion-financiera';
 
 @Injectable({

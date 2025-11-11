@@ -1,1 +1,99 @@
-<p>analisis works!</p>
+<h1 class="titulo">Análisis</h1>
+
+<div class="grid-analisis">
+  <section class="card-neo fade-card">
+    <header class="card-neo__header water-header">
+      <div class="left">
+        <mat-icon>pie_chart</mat-icon>
+        <div>
+          <h3>Reporte por tipo</h3>
+          <span>Distribución de montos por título</span>
+        </div>
+      </div>
+
+      <button mat-icon-button (click)="descargarImagen(imgPorTipo)">
+        <mat-icon>download</mat-icon>
+      </button>
+    </header>
+
+    <form [formGroup]="formTipo" class="controls">
+      <mat-form-field appearance="outline" class="full">
+        <mat-label>Tipo*</mat-label>
+        <mat-select formControlName="tipo">
+          <mat-option value="ingreso">Ingreso</mat-option>
+          <mat-option value="egreso">Egreso</mat-option>
+        </mat-select>
+
+        <mat-error *ngIf="tieneErrorTipo()">
+          Seleccione un tipo
+        </mat-error>
+      </mat-form-field>
+
+      <button mat-raised-button class="btn-cta" type="button" (click)="mostrarPorTipo()">
+        <mat-icon>play_arrow</mat-icon> Mostrar
+      </button>
+    </form>
+
+    <div class="viz">
+      <img *ngIf="imgPorTipo" [src]="imgPorTipo" class="chart-img">
+
+      <p *ngIf="noDataTipo" class="placeholder no-data">
+        <mat-icon>info</mat-icon>
+        No hay datos disponibles para este tipo.
+      </p>
+
+      <p *ngIf="!imgPorTipo && !noDataTipo" class="placeholder">
+        Seleccione un tipo y presione <b>Mostrar</b>.
+      </p>
+    </div>
+  </section>
+
+
+  <!-- REPORTE POR FECHA -->
+  <section class="card-neo fade-card">
+    <header class="card-neo__header water-header">
+      <div class="left">
+        <mat-icon>event</mat-icon>
+        <div>
+          <h3>Reporte por fecha</h3>
+          <span>Sumatoria de montos en un día</span>
+        </div>
+      </div>
+
+      <button mat-icon-button (click)="descargarImagen(imgPorFecha)">
+        <mat-icon>download</mat-icon>
+      </button>
+    </header>
+
+    <form [formGroup]="formFecha" class="controls">
+      <mat-form-field appearance="outline" class="full">
+        <mat-label>Fecha*</mat-label>
+        <input matInput [matDatepicker]="picker" formControlName="fecha" placeholder="DD/MM/YYYY">
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+
+        <mat-error *ngIf="tieneErrorFecha()">
+          La fecha es obligatoria
+        </mat-error>
+      </mat-form-field>
+
+      <button mat-raised-button class="btn-cta" type="button" (click)="mostrarPorFecha()">
+        <mat-icon>play_arrow</mat-icon> Mostrar
+      </button>
+    </form>
+
+    <div class="viz">
+      <img *ngIf="imgPorFecha" [src]="imgPorFecha" class="chart-img">
+
+      <p *ngIf="noDataFecha" class="placeholder no-data">
+        <mat-icon>info</mat-icon>
+        No hay datos disponibles para esta fecha.
+      </p>
+
+      <p *ngIf="!imgPorFecha && !noDataFecha" class="placeholder">
+        Seleccione una fecha y presione <b>Mostrar</b>.
+      </p>
+    </div>
+  </section>
+</div>
+

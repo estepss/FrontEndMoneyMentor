@@ -3,13 +3,13 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 
-// Modelos Reales que SÍ tienes
 import { AsesorFinanciero } from '../../model/asesor-financiero';
 import { Disponibilidad } from '../../model/disponibilidad';
+import { CalificacionAsesor } from '../../model/calificacion-asesor';
 
-// Servicios Reales que SÍ tienes
 import { AsesorService } from '../../services/asesor-service';
 import { DisponibilidadService } from '../../services/disponibilidad-service';
+import { CalificacionService } from '../../services/calificacion-asesor-service';
 
 @Component({
   selector: 'app-asesor',
@@ -20,70 +20,112 @@ import { DisponibilidadService } from '../../services/disponibilidad-service';
 })
 export class AsesorComponent implements OnInit {
 
-  // --- Inyección de Servicios ---
   private asesorService = inject(AsesorService);
   private disponibilidadService = inject(DisponibilidadService);
+  private calificacionService = inject(CalificacionService);
 
-  // --- ESTADO REAL (Conectado a Backend) ---
   public asesores: AsesorFinanciero[] = [];
-  public disponibilidades: Record<number, Disponibilidad[]> = {}; // Almacén de disponibilidad por idAsesor
+  public disponibilidades: Record<number, Disponibilidad[]> = {};
 
-  // --- ESTADO DE MODAL DE RESERVA ---
   public mostrarReservaModal = false;
   public asesorReserva: AsesorFinanciero | null = null;
   public horariosVisibles: Disponibilidad[] = [];
   public slotSeleccionado: Disponibilidad | null = null;
 
-  constructor() {}
+  public mostrarResenaModal = false;
+  public asesorSeleccionado: AsesorFinanciero | null = null;
+
+  public resenas: Record<number, CalificacionAsesor[]> = {};
+
+  public puntuacion = 0;
+  public comentario = '';
 
   ngOnInit(): void {
     this.cargarAsesores();
   }
 
-  /**
-   * 1. Carga la lista de asesores desde el backend.
-   */
   cargarAsesores(): void {
     this.asesorService.obtenerTodosLosAsesores().subscribe({
       next: (data) => {
         this.asesores = data;
-        // 2. Por cada asesor, cargamos su disponibilidad real
-        data.forEach(asesor => {
+
+        data.forEach((asesor) => {
           this.cargarDisponibilidad(asesor.idAsesor);
+          this.cargarResenas(asesor.idAsesor);
         });
       },
-      error: (err) => console.error('Error cargando asesores:', err)
+      error: (err) => console.error(err),
     });
   }
 
-  /**
-   * 2. Carga la disponibilidad para un asesor específico.
-   */
   cargarDisponibilidad(idAsesor: number): void {
     this.disponibilidadService.listByAsesor(idAsesor).subscribe({
       next: (data) => {
-        // Almacenamos solo los slots que están marcados como 'disponible: true'
-        this.disponibilidades[idAsesor] = data.filter(slot => slot.disponible);
+        this.disponibilidades[idAsesor] = data.filter(s => s.disponible);
       },
-      error: (err) => {
-        console.error(`Error cargando disponibilidad para asesor ${idAsesor}:`, err);
-        this.disponibilidades[idAsesor] = []; // Dejar vacío si hay error
-      }
+      error: () => (this.disponibilidades[idAsesor] = []),
     });
   }
 
-  // ===============================================
-  // LÓGICA DE RESERVA (CON DISPONIBILIDAD REAL)
-  // ===============================================
+  abrirModalResena(asesor: AsesorFinanciero): void {
+    this.asesorSeleccionado = asesor;
+    this.puntuacion = 0;
+    this.comentario = '';
+    this.mostrarResenaModal = true;
+  }
 
-  /**
-   * Abre el modal de reserva y muestra los horarios REALES disponibles.
-   */
+  cerrarModalResena(): void {
+    this.mostrarResenaModal = false;
+    this.asesorSeleccionado = null;
+    this.puntuacion = 0;
+    this.comentario = '';
+  }
+
+  cargarResenas(idAsesor: number): void {
+    this.calificacionService.listarPorAsesor(idAsesor).subscribe({
+      next: (data) => {
+        this.resenas[idAsesor] = data;
+      },
+      error: (err) => console.error(err),
+    });
+  }
+
+  enviarResena(): void {
+    if (!this.asesorSeleccionado) return;
+
+    if (this.puntuacion < 1 || this.puntuacion > 5) {
+      alert('Seleccione una calificación del 1 al 5.');
+      return;
+    }
+
+    if (!this.comentario || this.comentario.length < 5) {
+      alert('El comentario debe tener mínimo 5 caracteres.');
+      return;
+    }
+
+    const dto = {
+      puntuacion: this.puntuacion,
+      comentario: this.comentario,
+      idAsesor: this.asesorSeleccionado.idAsesor,
+      idCliente: 1, // HARDCODE por ahora
+    };
+
+    this.calificacionService.insertar(dto).subscribe({
+      next: () => {
+        this.cargarResenas(this.asesorSeleccionado!.idAsesor);
+        this.cerrarModalResena();
+      },
+      error: (err) => {
+        console.error(err);
+        alert('Error al registrar la reseña.');
+      },
+    });
+  }
+
   abrirReserva(asesor: AsesorFinanciero): void {
     this.asesorReserva = asesor;
-    // Filtra la disponibilidad real para este asesor
     this.horariosVisibles = this.disponibilidades[asesor.idAsesor] || [];
-    this.slotSeleccionado = null; // Resetea la selección anterior
+    this.slotSeleccionado = null;
     this.mostrarReservaModal = true;
   }
 
@@ -94,77 +136,36 @@ export class AsesorComponent implements OnInit {
     this.slotSeleccionado = null;
   }
 
-  /**
-   * Selecciona un slot de tiempo del modal.
-   */
   seleccionarSlot(slot: Disponibilidad): void {
     this.slotSeleccionado = slot;
   }
 
-  /**
-   * Confirma la reserva.
-   * (Esta lógica la implementará tu compañero de Reservas,
-   * por ahora solo cerramos el modal)
-   */
   confirmarReserva(): void {
-    if (!this.slotSeleccionado || !this.asesorReserva) {
-      console.error("No se ha seleccionado un slot o asesor.");
-      return;
-    }
-
-    console.log("Reservando slot:", this.slotSeleccionado);
-    // AQUÍ IRÍA LA LLAMADA AL 'ReservaService'
-    // Como no tenemos ese servicio, solo mostramos un mensaje y cerramos.
-
-    alert('Reserva confirmada (simulación). El slot se marcará como ocupado.');
-
-    // Aquí tu compañero de reservas llamaría al servicio
-    // y luego actualizaría la disponibilidad:
-
-    // const slotOcupado = { ...this.slotSeleccionado!, disponible: false };
-    // this.disponibilidadService.update(slotOcupado).subscribe(() => {
-    //     this.cargarDisponibilidad(this.asesorReserva!.idAsesor);
-    // });
-
+    if (!this.slotSeleccionado || !this.asesorReserva) return;
+    alert('Reserva confirmada (simulación).');
     this.cerrarReservaModal();
   }
 
-
-  // ===============================================
-  // MÉTODOS DE UTILIDAD
-  // ===============================================
-
-  /**
-   * Genera iniciales para la imagen placeholder.
-   */
   getIniciales(nombre: string): string {
-    if (!nombre) return '...';
+    if (!nombre) return '??';
     return nombre
       .split(' ')
-      .slice(0, 2) // Tomamos solo los primeros dos nombres/apellidos
-      .map((n) => n[0])
+      .slice(0, 2)
+      .map(n => n[0])
       .join('')
       .toUpperCase();
   }
 
-  /**
-   * Genera una URL de placeholder.
-   */
   getPlaceholderAvatar(nombre: string): string {
-    const iniciales = this.getIniciales(nombre);
-    return `https://placehold.co/150x150/f0f9ff/0f172a?text=${iniciales}`;
+    return `https://placehold.co/150x150/f0f9ff/0f172a?text=${this.getIniciales(nombre)}`;
   }
 
-  /** Convierte una hora (ej: "09:00:00") a formato 12h (ej: "9am") */
   formatoHoraAmPm(hora: string): string {
     if (!hora) return '';
     const [h, m] = hora.split(':');
-    const horaNum = parseInt(h, 10);
-    const ampm = horaNum >= 12 ? 'pm' : 'am';
-    const hora12 = horaNum % 12 === 0 ? 12 : horaNum % 12;
-    if (m === '00' || !m) {
-      return `${hora12}${ampm}`;
-    }
-    return `${hora12}:${m}${ampm}`;
+    const num = parseInt(h, 10);
+    const ampm = num >= 12 ? 'pm' : 'am';
+    const hora12 = num % 12 === 0 ? 12 : num % 12;
+    return m === '00' ? `${hora12}${ampm}` : `${hora12}:${m}${ampm}`;
   }
 }

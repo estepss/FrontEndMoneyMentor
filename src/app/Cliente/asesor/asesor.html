@@ -1,24 +1,18 @@
 <div class="asesor-page-container">
   <h1 class="page-title">Lista de asesores</h1>
 
-  <!-- 1. CONTENEDOR DE LA LISTA DE ASESORES -->
   <div class="asesores-grid">
 
-    <!-- Mensaje si no hay asesores -->
     @if (asesores.length === 0) {
       <p class="empty-state">No hay asesores registrados actualmente.</p>
     }
 
-    <!-- Loop de Asesores Reales -->
     @for (asesor of asesores; track asesor.idAsesor) {
       <div class="asesor-card">
-        <div class="card-header">
-          <!-- Nombre del Asesor -->
-          <div class="header-name-box">
-            {{ asesor.nombre }}
-          </div>
 
-          <!-- Foto de perfil del Asesor (usando placeholder) -->
+        <div class="card-header">
+          <div class="header-name-box">{{ asesor.nombre }}</div>
+
           <div class="profile-photo">
             <img
               [src]="getPlaceholderAvatar(asesor.nombre)"
@@ -28,64 +22,163 @@
         </div>
 
         <div class="card-body">
-          <!-- Contenido: Usamos 'sobreMi' del backend -->
+
           <p class="content-text">
             {{ asesor.sobreMi || 'Este asesor aún no ha añadido una descripción.' }}
           </p>
 
-          <!-- Botones de acción (Solo Reservar) -->
           <div class="card-actions">
-            <button class="action-button btn-reservar" (click)="abrirReserva(asesor)">
+
+
+            <button
+              class="action-button btn-revisar"
+              (click)="abrirModalResena(asesor)">
+              Revisar
+              <span class="material-icons-sharp">rate_review</span>
+            </button>
+
+
+            <button
+              class="action-button btn-reservar"
+              (click)="abrirReserva(asesor)">
               Reservar
               <span class="material-icons-sharp">event_available</span>
             </button>
+
+          </div>
+        </div>
+
+      </div>
+    }
+
+  </div>
+</div>
+
+
+
+@if (mostrarResenaModal && asesorSeleccionado) {
+  <div class="modal-overlay" (click)="cerrarModalResena()">
+    <div class="modal-content resena-modal" (click)="$event.stopPropagation()">
+
+      <button class="cerrar-modal" (click)="cerrarModalResena()">×</button>
+
+      <div class="modal-header-info">
+
+        <div class="modal-avatar">
+          {{ getIniciales(asesorSeleccionado.nombre) }}
+        </div>
+
+        <div class="modal-name-block">
+
+          <h3 class="modal-name">{{ asesorSeleccionado.nombre }}</h3>
+
+          <div class="modal-experience">
+            {{
+              asesorSeleccionado.sobreMi
+              || 'Este asesor aún no ha añadido una descripción personal.'
+            }}
           </div>
 
         </div>
       </div>
-    }
+
+
+      <div class="form-reseña">
+
+        <input
+          type="number"
+          min="1"
+          max="5"
+          placeholder="Calificación (1 a 5)"
+          [(ngModel)]="puntuacion"
+        />
+
+        <textarea
+          placeholder="Escribir un comentario"
+          [(ngModel)]="comentario">
+        </textarea>
+
+        <button class="btn-enviar" (click)="enviarResena()">
+          Enviar
+        </button>
+
+      </div>
+
+
+      <div class="reseñas-previas">
+
+        @if (resenas[asesorSeleccionado.idAsesor]?.length === 0) {
+          <p class="no-reseñas">Este asesor aún no tiene reseñas.</p>
+        } @else {
+
+          @for (r of resenas[asesorSeleccionado.idAsesor]; track r.idCalificacion) {
+
+            <div class="reseña-item">
+
+              <div class="avatar-mini">
+                {{ getIniciales(r.nombreCliente || 'C') }}
+              </div>
+
+              <div class="reseña-info">
+
+                <div class="fila-nombre">
+                  <strong>{{ r.nombreCliente || 'Cliente' }}</strong>
+                  <span class="estrellas">{{ '★'.repeat(r.puntuacion) }}</span>
+                </div>
+
+                <p>{{ r.comentario }}</p>
+              </div>
+
+            </div>
+
+          }
+
+        }
+      </div>
+
+    </div>
   </div>
+}
 
-</div>
 
 
-<!-- 2. MODAL PARA RESERVA (CON HORARIOS REALES) -->
 @if (mostrarReservaModal && asesorReserva) {
   <div class="modal-overlay" (click)="cerrarReservaModal()">
     <div class="modal-content reserva-modal" (click)="$event.stopPropagation()">
+
       <h3 class="modal-title">Reservar cita con {{ asesorReserva.nombre }}</h3>
 
       <p>Selecciona un horario disponible:</p>
 
-      <!-- Lista de Horarios Reales -->
       <div class="horarios-disponibles-lista">
+
         @if (horariosVisibles.length === 0) {
-          <p class="horario-placeholder">No hay horarios disponibles para este asesor.</p>
+          <p class="horario-placeholder">No hay horarios disponibles.</p>
         } @else {
+
           @for (slot of horariosVisibles; track slot.idDisponibilidad) {
             <div
               class="slot-item"
               [class.slot-seleccionado]="slot.idDisponibilidad === slotSeleccionado?.idDisponibilidad"
-              (click)="seleccionarSlot(slot)">
-              <!-- Formato: "Jueves 9 de Noviembre" -->
+              (click)="seleccionarSlot(slot)"
+            >
               <span class="slot-fecha">{{ slot.fecha | date:'EEEE d \'de\' MMMM' }}</span>
-              <!-- Formato: "9am - 11am" -->
-              <span class="slot-hora">{{ formatoHoraAmPm(slot.horaInicio) }} - {{ formatoHoraAmPm(slot.horaFin) }}</span>
+              <span class="slot-hora">
+                {{ formatoHoraAmPm(slot.horaInicio) }} - {{ formatoHoraAmPm(slot.horaFin) }}
+              </span>
             </div>
           }
+
         }
       </div>
 
-      <!-- Acciones del Modal -->
       <div class="modal-actions">
         <button class="btn btn-secondary" (click)="cerrarReservaModal()">Cancelar</button>
-        <button
-          class="btn btn-primary"
-          (click)="confirmarReserva()"
-          [disabled]="!slotSeleccionado">
+        <button class="btn btn-primary" (click)="confirmarReserva()" [disabled]="!slotSeleccionado">
           Confirmar Reserva
         </button>
       </div>
+
     </div>
   </div>
 }

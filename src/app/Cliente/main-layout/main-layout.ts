@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import {RouterLink, RouterOutlet} from "@angular/router";
+import {Component, inject} from '@angular/core';
+import {Router, RouterLink, RouterOutlet} from "@angular/router";
 
 @Component({
   selector: 'app-main-layout',
@@ -12,7 +12,7 @@ import {RouterLink, RouterOutlet} from "@angular/router";
 })
 export class MainLayout {
   public nombre: string = '';
-  public rol: string = '';
+  //public rol: string = '';
 
   ngOnInit(): void {
     this.cargarUsuario();
@@ -32,4 +32,14 @@ export class MainLayout {
       this.rol = '( rol)';
     }
   }
+
+  router: Router = inject(Router);
+  rol: any;
+  esCliente(): boolean {
+    let es = false;
+    this.rol = localStorage.getItem('rol');
+    if (this.rol === 'ROLE_CLIENTE') es = true;
+    return es;
+  }
+
 }

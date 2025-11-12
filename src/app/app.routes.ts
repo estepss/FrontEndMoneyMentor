@@ -9,7 +9,6 @@ import {TarjetaComponent} from './Cliente/tarjeta/tarjeta';
 import {Landing} from './landing/landing';
 import {Acceso} from './acceso/acceso';
 import {MainLayout} from './Cliente/main-layout/main-layout';
-import {Perfil} from './model/perfil';
 import {PerfilComponent} from './Cliente/perfil/perfil';
 import {LayoutAsesor} from './Asesor/layout-asesor/layout-asesor';
 import {InicioAsesor} from './Asesor/inicio-asesor/inicio-asesor';

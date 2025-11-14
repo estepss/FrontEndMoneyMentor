@@ -28,8 +28,6 @@
           </p>
 
           <div class="card-actions">
-
-
             <button
               class="action-button btn-revisar"
               (click)="abrirModalResena(asesor)">
@@ -37,14 +35,12 @@
               <span class="material-icons-sharp">rate_review</span>
             </button>
 
-
             <button
               class="action-button btn-reservar"
               (click)="abrirReserva(asesor)">
               Reservar
               <span class="material-icons-sharp">event_available</span>
             </button>
-
           </div>
         </div>
 
@@ -55,7 +51,7 @@
 </div>
 
 
-
+<!-- ===================== MODAL RESEÑAS ===================== -->
 @if (mostrarResenaModal && asesorSeleccionado) {
   <div class="modal-overlay" (click)="cerrarModalResena()">
     <div class="modal-content resena-modal" (click)="$event.stopPropagation()">
@@ -69,7 +65,6 @@
         </div>
 
         <div class="modal-name-block">
-
           <h3 class="modal-name">{{ asesorSeleccionado.nombre }}</h3>
 
           <div class="modal-experience">
@@ -78,11 +73,10 @@
               || 'Este asesor aún no ha añadido una descripción personal.'
             }}
           </div>
-
         </div>
       </div>
 
-
+      <!-- FORM RESEÑA -->
       <div class="form-reseña">
 
         <input
@@ -101,20 +95,17 @@
         <button class="btn-enviar" (click)="enviarResena()">
           Enviar
         </button>
-
       </div>
 
-
+      <!-- LISTA RESEÑAS -->
       <div class="reseñas-previas">
 
         @if (resenas[asesorSeleccionado.idAsesor]?.length === 0) {
           <p class="no-reseñas">Este asesor aún no tiene reseñas.</p>
         } @else {
-
           @for (r of resenas[asesorSeleccionado.idAsesor]; track r.idCalificacion) {
 
             <div class="reseña-item">
-
               <div class="avatar-mini">
                 {{ getIniciales(r.nombreCliente || 'C') }}
               </div>
@@ -127,12 +118,10 @@
                 </div>
 
                 <p>{{ r.comentario }}</p>
+
               </div>
-
             </div>
-
           }
-
         }
       </div>
 
@@ -141,14 +130,15 @@
 }
 
 
-
+<!-- ===================== MODAL RESERVA ===================== -->
 @if (mostrarReservaModal && asesorReserva) {
   <div class="modal-overlay" (click)="cerrarReservaModal()">
     <div class="modal-content reserva-modal" (click)="$event.stopPropagation()">
 
       <h3 class="modal-title">Reservar cita con {{ asesorReserva.nombre }}</h3>
 
-      <p>Selecciona un horario disponible:</p>
+      <p class="texto-horario">Selecciona un horario disponible:</p>
+
 
       <div class="horarios-disponibles-lista">
 
@@ -162,19 +152,50 @@
               [class.slot-seleccionado]="slot.idDisponibilidad === slotSeleccionado?.idDisponibilidad"
               (click)="seleccionarSlot(slot)"
             >
-              <span class="slot-fecha">{{ slot.fecha | date:'EEEE d \'de\' MMMM' }}</span>
+              <span class="slot-fecha">{{ slot.fecha | date:"EEEE d 'de' MMMM" | titlecase }}</span>
               <span class="slot-hora">
                 {{ formatoHoraAmPm(slot.horaInicio) }} - {{ formatoHoraAmPm(slot.horaFin) }}
               </span>
             </div>
           }
-
         }
+
       </div>
+
+      <!-- SELECT MODALIDAD -->
+      <div class="form-group">
+        <label>Modalidad</label>
+        <select [(ngModel)]="modalidadSeleccionada">
+          <option value="Virtual">Virtual</option>
+          <option value="Presencial">Presencial</option>
+        </select>
+      </div>
+
+      <!-- SELECT TARJETA -->
+      <div class="form-group">
+        <label>Tarjeta de pago</label>
+        <select [(ngModel)]="tarjetaSeleccionada">
+          @for (t of tarjetas; track t.idTarjeta) {
+            <option [ngValue]="t">
+              {{ t.nombreTarjeta }} - **** {{ t.numeroTarjeta.slice(-4) }}
+            </option>
+          }
+
+          <option *ngIf="tarjetas.length === 0" disabled>No tienes tarjetas registradas</option>
+        </select>
+      </div>
+
+      <!-- MONTO FINAL -->
+      <p class="monto-final">
+        Monto total: <strong>{{ precioCalculado }} soles</strong>
+      </p>
 
       <div class="modal-actions">
         <button class="btn btn-secondary" (click)="cerrarReservaModal()">Cancelar</button>
-        <button class="btn btn-primary" (click)="confirmarReserva()" [disabled]="!slotSeleccionado">
+
+        <button class="btn btn-primary"
+                (click)="confirmarReserva()"
+                [disabled]="!slotSeleccionado || !modalidadSeleccionada || !tarjetaSeleccionada">
           Confirmar Reserva
         </button>
       </div>
@@ -182,3 +203,4 @@
     </div>
   </div>
 }
+

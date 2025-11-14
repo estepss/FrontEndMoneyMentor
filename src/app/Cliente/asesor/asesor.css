@@ -21,10 +21,10 @@
   margin-bottom: 2rem;
 }
 
-/* --- ESTILOS DE LA LISTA DE ASESORES --- */
+
 .asesores-grid {
   display: grid;
-  /* Columnas responsivas */
+
   grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
   gap: 2rem;
 }
@@ -76,7 +76,7 @@
   overflow: hidden;
   z-index: 2;
   background-color: var(--color-gris-fondo);
-  /* Estilo para el texto de placeholder si la imagen falla */
+
   display: flex;
   align-items: center;
   justify-content: center;
@@ -108,10 +108,10 @@
 
 .card-actions {
   display: grid;
-  /* Se centra el único botón */
+
   grid-template-columns: 1fr;
   gap: 1rem;
-  margin-top: auto; /* Empuja los botones al fondo */
+  margin-top: auto;
 }
 
 .action-button {
@@ -133,14 +133,14 @@
 .btn-reservar {
   background-color: var(--color-turquesa);
   color: white;
-  /* Ocupa todo el ancho si es el único botón */
+
   grid-column: 1 / -1;
 }
 
 .btn-revisar {
   background-color: var(--color-turquesa);
   color: white;
-  /* Ocupa todo el ancho si es el único botón */
+
   grid-column: 1 / -1;
 }
 
@@ -179,7 +179,7 @@
 .modal-content p {
   text-align: center;
   color: #555;
-  margin-top: -1rem;
+  margin-top: 0.5rem;
   margin-bottom: 1.5rem;
 }
 
@@ -424,6 +424,89 @@
   margin: 0;
   color: #444;
   font-size: 0.9rem;
+}
+
+.reserva-modal {
+  background: #ffffff;
+  padding: 2rem;
+  border-radius: 16px;
+  width: 95%;
+  max-width: 520px;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.25);
+  animation: fadeInScale 0.25s ease-out;
+  position: relative;
+}
+
+/* --- FORMULARIO DE OPCIONES --- */
+.form-group {
+  margin-top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-group label {
+  font-weight: 600;
+  color: var(--color-dark-blue);
+}
+
+.form-group select {
+  width: 100%;
+  padding: 0.65rem 0.75rem;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  background-color: white;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+}
+
+.form-group select:focus {
+  border-color: var(--color-turquesa);
+  outline: none;
+}
+
+/* --- MONTO FINAL --- */
+.monto-final {
+  text-align: center;
+  font-size: 1.1rem;
+  margin-top: 1.5rem;
+  margin-bottom: 1rem;
+  color: var(--color-dark-blue);
+}
+
+.monto-final strong {
+  font-size: 1.3rem;
+  color: var(--color-naranja);
+}
+
+/* --- ESTILO PARA BOTÓN CONFIRMAR (versión más potente) --- */
+.reserva-modal .btn-primary {
+  background-color: var(--color-turquesa) !important;
+  color: white !important;
+  font-weight: 700;
+  border-radius: 10px;
+  padding: 0.85rem;
+  width: 100%;
+}
+
+.reserva-modal .btn-primary:hover {
+  background-color: #128492 !important;
+}
+
+/* Botón cancelar */
+.reserva-modal .btn-secondary {
+  background-color: #ddd !important;
+  color: #333 !important;
+  width: 100%;
+  padding: 0.85rem;
+  border-radius: 10px;
+}
+
+.texto-horario {
+  margin-top: -0.3rem !important;
+  margin-bottom: 1rem !important;
+  display: block;
 }
 
 

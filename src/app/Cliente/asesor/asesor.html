@@ -47,6 +47,15 @@
       </div>
     }
 
+    <!-- BOTÓN MIS RESERVAS -->
+    <div class="reservas-button-container">
+      <button class="btn-reservas" (click)="abrirModalReservas()">
+        Mis Reservas
+        <span class="material-icons-sharp">event_note</span>
+      </button>
+    </div>
+
+
   </div>
 </div>
 
@@ -203,4 +212,86 @@
     </div>
   </div>
 }
+
+
+@if (mostrarModalReservas) {
+  <div class="modal-overlay" (click)="cerrarModalReservas()">
+    <div class="reservas-modal" (click)="$event.stopPropagation()">
+
+      <button class="cerrar-modal" (click)="cerrarModalReservas()">×</button>
+
+      <h2 class="reservas-title">Mis reservas</h2>
+
+      @if (reservasCliente.length === 0) {
+        <p class="text-center sin-reservas">No tienes reservas realizadas.</p>
+      } @else {
+
+        <div class="reservas-grid">
+
+          @for (res of reservasCliente; track res.idReserva) {
+            <div class="reserva-card">
+
+              <div class="reserva-header">
+                <div class="reserva-avatar">
+                  {{ getIniciales(res.asesor.nombre) }}
+                </div>
+
+                <div class="reserva-info">
+                  <h3>{{ res.asesor.nombre }}</h3>
+                  <p class="descripcion">{{ res.asesor.sobreMi }}</p>
+                </div>
+              </div>
+
+              <div class="reserva-fechas">
+                <p><strong>Fecha:</strong> {{ res.fechaHoraInicio | date:'EEEE d MMMM yyyy' }}</p>
+                <p><strong>Hora:</strong>
+                  {{ res.fechaHoraInicio | date:'shortTime' }}
+                  -
+                  {{ res.fechaHoraFin | date:'shortTime' }}
+                </p>
+              </div>
+
+              <div class="reserva-actions">
+                <button class="btn-reprogramar" (click)="abrirReprogramar(res)">Reprogramar</button>
+                <button class="btn-eliminar" (click)="eliminarReserva(res)">Eliminar</button>
+              </div>
+
+            </div>
+          }
+
+        </div>
+
+      }
+
+    </div>
+  </div>
+}
+
+
+@if (mostrarModalReprogramar && reservaAReprogramar) {
+  <div class="modal-overlay" (click)="cerrarReprogramar()">
+    <div class="reprogramar-modal" (click)="$event.stopPropagation()">
+
+      <button class="cerrar-modal" (click)="cerrarReprogramar()">×</button>
+
+      <h3>Reprogramar cita</h3>
+
+      <label>Seleccione un nuevo horario:</label>
+      <select [(ngModel)]="nuevoHorarioSeleccionado" class="select-horarios">
+        @for (disp of horariosDisponiblesReprogramacion; track disp.idDisponibilidad) {
+          <option [ngValue]="disp">
+            {{ disp.fecha }} | {{ disp.horaInicio }} - {{ disp.horaFin }}
+          </option>
+        }
+      </select>
+
+      <div class="modal-actions">
+        <button class="btn-secondary" (click)="cerrarReprogramar()">Cancelar</button>
+        <button class="btn-primary" (click)="confirmarReprogramacion()">Guardar</button>
+      </div>
+
+    </div>
+  </div>
+}
+
 

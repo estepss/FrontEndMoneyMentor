@@ -9,13 +9,26 @@ import { environment } from '../../environments/environment';
 export class ReservaService {
 
   private http = inject(HttpClient);
-  private url = environment.apiUrl + '/reservas/reservas';
+
+  private baseUrl = environment.apiUrl + '/reservas';
+
 
   insertar(reservaDTO: any): Observable<any> {
-    return this.http.post<any>(this.url, reservaDTO);
+    return this.http.post<any>(`${this.baseUrl}/reservas`, reservaDTO);
   }
 
-  listarPorCliente(idCliente: number) {
-    return this.http.get<any[]>(`${environment.apiUrl}/reservas/cliente/${idCliente}`);
+
+  listarPorCliente(idCliente: number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.baseUrl}/cliente/${idCliente}`);
+  }
+
+
+  actualizar(reservaActualizada: any): Observable<any> {
+    return this.http.put<any>(`${this.baseUrl}`, reservaActualizada);
+  }
+
+
+  eliminar(idReserva: number): Observable<any> {
+    return this.http.delete<any>(`${this.baseUrl}/${idReserva}`);
   }
 }

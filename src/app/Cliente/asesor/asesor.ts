@@ -6,10 +6,14 @@ import { HttpClientModule } from '@angular/common/http';
 import { AsesorFinanciero } from '../../model/asesor-financiero';
 import { Disponibilidad } from '../../model/disponibilidad';
 import { CalificacionAsesor } from '../../model/calificacion-asesor';
+import { Tarjeta } from '../../model/tarjeta';
+import { Reserva } from '../../model/reserva';
 
 import { AsesorService } from '../../services/asesor-service';
 import { DisponibilidadService } from '../../services/disponibilidad-service';
 import { CalificacionService } from '../../services/calificacion-asesor-service';
+import { ReservaService } from '../../services/reserva-service';
+import { TarjetaService } from '../../services/tarjeta-service';
 
 @Component({
   selector: 'app-asesor',
@@ -23,26 +27,52 @@ export class AsesorComponent implements OnInit {
   private asesorService = inject(AsesorService);
   private disponibilidadService = inject(DisponibilidadService);
   private calificacionService = inject(CalificacionService);
+  private reservaService = inject(ReservaService);
+  private tarjetaService = inject(TarjetaService);
 
   public asesores: AsesorFinanciero[] = [];
   public disponibilidades: Record<number, Disponibilidad[]> = {};
+
 
   public mostrarReservaModal = false;
   public asesorReserva: AsesorFinanciero | null = null;
   public horariosVisibles: Disponibilidad[] = [];
   public slotSeleccionado: Disponibilidad | null = null;
 
+  public modalidadSeleccionada = '';
+  public tarjetas: Tarjeta[] = [];
+  public tarjetaSeleccionada: Tarjeta | null = null;
+  public precioCalculado = 0;
+
+  // --------------------------------------------------------
+  // RESEÑAS
+  // --------------------------------------------------------
+
   public mostrarResenaModal = false;
   public asesorSeleccionado: AsesorFinanciero | null = null;
-
   public resenas: Record<number, CalificacionAsesor[]> = {};
-
   public puntuacion = 0;
   public comentario = '';
 
+
+
+  public mostrarModalReservas = false;
+  public reservasCliente: Reserva[] = [];
+
+
+  public mostrarModalReprogramar = false;
+  public reservaAReprogramar: Reserva | null = null;
+  public horariosDisponiblesReprogramacion: Disponibilidad[] = [];
+  public nuevoHorarioSeleccionado: Disponibilidad | null = null;
+
+
+
   ngOnInit(): void {
     this.cargarAsesores();
+    this.cargarTarjetas();
   }
+
+
 
   cargarAsesores(): void {
     this.asesorService.obtenerTodosLosAsesores().subscribe({
@@ -67,6 +97,24 @@ export class AsesorComponent implements OnInit {
     });
   }
 
+  cargarResenas(idAsesor: number): void {
+    this.calificacionService.listarPorAsesor(idAsesor).subscribe({
+      next: (data) => this.resenas[idAsesor] = data,
+      error: (err) => console.error(err),
+    });
+  }
+
+  cargarTarjetas(): void {
+    this.tarjetaService.list().subscribe({
+      next: (data) => this.tarjetas = data,
+      error: () => this.tarjetas = []
+    });
+  }
+
+  // ========================================================
+  // ===============      RESEÑAS       =====================
+  // ========================================================
+
   abrirModalResena(asesor: AsesorFinanciero): void {
     this.asesorSeleccionado = asesor;
     this.puntuacion = 0;
@@ -77,37 +125,30 @@ export class AsesorComponent implements OnInit {
   cerrarModalResena(): void {
     this.mostrarResenaModal = false;
     this.asesorSeleccionado = null;
-    this.puntuacion = 0;
     this.comentario = '';
-  }
-
-  cargarResenas(idAsesor: number): void {
-    this.calificacionService.listarPorAsesor(idAsesor).subscribe({
-      next: (data) => {
-        this.resenas[idAsesor] = data;
-      },
-      error: (err) => console.error(err),
-    });
+    this.puntuacion = 0;
   }
 
   enviarResena(): void {
     if (!this.asesorSeleccionado) return;
 
     if (this.puntuacion < 1 || this.puntuacion > 5) {
-      alert('Seleccione una calificación del 1 al 5.');
+      alert('Seleccione una calificación válida (1–5).');
       return;
     }
 
     if (!this.comentario || this.comentario.length < 5) {
-      alert('El comentario debe tener mínimo 5 caracteres.');
+      alert('El comentario debe tener al menos 5 caracteres.');
       return;
     }
+
+    const idCliente = Number(localStorage.getItem('idCliente'));
 
     const dto = {
       puntuacion: this.puntuacion,
       comentario: this.comentario,
       idAsesor: this.asesorSeleccionado.idAsesor,
-      idCliente: 1, // HARDCODE por ahora
+      idCliente: idCliente
     };
 
     this.calificacionService.insertar(dto).subscribe({
@@ -115,36 +156,181 @@ export class AsesorComponent implements OnInit {
         this.cargarResenas(this.asesorSeleccionado!.idAsesor);
         this.cerrarModalResena();
       },
-      error: (err) => {
-        console.error(err);
-        alert('Error al registrar la reseña.');
-      },
+      error: () => alert('Error al registrar la reseña')
     });
   }
 
+  // ========================================================
+  // ===============      CREAR RESERVA    ==================
+  // ========================================================
+
   abrirReserva(asesor: AsesorFinanciero): void {
+    this.cargarTarjetas();
+
     this.asesorReserva = asesor;
     this.horariosVisibles = this.disponibilidades[asesor.idAsesor] || [];
     this.slotSeleccionado = null;
+    this.modalidadSeleccionada = '';
+    this.tarjetaSeleccionada = null;
+    this.precioCalculado = 0;
     this.mostrarReservaModal = true;
   }
 
   cerrarReservaModal(): void {
     this.mostrarReservaModal = false;
     this.asesorReserva = null;
-    this.horariosVisibles = [];
     this.slotSeleccionado = null;
+    this.modalidadSeleccionada = '';
+    this.tarjetaSeleccionada = null;
+    this.precioCalculado = 0;
   }
 
   seleccionarSlot(slot: Disponibilidad): void {
     this.slotSeleccionado = slot;
+    this.precioCalculado = this.calcularPrecio(slot);
+  }
+
+  calcularPrecio(slot: Disponibilidad): number {
+    const [h1, m1] = slot.horaInicio.split(':').map(Number);
+    const [h2, m2] = slot.horaFin.split(':').map(Number);
+
+    const inicio = h1 + m1 / 60;
+    const fin = h2 + m2 / 60;
+    const horas = fin - inicio;
+
+    return horas * 50;
   }
 
   confirmarReserva(): void {
-    if (!this.slotSeleccionado || !this.asesorReserva) return;
-    alert('Reserva confirmada (simulación).');
-    this.cerrarReservaModal();
+    if (!this.slotSeleccionado || !this.asesorReserva || !this.tarjetaSeleccionada) {
+      alert('Seleccione horario, modalidad y tarjeta.');
+      return;
+    }
+
+    const idCliente = Number(localStorage.getItem('idCliente'));
+    const fecha = this.slotSeleccionado.fecha;
+
+    const reservaDTO = {
+      idReserva: null,
+      fechaHoraInicio: `${fecha}T${this.slotSeleccionado.horaInicio}`,
+      fechaHoraFin: `${fecha}T${this.slotSeleccionado.horaFin}`,
+      estado: 'Reservado',
+      modalidad: this.modalidadSeleccionada,
+      montoTotal: this.precioCalculado,
+
+      cliente: { idCliente },
+      asesor: { idAsesor: this.asesorReserva.idAsesor },
+      tarjeta: { idTarjeta: this.tarjetaSeleccionada.idTarjeta }
+    };
+
+    this.reservaService.insertar(reservaDTO).subscribe({
+      next: () => {
+        alert('Reserva realizada con éxito.');
+        this.slotSeleccionado!.disponible = false;
+        this.cerrarReservaModal();
+        this.cargarDisponibilidad(this.asesorReserva!.idAsesor);
+      },
+      error: (err) => {
+        console.error(err);
+        alert('Error al crear la reserva.');
+      }
+    });
   }
+
+
+
+  abrirModalReservas(): void {
+    const idCliente = Number(localStorage.getItem('idCliente'));
+
+    this.reservaService.listarPorCliente(idCliente).subscribe({
+      next: (data) => {
+        // Ordena por fecha de inicio ASCENDENTE
+        this.reservasCliente = data.sort((a, b) =>
+          new Date(a.fechaHoraInicio).getTime() - new Date(b.fechaHoraInicio).getTime()
+        );
+
+        this.mostrarModalReservas = true;
+      },
+      error: () => alert("Error al cargar tus reservas")
+    });
+  }
+
+
+  cerrarModalReservas(): void {
+    this.mostrarModalReservas = false;
+  }
+
+  eliminarReserva(reserva: Reserva): void {
+    if (!confirm('¿Deseas cancelar esta reserva?')) return;
+
+    this.reservaService.eliminar(reserva.idReserva).subscribe({
+      next: () => {
+        this.reservasCliente = this.reservasCliente.filter(r => r.idReserva !== reserva.idReserva);
+        alert("Reserva eliminada.");
+      },
+      error: () => alert("No se pudo eliminar la reserva.")
+    });
+  }
+
+
+
+  abrirReprogramar(reserva: Reserva): void {
+    this.reservaAReprogramar = reserva;
+
+    const idAsesor = reserva.asesor.idAsesor;
+
+    this.horariosDisponiblesReprogramacion =
+      [...(this.disponibilidades[idAsesor] || [])];
+
+    this.nuevoHorarioSeleccionado = null;
+    this.mostrarModalReprogramar = true;
+  }
+
+  cerrarReprogramar(): void {
+    this.mostrarModalReprogramar = false;
+    this.reservaAReprogramar = null;
+    this.nuevoHorarioSeleccionado = null;
+  }
+
+  confirmarReprogramacion(): void {
+    if (!this.reservaAReprogramar || !this.nuevoHorarioSeleccionado) {
+      alert("Seleccione un horario.");
+      return;
+    }
+
+    const d = this.nuevoHorarioSeleccionado;
+
+    const reservaActualizada = {
+      ...this.reservaAReprogramar,
+      fechaHoraInicio: `${d.fecha}T${d.horaInicio}`,
+      fechaHoraFin: `${d.fecha}T${d.horaFin}`
+    };
+
+    this.reservaService.actualizar(reservaActualizada).subscribe({
+      next: () => {
+        alert("Reserva reprogramada correctamente.");
+
+        const idCliente = Number(localStorage.getItem('idCliente'));
+
+        this.reservaService.listarPorCliente(idCliente).subscribe({
+          next: (data) => {
+            // ✔ ORDEN ASCENDENTE POR FECHA
+            this.reservasCliente = data.sort((a, b) =>
+              new Date(a.fechaHoraInicio).getTime() - new Date(b.fechaHoraInicio).getTime()
+            );
+          }
+        });
+
+        this.cerrarReprogramar();
+      },
+      error: () => alert("Error al reprogramar")
+    });
+  }
+
+
+  // ========================================================
+  // UTILS
+  // ========================================================
 
   getIniciales(nombre: string): string {
     if (!nombre) return '??';
@@ -169,3 +355,4 @@ export class AsesorComponent implements OnInit {
     return m === '00' ? `${hora12}${ampm}` : `${hora12}:${m}${ampm}`;
   }
 }
+

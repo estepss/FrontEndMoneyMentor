@@ -50,4 +50,3 @@ export const routes: Routes = [
   },
   {path: '**', redirectTo: ''}, //re dirige a home
 ];
-

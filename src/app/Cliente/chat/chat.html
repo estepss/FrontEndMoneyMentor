@@ -1,1 +1,12 @@
-<p>chat works!</p>
+<h1 class="titulo">Tus asesores</h1>
+<p class="subtitulo">Consulta con tu asesor financiero cuando lo necesites</p>
+
+<div class="lista-chats">
+  <div class="chat-card" *ngFor="let chat of chats" (click)="abrirChat(chat)">
+    <img [src]="obtenerAvatar(chat.asesor.nombre)" class="avatar" />
+    <div class="info">
+      <h3>{{ chat.asesor.nombre }}</h3>
+      <p>Haz clic para continuar la conversación</p>
+    </div>
+  </div>
+</div>

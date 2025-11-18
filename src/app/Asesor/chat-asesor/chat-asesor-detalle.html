@@ -1,0 +1,36 @@
+<section class="chat-container">
+  <header class="chat-header">
+    <button class="btn-volver" (click)="volver()">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <div class="left">
+      <img [src]="'https://ui-avatars.com/api/?name=' + nombreCliente + '&background=ffffff&color=179bae&bold=true'" class="avatar" />
+      <div>
+        <h2>{{ nombreCliente || 'Cliente' }}</h2>
+        <p>Cliente financiero</p>
+      </div>
+    </div>
+  </header>
+
+  <div class="chat-window">
+    <div
+      *ngFor="let msg of mensajes"
+      [ngClass]="['mensaje', msg.emisor === 'ASESOR' ? 'propio' : 'ajeno']"
+    >
+      <ng-container *ngIf="msg.emisor === 'CLIENTE'">
+        <img
+          [src]="'https://ui-avatars.com/api/?name=' + nombreCliente + '&background=ffffff&color=179bae&bold=true'"
+          class="avatar"
+        />
+      </ng-container>
+      <div class="burbuja">{{ msg.contenido }}</div>
+    </div>
+  </div>
+
+  <footer class="input-area">
+    <input [(ngModel)]="nuevoMensaje" placeholder="Escribe un mensaje..." />
+    <button (click)="enviarMensaje()">
+      <mat-icon>send</mat-icon>
+    </button>
+  </footer>
+</section>

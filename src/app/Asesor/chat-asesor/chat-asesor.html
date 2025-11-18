@@ -1,1 +1,12 @@
-<p>chat-asesor works!</p>
+<h1 class="titulo">Chats con tus clientes</h1>
+<p class="subtitulo">Selecciona una conversación para continuar</p>
+
+<div class="lista-chats">
+  <div class="chat-card" *ngFor="let chat of chats" (click)="abrirChat(chat)">
+    <img [src]="obtenerAvatar(chat.cliente.nombre)" class="avatar" />
+    <div class="info">
+      <h3>{{ chat.cliente.nombre }}</h3>
+      <p>Haz clic para ver los mensajes</p>
+    </div>
+  </div>
+</div>

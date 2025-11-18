@@ -41,5 +41,8 @@ export class ChatService {
       emisor,
     });
   }
+  getChatClienteAsesor(idCliente: number, idAsesor: number): Observable<any[]> {
+    return this.http.get<any[]>(`${baseUrl}/chats/conversacion/${idCliente}/${idAsesor}`);
+  }
 }
 

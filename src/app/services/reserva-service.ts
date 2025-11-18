@@ -31,4 +31,7 @@ export class ReservaService {
   eliminar(idReserva: number): Observable<any> {
     return this.http.delete<any>(`${this.baseUrl}/${idReserva}`);
   }
+  getClientesConReservas(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.baseUrl}/clientes/reservados`);
+  }
 }

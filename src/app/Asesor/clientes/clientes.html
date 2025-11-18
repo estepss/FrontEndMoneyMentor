@@ -1,1 +1,36 @@
-<p>clientes works!</p>
+<div class="contenedor">
+  <h2>Clientes con Reservas</h2>
+
+  <div *ngIf="cargando" class="cargando">Cargando clientes...</div>
+
+  <div class="tarjetas" *ngIf="!cargando && clientes.length > 0">
+
+    <div class="card fade-in" *ngFor="let c of clientes">
+
+      <div class="card-header">
+        <div class="avatar">{{ c.nombre[0] }}</div>
+
+        <div class="info-header">
+          <div class="nombre">{{ c.nombre }}</div>
+        </div>
+
+        <!-- BOTÓN CHAT A LA DERECHA -->
+        <button mat-button class="chat-btn" (click)="irAlChat(c.idCliente)">
+          <mat-icon>chat</mat-icon> Chat
+        </button>
+      </div>
+
+      <div class="info">
+        <p><mat-icon>phone</mat-icon><strong> Teléfono:</strong> {{ c.telefono }}</p>
+        <p><mat-icon>mail</mat-icon><strong> Correo:</strong> {{ c.email }}</p>
+        <p><mat-icon>description</mat-icon><strong> Descripción:</strong> {{ c.sobreMi || 'Sin registrar' }}</p>
+      </div>
+
+    </div>
+
+  </div>
+
+  <p *ngIf="!cargando && clientes.length === 0" class="no-data">
+    No hay clientes con reservas previas.
+  </p>
+</div>

@@ -4,7 +4,7 @@ import {Calculadora} from './Cliente/calculadora/calculadora';
 import {Analisis} from './Cliente/analisis/analisis';
 import {Gestion} from './Cliente/gestion/gestion';
 import {AsesorComponent} from './Cliente/asesor/asesor';
-import {Chat} from './Cliente/chat/chat';
+import {ChatComponent} from './Cliente/chat/chat';
 import {TarjetaComponent} from './Cliente/tarjeta/tarjeta';
 import {Landing} from './landing/landing';
 import {Acceso} from './acceso/acceso';
@@ -16,6 +16,8 @@ import {ChatAsesor} from './Asesor/chat-asesor/chat-asesor';
 import {PerfilAsesor} from './Asesor/perfil-asesor/perfil-asesor';
 import {Clientes} from './Asesor/clientes/clientes';
 import {CalendarioAsesorComponent} from './Asesor/calendario-asesor/calendario-asesor';
+import {ChatDetalleComponent} from './Cliente/chat/chat-detalle';
+import {ChatAsesorDetalle} from './Asesor/chat-asesor/chat-asesor-detalle';
 
 export const routes: Routes = [
   //Landing
@@ -31,22 +33,25 @@ export const routes: Routes = [
       {path: 'Análisis', component: Analisis}, // lo mismo que con about
       {path: 'Gestión', component: Gestion},
       {path: 'Asesor', component:  AsesorComponent},
-      {path: 'Chat', component: Chat},
+      {path: 'Chat', component: ChatComponent},
+      { path: 'Chat/Detalle/:id', component: ChatDetalleComponent },
       {path: 'Perfil', component: PerfilComponent},
       {path: 'Tarjeta', component: TarjetaComponent},
+
     ],
   },
   {
     path: '',
-    component: LayoutAsesor, // layout con barra
+    component: LayoutAsesor,
     children: [
-      // ejemplo de rutas o sea< direccionamiento a otras "pantallas"
-      {path: 'InicioAsesor', component: InicioAsesor}, // primera pagina que se mostrará
-      {path: 'Clientes', component: Clientes},
-      {path: 'ChatAsesor', component: ChatAsesor}, //en esta en el path si se pone algo porque nos re dirigirá
-      {path: 'CalendarioAsesor', component: CalendarioAsesorComponent}, // lo mismo que con about
-      {path: 'PerfilAsesor', component: PerfilAsesor},
+      { path: 'InicioAsesor', component: InicioAsesor },
+      { path: 'Clientes', component: Clientes },
+      { path: 'ChatAsesor', component: ChatAsesor },
+      { path: 'ChatAsesor/Detalle/:id', component: ChatAsesorDetalle },
+      { path: 'CalendarioAsesor', component: CalendarioAsesorComponent },
+      { path: 'PerfilAsesor', component: PerfilAsesor },
     ],
   },
   {path: '**', redirectTo: ''}, //re dirige a home
 ];
+

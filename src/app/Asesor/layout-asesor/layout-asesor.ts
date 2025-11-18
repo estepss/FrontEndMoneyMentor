@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import {RouterLink, RouterOutlet} from "@angular/router";
+import {Component, inject} from '@angular/core';
+import {Router, RouterLink, RouterOutlet} from "@angular/router";
 
 @Component({
   selector: 'app-layout-asesor',
@@ -12,12 +12,12 @@ import {RouterLink, RouterOutlet} from "@angular/router";
 })
 export class LayoutAsesor {
   public nombre: string = '';
-  public rol: string = '';
+  //public rol: string = '';
 
   ngOnInit(): void {
     this.cargarUsuario();
 
-    // 🔹 escucha cambios en localStorage (desde otros componentes)
+    //escucha cambios en localStorage (desde otros componentes)
     window.addEventListener('storage', () => this.cargarUsuario());
   }
 
@@ -32,4 +32,14 @@ export class LayoutAsesor {
       this.rol = '( rol)';
     }
   }
+
+  router: Router = inject(Router);
+  rol: any;
+  esAsesor(): boolean {
+    let es = false;
+    this.rol = localStorage.getItem('rol');
+    if (this.rol === 'ROLE_ASESOR') es = true;
+    return es;
+  }
+
 }

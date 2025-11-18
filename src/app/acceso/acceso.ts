@@ -14,6 +14,9 @@ import { NgIf } from '@angular/common';
 import {ClienteService} from '../services/cliente-service';
 import {catchError, EMPTY, of, switchMap, tap} from 'rxjs';
 import {AsesorService} from '../services/asesor-service';
+import {Credenciales} from '../model/credenciales';
+import {ResponeDto} from '../model/respone-dto';
+import {LoginService} from '../services/login-service';
 
 @Component({
   selector: 'app-acceso',
@@ -36,15 +39,20 @@ export class Acceso {
   private router = inject(Router);
   private clienteService = inject(ClienteService);
   private asesorService = inject(AsesorService);
+  private loginService = inject(LoginService);
+
 
   isSignUpMode = false; // muestra primero Registro
   toggleSignUp() { this.isSignUpMode = true; }
   toggleSignIn() { this.isSignUpMode = false; }
+
+
   // Form de LOGIN (placeholder)
   loginForm: FormGroup = this.fb.group({
     email: ['', [Validators.required, Validators.email]],
     password: ['', [Validators.required]]
   });
+
 
   // Form de REGISTRO
   accesoForm: FormGroup = this.fb.group({
@@ -62,7 +70,6 @@ export class Acceso {
   // === REGISTRO ===
   onSubmit() {
     if (this.accesoForm.invalid) return;
-
     const v = this.accesoForm.value;
 
     const perfil = new Perfil();
@@ -75,12 +82,15 @@ export class Acceso {
     perfil.sobreMi  = v.sobreMi?.trim() || null;
     perfil.rol      = String(v.rol).toUpperCase() as any; // 'CLIENTE' | 'ASESOR'
 
+
     this.perfilService.insert(perfil).subscribe({
       next: (data) => {
         console.log('Registrado:', data);
         alert('Registro exitoso');
         this.accesoForm.reset();
         this.toggleSignIn();
+
+
       },
       error: (e) => {
         console.error(e);
@@ -89,71 +99,85 @@ export class Acceso {
     });
   }
 
-// === LOGIN ===
-  onLogin() {
-    if (this.loginForm.invalid) return;
-
-    const { email, password } = this.loginForm.value;
-    // this.loading = true; // si usas spinner
-
-    this.perfilService.auth({ username: email, password })
-      .pipe(
-        tap((res: any) => {
-          // guarda token
-          localStorage.setItem('token', res.jwt);
-        }),
-        switchMap((res: any) => {
-          // normaliza roles
-          const roles: string[] = (res.roles ?? [])
-            .map(String)
-            .map((r: string) => r.toUpperCase().trim());
-          const role = roles[0] ?? '';
-          console.log('roles', roles, 'role elegido =>', role);
-
-          localStorage.setItem('rol', role);
-
-          if (role === 'ROLE_CLIENTE') {
-            // CLIENTE
-            return this.clienteService.obtenerclienteporEmail(email).pipe(
-              tap((cli: any) => {
-                localStorage.setItem('idCliente', String(cli.idCliente));
-                localStorage.setItem('userId', String(res.userId)); // OK: viene del auth
-                console.log('userId guardado =', localStorage.getItem('userId'));
-                this.router.navigate(['/Inicio']);
-              })
-            );
-          } else if (role === 'ROLE_ASESOR') {
-            // ASESOR
-            return this.asesorService.obtenerAsesorPorEmail(email).pipe(
-              tap((ase: any) => {
-                localStorage.setItem('idAsesor', String(ase.idAsesor));
-                localStorage.setItem('userId', String(res.userId)); // OK
-                console.log('userId guardado =', localStorage.getItem('userId'));
-                this.router.navigate(['/InicioAsesor']);
-              })
-            );
-          }
-
-          // rol desconocido: no hagas 2da llamada
-          console.warn('Rol desconocido o vacío, no se realizará llamada adicional');
-          return of(null);
-        }),
-        catchError((e) => {
-          console.error('Login error:', e);
-          alert(e?.error?.message ?? 'Error en login / carga de perfil');
-          return EMPTY; // corta la cadena
-        }),
-        // finalize(() => this.loading = false)
-      )
-      .subscribe({
-        next: () => {
-          // opcional: ya navegaste dentro de los taps de cada rama
-        },
-        complete: () => {
-          // opcional: lógica al completar
-        }
-      });
+  ngOnInit() {
+    if(localStorage.getItem('token')!=null){
+      localStorage.clear();//borra todos los items
+      console.log("Token y items eliminados");
+    }
+    this.loadForm()
   }
+
+  loadForm(): void {
+    console.log("Form");
+  }
+
+
+  onLogin() {
+    if (this.loginForm.invalid) {
+      alert('Formulario no válido');
+      return;
+    }
+
+    // Construye tu DTO como usas normalmente
+    const requestDto: Credenciales = new Credenciales();
+
+    // el Service mapeará email -> username, así no rompes tu modelo
+    requestDto.email = this.loginForm.value.email;
+    requestDto.password = this.loginForm.value.password;
+
+    let responseDTO: ResponeDto = new ResponeDto();
+
+    this.loginService.login(requestDto).subscribe({
+
+      next: (data: ResponeDto) => {
+        console.log("Login response ROLs:", data.roles);
+        console.log("Login response ROL:", data.roles[0]);
+        localStorage.setItem('rol', data.roles[0]);
+        localStorage.setItem('rol', data.roles[0]); // si lo usas aún
+
+        if (data.roles[0] === 'ROLE_CLIENTE') {
+          this.clienteService.obtenerclienteporEmail(requestDto.email).subscribe({
+            next: (cli: any) => {
+              localStorage.setItem('idCliente', String(cli.idCliente));
+              localStorage.setItem('userId', String(data.userId));
+              console.log('Cliente logeado ->', cli);
+              alert('¡Login correcto!');
+              this.router.navigate(['/Inicio']);
+            },
+            error: (err) => {
+              console.error('Error al obtener cliente:', err);
+              alert('No se pudo obtener cliente');
+            }
+          });
+
+        } else if (data.roles[0] === 'ROLE_ASESOR') {
+          this.asesorService.obtenerAsesorPorEmail(requestDto.email).subscribe({
+            next: (ase: any) => {
+              localStorage.setItem('idAsesor', String(ase.idAsesor));
+              localStorage.setItem('userId', String(data.userId));
+              console.log('Asesor logeado ->', ase);
+              alert('¡Login correcto!');
+              this.router.navigate(['/InicioAsesor']);
+            },
+            error: (err) => {
+              console.error('Error al obtener asesor:', err);
+              alert('No se pudo obtener asesor');
+            }
+          });
+        }
+        else {
+          console.warn('Rol desconocido o vacío');
+          this.router.navigate(['/Landing']);
+        }
+      },
+      error: (error) => {
+        console.error('Login error:', error);
+        alert(error?.error?.message ?? 'Error en login');
+        this.router.navigate(['/Landing']);
+      }
+    });
+  }
+
   private route = inject(ActivatedRoute);
 
   constructor() {

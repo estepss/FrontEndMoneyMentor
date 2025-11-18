@@ -27,6 +27,7 @@
 <div class="mm-layout">
   <aside>
     <nav class="sidebar">
+      @if(esAsesor()){
       <a [routerLink]="'/InicioAsesor'">
         <span class="material-icons-sharp">home</span>
         <h3>Inicio</h3>
@@ -56,7 +57,7 @@
         <span class="material-icons-sharp">logout</span>
         <h3>Logout</h3>
       </a>
-
+      }
     </nav>
   </aside>
   <!--a-->

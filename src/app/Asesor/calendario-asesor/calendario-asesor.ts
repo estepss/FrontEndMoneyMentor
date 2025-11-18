@@ -52,7 +52,7 @@ export class CalendarioAsesorComponent implements OnInit {
   public horarioFormulario: { inicio: string, fin: string } = { inicio: '09:00', fin: '11:00' };
 
   ngOnInit(): void {
-    // ⬇️ MODIFICACIÓN: Leer 'idAsesor' que es la clave que tu Login.ts usa
+    // ⬇ MODIFICACIÓN: Leer 'idAsesor' que es la clave que tu Login.ts usa
     const storedId = localStorage.getItem('idAsesor');
 
     if (storedId) {

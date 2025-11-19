@@ -69,7 +69,7 @@ export class AsesorComponent implements OnInit {
 
   ngOnInit(): void {
     this.cargarAsesores();
-    this.cargarTarjetas();
+    // Quitamos cargarTarjetas() de aquí, ya que se llama en abrirReserva()
   }
 
 
@@ -104,11 +104,23 @@ export class AsesorComponent implements OnInit {
     });
   }
 
+  // ⭐️ ÚNICA FUNCIÓN MODIFICADA: Cargar tarjetas filtrando por idCliente
   cargarTarjetas(): void {
-    this.tarjetaService.list().subscribe({
-      next: (data) => this.tarjetas = data,
-      error: () => this.tarjetas = []
-    });
+    const idCliente = Number(localStorage.getItem('idCliente'));
+
+    if (idCliente) {
+      // Usamos la función listPorCliente del servicio de tarjetas
+      this.tarjetaService.listPorCliente(idCliente).subscribe({
+        next: (data) => this.tarjetas = data,
+        error: (err) => {
+          console.error("Error al cargar tarjetas del cliente:", err);
+          this.tarjetas = [];
+        }
+      });
+    } else {
+      console.warn("No se encontró idCliente en localStorage. No se cargan tarjetas.");
+      this.tarjetas = [];
+    }
   }
 
   // ========================================================
@@ -165,7 +177,7 @@ export class AsesorComponent implements OnInit {
   // ========================================================
 
   abrirReserva(asesor: AsesorFinanciero): void {
-    this.cargarTarjetas();
+    this.cargarTarjetas(); // Llama a la versión actualizada que filtra por cliente
 
     this.asesorReserva = asesor;
     this.horariosVisibles = this.disponibilidades[asesor.idAsesor] || [];
@@ -355,4 +367,3 @@ export class AsesorComponent implements OnInit {
     return m === '00' ? `${hora12}${ampm}` : `${hora12}:${m}${ampm}`;
   }
 }
-

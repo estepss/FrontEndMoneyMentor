@@ -23,4 +23,5 @@ export class ClienteService {
     const enc = encodeURIComponent(email);
     return this.httpClient.get<Cliente>(`${this.url}/clientes/email/${enc}`);
   }
+
 }

@@ -50,7 +50,7 @@ export class Acceso {
   // Form de LOGIN (placeholder)
   loginForm: FormGroup = this.fb.group({
     email: ['', [Validators.required, Validators.email]],
-    password: ['', [Validators.required]]
+    password: ['', [Validators.required, Validators.minLength(8)]],
   });
 
 
@@ -58,17 +58,19 @@ export class Acceso {
   accesoForm: FormGroup = this.fb.group({
     idPerfil: [''],
     nombres: ['', Validators.required],
-    dni: ['', [Validators.required, Validators.minLength(8)]],
+    dni: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(8)]],
     email: ['', [Validators.required, Validators.email]],
-    password: ['', [Validators.required, Validators.minLength(6)]],
-    telefono: [''],
+    password: ['', [Validators.required, Validators.minLength(8)]],
+    telefono: ['999 999 999'],
     sobreMi: [''],
     rol: ['', Validators.required], // 'CLIENTE' | 'ASESOR'
     idUser: ['']
   });
 
   // === REGISTRO ===
+  private backendError: any;
   onSubmit() {
+    this.backendError  = null;
     if (this.accesoForm.invalid) return;
     const v = this.accesoForm.value;
 
@@ -92,9 +94,26 @@ export class Acceso {
 
 
       },
-      error: (e) => {
-        console.error(e);
-        alert(e?.error?.message ?? 'No se pudo registrar');
+      error: (err) => {
+        console.log('ERROR BACKEND COMPLETO:', err);
+
+        // HttpErrorResponse típico de Angular:
+        // - err.status -> 409
+        // - err.error  -> lo que devolvió Spring (objeto o string)
+        let msg = 'Ocurrió un error inesperado.';
+
+        if (err.status === 0) {
+          msg = 'No se pudo conectar con el servidor.';
+        } else if (typeof err.error === 'string') {
+          // por si el back devolviera texto plano
+          msg = err.error;
+        } else if (err.error?.message) {
+          // lo que mandamos desde el handler
+          msg = err.error.message; //  Aquí debe venir: "El DNI ya se encuentra registrado."
+        }
+
+        this.backendError = msg;
+        alert(msg); // para que veas el mensaje sí o sí mientras pruebas
       }
     });
   }

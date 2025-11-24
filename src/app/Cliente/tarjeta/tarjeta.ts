@@ -23,6 +23,11 @@ export class TarjetaComponent implements OnInit {
   tarjetasAgregadas: Tarjeta[] = [];
   vistaActual: 'agregar' | 'lista' = 'agregar';
 
+  //  Variable para almacenar el ID del cliente logueado
+  idClienteLogueado: number = 0;
+
+  // Datos para los selects de fecha
+=======
   // ⬇️ Variable para almacenar el ID del cliente logueado
   idClienteLogueado: number = 0;
 
@@ -230,5 +235,6 @@ export class TarjetaComponent implements OnInit {
       anios.push(anioActual + i);
     }
     return anios;
+
   }
 }

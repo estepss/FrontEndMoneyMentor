@@ -44,4 +44,5 @@ export class Landing {
     // Si no calza ninguna, resetea
     this.currentSectionId = '';
   }
+
 }

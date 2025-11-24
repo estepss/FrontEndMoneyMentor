@@ -25,7 +25,14 @@
 }
 
 /* Reset básico */
-*{ margin:0; padding:0; border:0; outline:0; box-sizing:border-box; text-decoration:none;}
+* {
+  font-family: "Poppins", sans-serif;
+  text-decoration: none;
+  outline: none;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 html{
   font-size:15px;
   margin:0; padding:0; border:0; outline:0;

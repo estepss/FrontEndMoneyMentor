@@ -27,7 +27,14 @@ export class TarjetaComponent implements OnInit {
 
   vistaActual: 'agregar' | 'lista' = 'agregar';
 
+<<<<<<< Updated upstream
   // (Tus arrays de meses y años para los <select> están perfectos)
+=======
+  //  Variable para almacenar el ID del cliente logueado
+  idClienteLogueado: number = 0;
+
+  // Datos para los selects de fecha
+>>>>>>> Stashed changes
   meses: number[] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
   anios: number[] = [2024, 2025, 2026, 2027, 2028];
   mesesNombres: { [key: number]: string } = {

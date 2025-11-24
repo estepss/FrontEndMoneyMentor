@@ -28,34 +28,88 @@ export class TarjetaComponent implements OnInit {
 
   // Datos para los selects de fecha
   meses: number[] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
-  anios: number[] = [2024, 2025, 2026, 2027, 2028];
+  // Generamos los años desde el actual hasta +5 años
+  anios: number[] = this.generarAniosExpiracion();
   mesesNombres: { [key: number]: string } = {
     1: 'Enero', 2: 'Febrero', 3: 'Marzo', 4: 'Abril', 5: 'Mayo', 6: 'Junio',
     7: 'Julio', 8: 'Agosto', 9: 'Septiembre', 10: 'Octubre', 11: 'Noviembre', 12: 'Diciembre'
   };
 
   constructor() {
-    // Inicializamos el formulario con valores por defecto o vacíos
     this.resetearFormulario();
   }
 
   ngOnInit(): void {
-    // 1. OBTENER ID DEL CLIENTE LOGUEADO AL INICIAR
-    // Buscamos en localStorage la clave 'userId' o 'idCliente' (según cómo lo guardaste en el Login)
-    // En tu Login.ts vi que usas 'userId' y 'idCliente'. Usaremos 'userId' como el ID principal.
     const storedId = localStorage.getItem('userId');
 
     if (storedId) {
       this.idClienteLogueado = parseInt(storedId, 10);
       console.log(`TarjetaComponent inicializado para Cliente ID: ${this.idClienteLogueado}`);
 
-      // Una vez tenemos el ID, cargamos SUS tarjetas
       this.cargarTarjetas();
     } else {
       console.error("¡Error! No se encontró el ID del usuario en localStorage. ¿El usuario inició sesión?");
-      // Aquí podrías redirigir al login si es crítico: this.router.navigate(['/login']);
     }
   }
+
+  // =========================================================================
+  // ⭐️ LÓGICA DE VALIDACIÓN (Implementación de reglas del TarjetaDTO) ⭐️
+  // =========================================================================
+
+  /**
+   * Valida la nueva tarjeta según las reglas del backend (TarjetaDTO).
+   * @returns {string | null} El mensaje de error si la validación falla, o null si es exitosa.
+   */
+  validarTarjeta(): string | null {
+    const tarjeta = this.nuevaTarjeta;
+    const anioActual = new Date().getFullYear();
+    const mesActual = new Date().getMonth() + 1;
+
+    // 1. nombreTarjeta (@NotBlank)
+    if (!tarjeta.nombreTarjeta || tarjeta.nombreTarjeta.trim() === '') {
+      return "El nombre del titular no puede estar vacío.";
+    }
+
+    // 2. numeroTarjeta (@NotBlank, @Pattern: \d{13,19})
+    // Se limpia de espacios antes de validar
+    const numeroLimpio = tarjeta.numeroTarjeta.replace(/\s/g, '');
+    if (!numeroLimpio || numeroLimpio === '') {
+      return "El número de tarjeta no puede estar vacío.";
+    }
+    if (!/^\d{13,19}$/.test(numeroLimpio)) {
+      return "El número de tarjeta debe tener entre 13 y 19 dígitos.";
+    }
+
+    // 3. cvc (@NotBlank, @Pattern: \d{3,4})
+    if (!tarjeta.cvc || tarjeta.cvc.trim() === '') {
+      return "El CVC no puede estar vacío.";
+    }
+    if (!/^\d{3,4}$/.test(tarjeta.cvc.trim())) {
+      return "El CVC debe tener 3 o 4 dígitos.";
+    }
+
+    // 4. anioExpiracion (@Min(2025)) -> Adaptado a la lógica del frontend (>= año actual o siguiente)
+    if (tarjeta.anioExpiracion < anioActual) {
+      return "El año de expiración no puede ser pasado.";
+    }
+
+    // 5. mesExpiracion (@Min(1), @Max(12)) -> Esto lo controla el <select>
+    if (tarjeta.mesExpiracion < 1 || tarjeta.mesExpiracion > 12) {
+      return "Seleccione un mes de expiración válido.";
+    }
+
+    // 6. Validación de fecha: No puede expirar este mes o en el pasado
+    if (tarjeta.anioExpiracion === anioActual && tarjeta.mesExpiracion < mesActual) {
+      return "La fecha de expiración no puede ser anterior al mes actual.";
+    }
+
+    // Si todo es correcto, retorna null
+    return null;
+  }
+
+  // =========================================================================
+  // LÓGICA CRUD
+  // =========================================================================
 
   /**
    * Carga las tarjetas EXCLUSIVAMENTE del cliente logueado.
@@ -63,7 +117,6 @@ export class TarjetaComponent implements OnInit {
   cargarTarjetas(): void {
     if (this.idClienteLogueado === 0) return;
 
-    // Llamamos al nuevo método del servicio que filtra por ID en el backend
     this.tarjetaService.listPorCliente(this.idClienteLogueado).subscribe({
       next: (tarjetas) => {
         this.tarjetasAgregadas = tarjetas;
@@ -79,20 +132,20 @@ export class TarjetaComponent implements OnInit {
    * Guarda una nueva tarjeta asignada al cliente logueado.
    */
   agregarTarjeta(): void {
-    // Validaciones básicas
-    if (!this.nuevaTarjeta.nombreTarjeta || !this.nuevaTarjeta.numeroTarjeta) {
-      console.error('Por favor, complete los campos obligatorios.');
-      alert('Por favor, complete el nombre y el número de tarjeta.');
-      return;
-    }
-
     if (this.idClienteLogueado === 0) {
       console.error('No se puede guardar la tarjeta: Usuario no identificado.');
       alert('Error de sesión. Por favor, inicie sesión nuevamente.');
       return;
     }
 
-    // Limpieza de datos (quitar espacios en blanco del número)
+    // ⭐️ PASO CLAVE: VALIDAR ANTES DE CONTINUAR
+    const errorValidacion = this.validarTarjeta();
+    if (errorValidacion) {
+      alert(errorValidacion);
+      return;
+    }
+
+    // Limpieza final de datos (quitar espacios en blanco del número)
     this.nuevaTarjeta.numeroTarjeta = this.nuevaTarjeta.numeroTarjeta.replace(/\s/g, '');
 
     // 2. ASIGNAR EL ID DEL CLIENTE A LA TARJETA ANTES DE ENVIAR
@@ -104,18 +157,13 @@ export class TarjetaComponent implements OnInit {
         console.log('Tarjeta guardada exitosamente:', tarjetaGuardada);
         alert('Tarjeta agregada correctamente');
 
-        // Recargar la lista para ver la nueva tarjeta
         this.cargarTarjetas();
-
-        // Cambiar a la vista de lista
         this.vistaActual = 'lista';
-
-        // Limpiar el formulario para la próxima vez
         this.resetearFormulario();
       },
       error: (err) => {
-        console.error('Error al guardar la tarjeta:', err);
-        alert('Hubo un error al guardar la tarjeta. Intente nuevamente.');
+        console.error('Error al guardar la tarjeta:', err.error.message || err);
+        alert(`Error al guardar: ${err.error.message || 'Intente nuevamente.'}`);
       }
     });
   }
@@ -135,7 +183,6 @@ export class TarjetaComponent implements OnInit {
       this.tarjetaService.delete(tarjetaAEliminar.idTarjeta).subscribe({
         next: () => {
           console.log(`Tarjeta ${tarjetaAEliminar.idTarjeta} eliminada.`);
-          // Si la eliminación en BD es exitosa, actualizamos la lista local
           this.tarjetasAgregadas.splice(index, 1);
         },
         error: (err) => {
@@ -150,7 +197,6 @@ export class TarjetaComponent implements OnInit {
 
   mostrarLista(): void {
     this.vistaActual = 'lista';
-    // Recargamos para asegurar que la lista esté actualizada
     this.cargarTarjetas();
   }
 
@@ -161,14 +207,12 @@ export class TarjetaComponent implements OnInit {
 
   resetearFormulario(): void {
     this.nuevaTarjeta = new Tarjeta();
-    // Aseguramos que el ID del cliente se mantenga si ya lo tenemos
+
     if (this.idClienteLogueado !== 0) {
       this.nuevaTarjeta.idCliente = this.idClienteLogueado;
     }
 
-    // Valores por defecto para facilitar pruebas (puedes quitarlos en producción)
-    this.nuevaTarjeta.nombreTarjeta = '';
-    this.nuevaTarjeta.numeroTarjeta = '';
+    // Valores por defecto al mes/año actual para que no quede 0/0
     this.nuevaTarjeta.mesExpiracion = new Date().getMonth() + 1;
     this.nuevaTarjeta.anioExpiracion = new Date().getFullYear();
     this.nuevaTarjeta.cvc = '';
@@ -176,5 +220,15 @@ export class TarjetaComponent implements OnInit {
 
   getNombreMes(mes: number): string {
     return this.mesesNombres[mes] || mes.toString();
+  }
+
+  generarAniosExpiracion(): number[] {
+    const anioActual = new Date().getFullYear();
+    const anios = [];
+    // Generar años desde el actual hasta el próximo 5 años (2024 a 2028 o similar)
+    for (let i = 0; i <= 5; i++) {
+      anios.push(anioActual + i);
+    }
+    return anios;
   }
 }

@@ -1,5 +1,3 @@
-<<<<<<< Updated upstream
-=======
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
@@ -29,12 +27,11 @@ export class ReservaService {
     return this.http.put<any>(`${this.baseUrl}`, reservaActualizada);
   }
 
+
   eliminar(idReserva: number): Observable<any> {
     return this.http.delete<any>(`${this.baseUrl}/${idReserva}`);
   }
   getClientesConReservas(): Observable<any[]> {
     return this.http.get<any[]>(`${this.baseUrl}/clientes/reservados`);
   }
-
 }
->>>>>>> Stashed changes

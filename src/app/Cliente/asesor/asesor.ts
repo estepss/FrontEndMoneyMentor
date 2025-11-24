@@ -3,13 +3,17 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 
-// Modelos Reales que SÍ tienes
 import { AsesorFinanciero } from '../../model/asesor-financiero';
 import { Disponibilidad } from '../../model/disponibilidad';
+import { CalificacionAsesor } from '../../model/calificacion-asesor';
+import { Tarjeta } from '../../model/tarjeta';
+import { Reserva } from '../../model/reserva';
 
-// Servicios Reales que SÍ tienes
 import { AsesorService } from '../../services/asesor-service';
 import { DisponibilidadService } from '../../services/disponibilidad-service';
+import { CalificacionService } from '../../services/calificacion-asesor-service';
+import { ReservaService } from '../../services/reserva-service';
+import { TarjetaService } from '../../services/tarjeta-service';
 
 @Component({
   selector: 'app-asesor',
@@ -20,151 +24,391 @@ import { DisponibilidadService } from '../../services/disponibilidad-service';
 })
 export class AsesorComponent implements OnInit {
 
-  // --- Inyección de Servicios ---
   private asesorService = inject(AsesorService);
   private disponibilidadService = inject(DisponibilidadService);
+  private calificacionService = inject(CalificacionService);
+  private reservaService = inject(ReservaService);
+  private tarjetaService = inject(TarjetaService);
 
-  // --- ESTADO REAL (Conectado a Backend) ---
   public asesores: AsesorFinanciero[] = [];
-  public disponibilidades: Record<number, Disponibilidad[]> = {}; // Almacén de disponibilidad por idAsesor
+  public disponibilidades: Record<number, Disponibilidad[]> = {};
 
-  // --- ESTADO DE MODAL DE RESERVA ---
+
   public mostrarReservaModal = false;
   public asesorReserva: AsesorFinanciero | null = null;
   public horariosVisibles: Disponibilidad[] = [];
   public slotSeleccionado: Disponibilidad | null = null;
 
-  constructor() {}
+  public modalidadSeleccionada = '';
+  public tarjetas: Tarjeta[] = [];
+  public tarjetaSeleccionada: Tarjeta | null = null;
+  public precioCalculado = 0;
+
+  // --------------------------------------------------------
+  // RESEÑAS
+  // --------------------------------------------------------
+
+  public mostrarResenaModal = false;
+  public asesorSeleccionado: AsesorFinanciero | null = null;
+  public resenas: Record<number, CalificacionAsesor[]> = {};
+  public puntuacion = 0;
+  public comentario = '';
+
+
+
+  public mostrarModalReservas = false;
+  public reservasCliente: Reserva[] = [];
+
+
+  public mostrarModalReprogramar = false;
+  public reservaAReprogramar: Reserva | null = null;
+  public horariosDisponiblesReprogramacion: Disponibilidad[] = [];
+  public nuevoHorarioSeleccionado: Disponibilidad | null = null;
+
+
 
   ngOnInit(): void {
     this.cargarAsesores();
   }
 
-  /**
-   * 1. Carga la lista de asesores desde el backend.
-   */
+
+
   cargarAsesores(): void {
     this.asesorService.obtenerTodosLosAsesores().subscribe({
       next: (data) => {
         this.asesores = data;
-        // 2. Por cada asesor, cargamos su disponibilidad real
-        data.forEach(asesor => {
+
+        data.forEach((asesor) => {
           this.cargarDisponibilidad(asesor.idAsesor);
+          this.cargarResenas(asesor.idAsesor);
         });
       },
-      error: (err) => console.error('Error cargando asesores:', err)
+      error: (err) => console.error(err),
     });
   }
 
-  /**
-   * 2. Carga la disponibilidad para un asesor específico.
-   */
   cargarDisponibilidad(idAsesor: number): void {
     this.disponibilidadService.listByAsesor(idAsesor).subscribe({
       next: (data) => {
-        // Almacenamos solo los slots que están marcados como 'disponible: true'
-        this.disponibilidades[idAsesor] = data.filter(slot => slot.disponible);
+        this.disponibilidades[idAsesor] = data.filter(s => s.disponible);
       },
-      error: (err) => {
-        console.error(`Error cargando disponibilidad para asesor ${idAsesor}:`, err);
-        this.disponibilidades[idAsesor] = []; // Dejar vacío si hay error
-      }
+      error: () => (this.disponibilidades[idAsesor] = []),
     });
   }
 
-  // ===============================================
-  // LÓGICA DE RESERVA (CON DISPONIBILIDAD REAL)
-  // ===============================================
+  cargarResenas(idAsesor: number): void {
+    this.calificacionService.listarPorAsesor(idAsesor).subscribe({
+      next: (data) => this.resenas[idAsesor] = data,
+      error: (err) => console.error(err),
+    });
+  }
 
-  /**
-   * Abre el modal de reserva y muestra los horarios REALES disponibles.
-   */
+
+  cargarTarjetas(): void {
+    const idCliente = Number(localStorage.getItem('idCliente'));
+
+    if (idCliente) {
+      // Usamos la función listPorCliente del servicio de tarjetas
+      this.tarjetaService.listPorCliente(idCliente).subscribe({
+        next: (data) => this.tarjetas = data,
+        error: (err) => {
+          console.error("Error al cargar tarjetas del cliente:", err);
+          this.tarjetas = [];
+        }
+      });
+    } else {
+      console.warn("No se encontró idCliente en localStorage. No se cargan tarjetas.");
+      this.tarjetas = [];
+    }
+  }
+
+  // ========================================================
+  // ===============      RESEÑAS       =====================
+  // ========================================================
+
+  abrirModalResena(asesor: AsesorFinanciero): void {
+    this.asesorSeleccionado = asesor;
+    this.puntuacion = 0;
+    this.comentario = '';
+    this.mostrarResenaModal = true;
+  }
+
+  cerrarModalResena(): void {
+    this.mostrarResenaModal = false;
+    this.asesorSeleccionado = null;
+    this.comentario = '';
+    this.puntuacion = 0;
+  }
+
+  enviarResena(): void {
+    if (!this.asesorSeleccionado) return;
+
+    if (this.puntuacion < 1 || this.puntuacion > 5) {
+      alert('Seleccione una calificación válida (1–5).');
+      return;
+    }
+
+    if (!this.comentario || this.comentario.length < 5) {
+      alert('El comentario debe tener al menos 5 caracteres.');
+      return;
+    }
+
+    const idCliente = Number(localStorage.getItem('idCliente'));
+
+    const dto = {
+      puntuacion: this.puntuacion,
+      comentario: this.comentario,
+      idAsesor: this.asesorSeleccionado.idAsesor,
+      idCliente: idCliente
+    };
+
+    this.calificacionService.insertar(dto).subscribe({
+      next: () => {
+        this.cargarResenas(this.asesorSeleccionado!.idAsesor);
+        this.cerrarModalResena();
+      },
+      error: () => alert('Error al registrar la reseña')
+    });
+  }
+
+  // ========================================================
+  // ===============      CREAR RESERVA    ==================
+  // ========================================================
+
   abrirReserva(asesor: AsesorFinanciero): void {
+    this.cargarTarjetas();
     this.asesorReserva = asesor;
-    // Filtra la disponibilidad real para este asesor
-    this.horariosVisibles = this.disponibilidades[asesor.idAsesor] || [];
-    this.slotSeleccionado = null; // Resetea la selección anterior
+
+    const hoy = new Date();
+
+
+    this.horariosVisibles = (this.disponibilidades[asesor.idAsesor] || [])
+      .filter(slot => {
+        if (!slot.fecha || !slot.horaInicio) return false;
+
+        const slotDateTime = new Date(`${slot.fecha}T${slot.horaInicio}`);
+
+
+        if (slotDateTime < hoy) return false;
+
+
+        const slotDateOnly = new Date(slot.fecha);
+        const todayDateOnly = new Date(hoy.toISOString().split("T")[0]);
+
+        if (slotDateOnly.getTime() === todayDateOnly.getTime()) {
+          const [h, m] = slot.horaInicio.split(':').map(Number);
+          if (h < hoy.getHours() || (h === hoy.getHours() && m <= hoy.getMinutes())) {
+            return false;
+          }
+        }
+
+        return true;
+      })
+      .sort((a, b) => {
+        // Ordenar por fecha
+        const fechaA = new Date(`${a.fecha}T${a.horaInicio}`);
+        const fechaB = new Date(`${b.fecha}T${b.horaInicio}`);
+        return fechaA.getTime() - fechaB.getTime();
+      });
+
+    // Reset de selección
+    this.slotSeleccionado = null;
+    this.modalidadSeleccionada = 'Virtual';
+    this.tarjetaSeleccionada = null;
+    this.precioCalculado = 0;
+
     this.mostrarReservaModal = true;
   }
+
 
   cerrarReservaModal(): void {
     this.mostrarReservaModal = false;
     this.asesorReserva = null;
-    this.horariosVisibles = [];
     this.slotSeleccionado = null;
+    this.modalidadSeleccionada = 'Virtual';
+    this.tarjetaSeleccionada = null;
+    this.precioCalculado = 0;
   }
 
-  /**
-   * Selecciona un slot de tiempo del modal.
-   */
   seleccionarSlot(slot: Disponibilidad): void {
     this.slotSeleccionado = slot;
+    this.precioCalculado = this.calcularPrecio(slot);
   }
 
-  /**
-   * Confirma la reserva.
-   * (Esta lógica la implementará tu compañero de Reservas,
-   * por ahora solo cerramos el modal)
-   */
+  calcularPrecio(slot: Disponibilidad): number {
+    const [h1, m1] = slot.horaInicio.split(':').map(Number);
+    const [h2, m2] = slot.horaFin.split(':').map(Number);
+
+    const inicio = h1 + m1 / 60;
+    const fin = h2 + m2 / 60;
+    const horas = fin - inicio;
+
+    return horas * 50;
+  }
+
   confirmarReserva(): void {
-    if (!this.slotSeleccionado || !this.asesorReserva) {
-      console.error("No se ha seleccionado un slot o asesor.");
+    if (!this.slotSeleccionado || !this.asesorReserva || !this.tarjetaSeleccionada) {
+      alert('Seleccione horario y tarjeta.');
       return;
     }
 
-    console.log("Reservando slot:", this.slotSeleccionado);
-    // AQUÍ IRÍA LA LLAMADA AL 'ReservaService'
-    // Como no tenemos ese servicio, solo mostramos un mensaje y cerramos.
+    const idCliente = Number(localStorage.getItem('idCliente'));
+    const fecha = this.slotSeleccionado.fecha;
 
-    alert('Reserva confirmada (simulación). El slot se marcará como ocupado.');
+    const reservaDTO = {
+      idReserva: null,
+      fechaHoraInicio: `${fecha}T${this.slotSeleccionado.horaInicio}`,
+      fechaHoraFin: `${fecha}T${this.slotSeleccionado.horaFin}`,
+      estado: 'Reservado',
+      modalidad: 'Virtual',   // <-- Modalidad fija
+      montoTotal: this.precioCalculado,
 
-    // Aquí tu compañero de reservas llamaría al servicio
-    // y luego actualizaría la disponibilidad:
+      cliente: { idCliente },
+      asesor: { idAsesor: this.asesorReserva.idAsesor },
+      tarjeta: { idTarjeta: this.tarjetaSeleccionada.idTarjeta }
+    };
 
-    // const slotOcupado = { ...this.slotSeleccionado!, disponible: false };
-    // this.disponibilidadService.update(slotOcupado).subscribe(() => {
-    //     this.cargarDisponibilidad(this.asesorReserva!.idAsesor);
-    // });
-
-    this.cerrarReservaModal();
+    this.reservaService.insertar(reservaDTO).subscribe({
+      next: () => {
+        alert('Reserva realizada con éxito.');
+        this.slotSeleccionado!.disponible = false;
+        this.cerrarReservaModal();
+        this.cargarDisponibilidad(this.asesorReserva!.idAsesor);
+      },
+      error: (err) => {
+        console.error(err);
+        alert('Error al crear la reserva.');
+      }
+    });
   }
 
 
-  // ===============================================
-  // MÉTODOS DE UTILIDAD
-  // ===============================================
+  abrirModalReservas(): void {
+    const idCliente = Number(localStorage.getItem('idCliente'));
+    const ahora = new Date();  // Fecha y hora actual
 
-  /**
-   * Genera iniciales para la imagen placeholder.
-   */
+    this.reservaService.listarPorCliente(idCliente).subscribe({
+      next: (data) => {
+
+        this.reservasCliente = data
+
+          .filter(res => {
+            if (!res.fechaHoraInicio) return false;
+
+            const fechaReserva = new Date(res.fechaHoraInicio);
+
+
+            return fechaReserva > ahora;
+          })
+
+          .sort((a, b) => {
+            const fechaA = new Date(a.fechaHoraInicio);
+            const fechaB = new Date(b.fechaHoraInicio);
+            return fechaA.getTime() - fechaB.getTime();
+          });
+
+        this.mostrarModalReservas = true;
+      },
+      error: () => alert("Error al cargar tus reservas")
+    });
+  }
+
+  cerrarModalReservas(): void {
+    this.mostrarModalReservas = false;
+  }
+
+  eliminarReserva(reserva: Reserva): void {
+    if (!confirm('¿Deseas cancelar esta reserva?')) return;
+
+    this.reservaService.eliminar(reserva.idReserva).subscribe({
+      next: () => {
+        this.reservasCliente = this.reservasCliente.filter(r => r.idReserva !== reserva.idReserva);
+        alert("Reserva eliminada.");
+      },
+      error: () => alert("No se pudo eliminar la reserva.")
+    });
+  }
+
+
+
+  abrirReprogramar(reserva: Reserva): void {
+    this.reservaAReprogramar = reserva;
+
+    const idAsesor = reserva.asesor.idAsesor;
+
+    this.horariosDisponiblesReprogramacion =
+      [...(this.disponibilidades[idAsesor] || [])];
+
+    this.nuevoHorarioSeleccionado = null;
+    this.mostrarModalReprogramar = true;
+  }
+
+  cerrarReprogramar(): void {
+    this.mostrarModalReprogramar = false;
+    this.reservaAReprogramar = null;
+    this.nuevoHorarioSeleccionado = null;
+  }
+
+  confirmarReprogramacion(): void {
+    if (!this.reservaAReprogramar || !this.nuevoHorarioSeleccionado) {
+      alert("Seleccione un horario.");
+      return;
+    }
+
+    const d = this.nuevoHorarioSeleccionado;
+
+    const reservaActualizada = {
+      ...this.reservaAReprogramar,
+      fechaHoraInicio: `${d.fecha}T${d.horaInicio}`,
+      fechaHoraFin: `${d.fecha}T${d.horaFin}`
+    };
+
+    this.reservaService.actualizar(reservaActualizada).subscribe({
+      next: () => {
+        alert("Reserva reprogramada correctamente.");
+
+        const idCliente = Number(localStorage.getItem('idCliente'));
+
+        this.reservaService.listarPorCliente(idCliente).subscribe({
+          next: (data) => {
+
+            this.reservasCliente = data.sort((a, b) =>
+              new Date(a.fechaHoraInicio).getTime() - new Date(b.fechaHoraInicio).getTime()
+            );
+          }
+        });
+
+        this.cerrarReprogramar();
+      },
+      error: () => alert("Error al reprogramar")
+    });
+  }
+
+
+  // ========================================================
+  // UTILS
+  // ========================================================
+
   getIniciales(nombre: string): string {
-    if (!nombre) return '...';
+    if (!nombre) return '??';
     return nombre
       .split(' ')
-      .slice(0, 2) // Tomamos solo los primeros dos nombres/apellidos
-      .map((n) => n[0])
+      .slice(0, 2)
+      .map(n => n[0])
       .join('')
       .toUpperCase();
   }
 
-  /**
-   * Genera una URL de placeholder.
-   */
   getPlaceholderAvatar(nombre: string): string {
-    const iniciales = this.getIniciales(nombre);
-    return `https://placehold.co/150x150/f0f9ff/0f172a?text=${iniciales}`;
+    return `https://placehold.co/150x150/f0f9ff/0f172a?text=${this.getIniciales(nombre)}`;
   }
 
-  /** Convierte una hora (ej: "09:00:00") a formato 12h (ej: "9am") */
   formatoHoraAmPm(hora: string): string {
     if (!hora) return '';
     const [h, m] = hora.split(':');
-    const horaNum = parseInt(h, 10);
-    const ampm = horaNum >= 12 ? 'pm' : 'am';
-    const hora12 = horaNum % 12 === 0 ? 12 : horaNum % 12;
-    if (m === '00' || !m) {
-      return `${hora12}${ampm}`;
-    }
-    return `${hora12}:${m}${ampm}`;
+    const num = parseInt(h, 10);
+    const ampm = num >= 12 ? 'pm' : 'am';
+    const hora12 = num % 12 === 0 ? 12 : num % 12;
+    return m === '00' ? `${hora12}${ampm}` : `${hora12}:${m}${ampm}`;
   }
 }

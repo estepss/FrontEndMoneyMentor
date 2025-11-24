@@ -28,6 +28,8 @@
             required
             placeholder="Nombre en la tarjeta"
           />
+          <!-- Mensaje de ayuda basado en la validación @NotBlank -->
+          <!-- La validación completa se hace en el componente, aquí solo se usa el 'required' del HTML -->
         </div>
 
         <!-- Campo Número de Tarjeta (CORREGIDO) -->
@@ -40,6 +42,8 @@
             name="numero"
             required
             placeholder="XXXX XXXX XXXX XXXX"
+            pattern="\d{13,19}"
+            title="El número debe tener entre 13 y 19 dígitos"
           />
         </div>
 
@@ -72,6 +76,8 @@
               name="cvc"
               required
               placeholder="XXX"
+              pattern="\d{3,4}"
+              title="El CVC debe tener 3 o 4 dígitos"
             />
           </div>
         </div>

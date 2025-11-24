@@ -1,0 +1,100 @@
+.contenedor {
+  padding: 25px;
+  width: 100%;
+}
+
+h2 {
+  margin-bottom: 20px;
+  font-weight: 600;
+  font-size: 20px;
+}
+
+.tarjetas {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.card {
+  background: #ffffff;
+  padding: 20px 25px;
+  border-radius: 16px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+  transition: 0.25s ease;
+  width: 70%;
+}
+
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 18px rgba(0,0,0,0.12);
+}
+
+/* ENCABEZADO */
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* AVATAR */
+.avatar {
+  width: 48px;
+  height: 48px;
+  background: #1b3547;
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+  font-size: 20px;
+}
+
+/* TEXTO */
+.info-header {
+  flex-grow: 1;
+  margin-left: 12px;
+}
+
+.nombre {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+/* INFO DETALLADA */
+.info {
+  margin-top: 10px;
+  padding-left: 5px;
+}
+
+.info p {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  margin: 4px 0;
+}
+
+.info mat-icon {
+  font-size: 18px;
+  color: #3c6e71;
+}
+
+/* BOTÓN CHAT */
+.chat-btn {
+  background-color: #dee9ea;
+  color: white;
+  padding: 6px 16px;
+  border-radius: 20px;
+  transition: 0.2s;
+}
+
+.chat-btn:hover {
+  background-color: #62bbc1;
+}
+
+.no-data {
+  color: #777;
+  text-align: center;
+  margin-top: 20px;
+}

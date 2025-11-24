@@ -5,12 +5,13 @@ import { FormsModule } from '@angular/forms';
 import { Disponibilidad } from '../../model/disponibilidad';
 import { DisponibilidadService } from '../../services/disponibilidad-service';
 
-// Tipo para la celda del calendario
+// Tipo para la celda del calendario, incluyendo el estado esPasado
 type DiaCalendario = {
   fecha: Date;
   numero: number;
   esHoy: boolean;
   esMesActual: boolean;
+  esPasado: boolean; // Indica si la fecha completa ya pasó
   disponibilidades: Disponibilidad[]; // Horarios para este día
 };
 
@@ -31,9 +32,10 @@ export class CalendarioAsesorComponent implements OnInit {
   public nombresDias = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
 
   // --- ESTADO DE DISPONIBILIDAD ---
-  // Inicializamos a 0 por seguridad, el valor real se lee en ngOnInit.
   private idAsesorLogueado: number = 0;
-  private disponibilidadesDelMes: Disponibilidad[] = [];
+  // Almacena TODAS las disponibilidades cargadas del backend
+  private disponibilidadesCargadas: Disponibilidad[] = [];
+  // Horarios SOLO FUTUROS/ACTUALES que se muestran en el sidebar
   public horariosDelDiaSeleccionado: Disponibilidad[] = [];
   public diaSeleccionado: DiaCalendario | null = null;
   public horarioSeleccionado: Disponibilidad | null = null;
@@ -41,6 +43,9 @@ export class CalendarioAsesorComponent implements OnInit {
   // --- ESTADO DE MODALES ---
   public showModalRegistrar = false;
   public showModalEditar = false;
+
+  // Variable para controlar mensaje de error de solapamiento
+  public errorSolapamiento = false;
 
   // --- FORMULARIO DE MODAL ---
   public horariosPredefinidos = [
@@ -52,7 +57,6 @@ export class CalendarioAsesorComponent implements OnInit {
   public horarioFormulario: { inicio: string, fin: string } = { inicio: '09:00', fin: '11:00' };
 
   ngOnInit(): void {
-    // ⬇ MODIFICACIÓN: Leer 'idAsesor' que es la clave que tu Login.ts usa
     const storedId = localStorage.getItem('idAsesor');
 
     if (storedId) {
@@ -68,6 +72,103 @@ export class CalendarioAsesorComponent implements OnInit {
   }
 
   // ------------------------------------------------------------------
+  // MÉTODOS DE VALIDACIÓN DE FECHA/HORA
+  // ------------------------------------------------------------------
+
+  /**
+   * Comprueba si la fecha completa ya ha pasado (sin considerar la hora).
+   */
+  esFechaPasada(fecha: Date): boolean {
+    const hoy = new Date();
+    // Normalizamos para comparar solo fecha (YYYY-MM-DD)
+    const fechaSinHora = new Date(fecha.getFullYear(), fecha.getMonth(), fecha.getDate());
+    const hoySinHora = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate());
+
+    return fechaSinHora.getTime() < hoySinHora.getTime();
+  }
+
+  /**
+   * Comprueba si un slot de disponibilidad (fecha + horaFin) ya ha pasado.
+   */
+  esHorarioPasado(disponibilidad: Disponibilidad): boolean {
+    const [h, m] = disponibilidad.horaFin.split(':').map(Number);
+    const fechaFinSlot = new Date(disponibilidad.fecha);
+    fechaFinSlot.setHours(h, m, 0, 0);
+
+    const ahora = new Date();
+    return fechaFinSlot.getTime() < ahora.getTime();
+  }
+
+  /**
+   * Comprueba si el horario seleccionado en el modal ya pasó para el día seleccionado.
+   */
+  esHorarioFormularioPasado(): boolean {
+    if (!this.diaSeleccionado) return true;
+
+    const fechaISO = this.formatoFechaISO(this.diaSeleccionado.fecha);
+
+    const slotTemporal: Disponibilidad = {
+      idDisponibilidad: 0,
+      fecha: fechaISO,
+      horaInicio: this.horarioFormulario.inicio,
+      horaFin: this.horarioFormulario.fin,
+      disponible: true,
+      idAsesor: this.idAsesorLogueado
+    };
+
+    return this.esHorarioPasado(slotTemporal);
+  }
+
+  /**
+   * Permite navegar solo hasta un año en el futuro.
+   */
+  esMesFuturoLejano(): boolean {
+    const unAnioEnElFuturo = new Date();
+    unAnioEnElFuturo.setFullYear(unAnioEnElFuturo.getFullYear() + 1);
+    return this.fechaActual.getTime() > unAnioEnElFuturo.getTime();
+  }
+
+  // ------------------------------------------------------------------
+  //  NUEVA LÓGICA DE VALIDACIÓN DE SOLAPAMIENTO (RANGO DE HORAS)
+  // ------------------------------------------------------------------
+
+  /**
+   * Convierte una hora string "HH:mm" a minutos totales (ej: "01:30" -> 90)
+   */
+  private horaAMinutos(hora: string): number {
+    const [h, m] = hora.split(':').map(Number);
+    return (h * 60) + m;
+  }
+
+  /**
+   * Verifica si el horario seleccionado en el formulario se cruza con alguno existente.
+   * @param idExcluir (Opcional) ID de la disponibilidad que estamos editando.
+   */
+  detectarSolapamiento(idExcluir: number | null = null): boolean {
+    // 1. Convertimos el nuevo rango a minutos
+    const nuevoInicio = this.horaAMinutos(this.horarioFormulario.inicio);
+    const nuevoFin = this.horaAMinutos(this.horarioFormulario.fin);
+
+    // 2. Recorremos los horarios que YA existen en el día seleccionado
+    return this.horariosDelDiaSeleccionado.some(existente => {
+
+      // Si estamos editando, ignoramos el mismo registro que estamos modificando
+      if (idExcluir && existente.idDisponibilidad === idExcluir) {
+        return false;
+      }
+
+      // Convertimos el rango existente a minutos
+      const existInicio = this.horaAMinutos(existente.horaInicio);
+      const existFin = this.horaAMinutos(existente.horaFin);
+
+      // 3. FÓRMULA DE SOLAPAMIENTO: (InicioA < FinB) Y (InicioB < FinA)
+      const hayCruce = (nuevoInicio < existFin) && (existInicio < nuevoFin);
+
+      return hayCruce;
+    });
+  }
+
+  // ------------------------------------------------------------------
   // MÉTODOS DE RENDERIZADO DEL CALENDARIO
   // ------------------------------------------------------------------
 
@@ -75,10 +176,10 @@ export class CalendarioAsesorComponent implements OnInit {
   generarCalendario(): void {
     this.diasDelMes = [];
     const anio = this.fechaActual.getFullYear();
-    const mes = this.fechaActual.getMonth(); // 0-11
+    const mes = this.fechaActual.getMonth();
 
-    const primerDiaDelMes = new Date(anio, mes, 1).getDay(); // 0=Domingo
-    const diasEnMes = new Date(anio, mes + 1, 0).getDate(); // Último día del mes
+    const primerDiaDelMes = new Date(anio, mes, 1).getDay();
+    const diasEnMes = new Date(anio, mes + 1, 0).getDate();
 
     // Relleno de días del mes anterior
     const diasMesAnterior = new Date(anio, mes, 0).getDate();
@@ -89,6 +190,7 @@ export class CalendarioAsesorComponent implements OnInit {
         numero: fecha.getDate(),
         esHoy: false,
         esMesActual: false,
+        esPasado: true,
         disponibilidades: []
       });
     }
@@ -98,12 +200,15 @@ export class CalendarioAsesorComponent implements OnInit {
     for (let i = 1; i <= diasEnMes; i++) {
       const fecha = new Date(anio, mes, i);
       const esHoy = fecha.toDateString() === hoy.toDateString();
+      const esPasado = this.esFechaPasada(fecha);
+
       this.diasDelMes.push({
         fecha: fecha,
         numero: i,
         esHoy: esHoy,
         esMesActual: true,
-        disponibilidades: this.filtrarDisponibilidadPorDia(fecha) // Rellenado con datos cargados
+        esPasado: esPasado,
+        disponibilidades: this.filtrarDisponibilidadPorDia(fecha)
       });
     }
 
@@ -117,6 +222,7 @@ export class CalendarioAsesorComponent implements OnInit {
         numero: i,
         esHoy: false,
         esMesActual: false,
+        esPasado: false,
         disponibilidades: []
       });
     }
@@ -124,6 +230,9 @@ export class CalendarioAsesorComponent implements OnInit {
 
   /** Cambia al mes anterior o siguiente */
   cambiarMes(offset: number): void {
+    if (offset > 0 && this.esMesFuturoLejano()) {
+      return;
+    }
     this.fechaActual.setMonth(this.fechaActual.getMonth() + offset);
     this.diaSeleccionado = null;
     this.horariosDelDiaSeleccionado = [];
@@ -140,36 +249,48 @@ export class CalendarioAsesorComponent implements OnInit {
   // MÉTODOS DE LÓGICA DE DISPONIBILIDAD (CONEXIÓN AL SERVICIO)
   // ------------------------------------------------------------------
 
-  /** Carga todas las disponibilidades del asesor (filtradas por el ID logueado) */
+  /** Carga todas las disponibilidades del asesor y filtra las pasadas. */
   cargarDisponibilidadesDelAsesor(): void {
     if (this.idAsesorLogueado === 0) return;
 
     this.disponibilidadService.listByAsesor(this.idAsesorLogueado).subscribe(data => {
-      this.disponibilidadesDelMes = data;
-      this.generarCalendario(); // Re-renderizar el calendario con los datos nuevos
+      this.disponibilidadesCargadas = data.filter(d => !this.esHorarioPasado(d));
+      this.generarCalendario();
 
-      // Si había un día seleccionado, actualizar su lista de horarios
       if (this.diaSeleccionado) {
-        const diaActualizado = this.diasDelMes.find(d => d.fecha.toDateString() === this.diaSeleccionado?.fecha.toDateString());
+        const diaActualizado = this.diasDelMes.find(d =>
+          this.formatoFechaISO(d.fecha) === this.formatoFechaISO(this.diaSeleccionado!.fecha)
+        );
         if (diaActualizado) {
           this.seleccionarDia(diaActualizado);
+        } else {
+          this.diaSeleccionado = null;
+          this.horariosDelDiaSeleccionado = [];
+          this.horarioSeleccionado = null;
         }
       }
     });
   }
 
-  /** Filtra las disponibilidades cargadas para un día específico */
+  /** Filtra las disponibilidades cargadas (solo futuras) para un día específico */
   filtrarDisponibilidadPorDia(fecha: Date): Disponibilidad[] {
     const fechaStr = this.formatoFechaISO(fecha);
-    return this.disponibilidadesDelMes
+    return this.disponibilidadesCargadas
       .filter(d => d.fecha === fechaStr)
       .sort((a, b) => a.horaInicio.localeCompare(b.horaInicio));
   }
 
   /** Maneja el clic en un día del calendario */
   seleccionarDia(dia: DiaCalendario): void {
-    if (!dia.esMesActual) return;
-
+    if (!dia.esMesActual || dia.esPasado) {
+      if (dia.esPasado) {
+        console.warn("No puedes seleccionar un día pasado para gestionar horarios.");
+      }
+      this.diaSeleccionado = dia;
+      this.horariosDelDiaSeleccionado = [];
+      this.horarioSeleccionado = null;
+      return;
+    }
     this.diaSeleccionado = dia;
     this.horariosDelDiaSeleccionado = dia.disponibilidades;
     this.horarioSeleccionado = null;
@@ -183,6 +304,18 @@ export class CalendarioAsesorComponent implements OnInit {
   /** REGISTRAR: Llama al servicio para guardar la nueva disponibilidad */
   registrarDisponibilidad(): void {
     if (!this.diaSeleccionado) return;
+    if (this.esHorarioFormularioPasado()) {
+      console.error("No se puede registrar un horario cuya hora de fin ya ha pasado.");
+      return;
+    }
+
+    // --- VALIDACIÓN DE SOLAPAMIENTO ---
+    if (this.detectarSolapamiento()) {
+      this.errorSolapamiento = true; // Mostramos error
+      return; // Detenemos el guardado
+    } else {
+      this.errorSolapamiento = false;
+    }
 
     const nuevaDisp = new Disponibilidad();
     nuevaDisp.idAsesor = this.idAsesorLogueado;
@@ -194,7 +327,7 @@ export class CalendarioAsesorComponent implements OnInit {
     this.disponibilidadService.insert(nuevaDisp).subscribe({
       next: () => {
         this.showModalRegistrar = false;
-        this.cargarDisponibilidadesDelAsesor(); // Recargar datos, lo que actualiza automáticamente la vista
+        this.cargarDisponibilidadesDelAsesor();
       },
       error: (err) => console.error("Error al registrar:", err)
     });
@@ -203,6 +336,19 @@ export class CalendarioAsesorComponent implements OnInit {
   /** EDITAR: Llama al servicio para actualizar la disponibilidad */
   actualizarDisponibilidad(): void {
     if (!this.horarioSeleccionado) return;
+    if (this.esHorarioFormularioPasado()) {
+      console.error("No se puede actualizar a un horario cuya hora de fin ya ha pasado.");
+      return;
+    }
+
+    // --- VALIDACIÓN DE SOLAPAMIENTO ---
+    // Pasamos el ID actual para no chocar con el registro que estamos editando
+    if (this.detectarSolapamiento(this.horarioSeleccionado.idDisponibilidad)) {
+      this.errorSolapamiento = true; // Mostramos error
+      return; // Detenemos la edición
+    } else {
+      this.errorSolapamiento = false;
+    }
 
     const dispActualizada: Disponibilidad = {
       ...this.horarioSeleccionado,
@@ -214,7 +360,7 @@ export class CalendarioAsesorComponent implements OnInit {
       next: () => {
         this.showModalEditar = false;
         this.horarioSeleccionado = null;
-        this.cargarDisponibilidadesDelAsesor(); // Recargar datos
+        this.cargarDisponibilidadesDelAsesor();
       },
       error: (err) => console.error("Error al actualizar:", err)
     });
@@ -223,12 +369,16 @@ export class CalendarioAsesorComponent implements OnInit {
   /** ELIMINAR: Llama al servicio para borrar la disponibilidad */
   eliminarDisponibilidad(): void {
     if (!this.horarioSeleccionado || !this.horarioSeleccionado.idDisponibilidad) return;
+    if (this.diaSeleccionado?.esPasado) {
+      console.error("No se puede eliminar un horario en un día pasado.");
+      return;
+    }
 
     const idParaEliminar = this.horarioSeleccionado.idDisponibilidad;
     this.disponibilidadService.delete(idParaEliminar).subscribe({
       next: () => {
         this.horarioSeleccionado = null;
-        this.cargarDisponibilidadesDelAsesor(); // Recargar datos
+        this.cargarDisponibilidadesDelAsesor();
       },
       error: (err) => console.error("Error al eliminar:", err)
     });
@@ -240,26 +390,26 @@ export class CalendarioAsesorComponent implements OnInit {
 
   /** Abre el modal de Registrar */
   abrirModalRegistrar(): void {
-    if (!this.diaSeleccionado) {
-      console.error("Por favor, seleccione un día del calendario primero.");
+    if (!this.diaSeleccionado || this.diaSeleccionado.esPasado) {
+      console.error("Por favor, seleccione un día actual o futuro del calendario primero.");
       return;
     }
-    // Reseteamos el formulario al slot por defecto
     this.horarioFormulario = { inicio: '09:00', fin: '11:00' };
+    this.errorSolapamiento = false; // Resetear error
     this.showModalRegistrar = true;
   }
 
   /** Abre el modal de Editar */
   abrirModalEditar(): void {
-    if (!this.horarioSeleccionado) {
-      console.error("Por favor, seleccione un horario de la lista primero.");
+    if (!this.horarioSeleccionado || this.diaSeleccionado?.esPasado) {
+      console.error("Por favor, seleccione un horario de la lista primero, y asegúrese de que el día no es pasado.");
       return;
     }
-    // Cargamos el formulario con los datos del horario seleccionado
     this.horarioFormulario = {
       inicio: this.horarioSeleccionado.horaInicio,
       fin: this.horarioSeleccionado.horaFin
     };
+    this.errorSolapamiento = false; // Resetear error
     this.showModalEditar = true;
   }
 
@@ -284,8 +434,10 @@ export class CalendarioAsesorComponent implements OnInit {
 
   /** Convierte un objeto Date a "YYYY-MM-DD" */
   formatoFechaISO(date: Date): string {
-    const offset = date.getTimezoneOffset();
-    const adjustedDate = new Date(date.getTime() - (offset*60*1000));
-    return adjustedDate.toISOString().split('T')[0];
+    const d = new Date(date);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
   }
 }

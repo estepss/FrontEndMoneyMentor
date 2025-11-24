@@ -1,0 +1,187 @@
+.titulo {
+  text-align: center;
+  font-size: 30px;
+  font-weight: 700;
+  color: #1a2c38;
+  margin-bottom: 25px;
+}
+
+/* GRID */
+.grid-analisis {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 50px;
+  padding: 0 24px;
+  width: min(95%, 40000px); /* RESPONSIVE: hasta 1400px máximo */
+  max-width: 4000px; /* ANCHO MÁXIMO */
+  margin: 0 auto;    /* CENTRAR SIEMPRE */
+}
+
+/* TARJETAS */
+.card-neo {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 6px 25px rgba(0,0,0,0.08);
+  transition: transform .3s ease, box-shadow .3s ease;
+}
+.card-neo:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 30px rgba(86, 149, 172, 0.12);
+}
+
+/* HEADER */
+.card-neo__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.card-neo__header .left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.card-neo__header h3 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.card-neo__header span {
+  font-size: 12px;
+  color: #7c8c98;
+}
+
+/* FORM */
+.controls {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  margin-bottom: 14px;
+  margin-top: 5px;
+}
+.full { flex: 1; }
+
+.btn-cta {
+  background: #2ea8b4;
+  color: white;
+  border-radius: 18px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: -20px;
+}
+
+/* Contenedor del gráfico */
+.viz {
+  border: 2px dashed #bdd4e1;
+  border-radius: 12px;
+  padding: 14px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 500px;  /* MISMA ALTURA DE CONTENEDOR */
+  text-align: center;
+}
+
+/* Ambas imágenes tendrán el mismo espacio visual siempre */
+.viz img {
+  width: 100%;
+  max-width: 900px;     /* más grande */
+  height: auto;
+  object-fit: contain;
+  display: block;
+}
+
+.placeholder {
+  color: #8998a8;
+}
+.chart-img {
+  opacity: 1;
+  transform: none;
+  filter: none;
+  transition: none;
+}
+/* RESPONSIVE */
+@media (max-width: 900px) {
+  .grid-analisis {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .controls { flex-direction: column; }
+  .btn-cta { width: 100%; justify-content: center; }
+}
+
+
+/* TARJETA */
+.card-neo {
+  background: #ffffff;
+  border-radius: 14px;
+  overflow: hidden;        /* Para que la cabecera encaje */
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.09);
+  border: 1.5px solid #c9e4ec;
+  padding-bottom: 18px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* CABECERA COMPLETA DE COLOR (fuerza la prioridad) */
+.card-neo__header {
+  background-color: #2d566e !important;   /* EL COLOR QUE QUIERES */
+  border-bottom: 2px solid #14415c !important;
+  color: #ffffff !important;
+  padding: 16px 24px !important;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* TEXTOS */
+.water-header h3 {
+  margin: 0;
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: #ffffff;
+}
+
+.water-header span {
+  display: block;
+  margin-top: 2px;
+  font-size: 0.78rem;
+  color: #e8f5fc;
+}
+
+/* ÍCONOS BLANCOS */
+.water-header mat-icon {
+  color: #ffffff !important;
+}
+
+/* ALINEO DEL TÍTULO + ICONO */
+.water-header .left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.viz {
+  border: 1px solid #e3eef5;
+  background: #f9fcff;
+}
+.no-data {
+  color: #5f6f7a;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  opacity: 0.9;
+  font-size: 15px;
+}
+.no-data mat-icon {
+  font-size: 20px;
+  color: #5f6f7a;
+}

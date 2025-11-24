@@ -40,7 +40,7 @@ export class TarjetaComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    const storedId = localStorage.getItem('userId');
+    const storedId = localStorage.getItem('idCliente');
 
     if (storedId) {
       this.idClienteLogueado = parseInt(storedId, 10);

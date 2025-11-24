@@ -69,7 +69,6 @@ export class AsesorComponent implements OnInit {
 
   ngOnInit(): void {
     this.cargarAsesores();
-    // Quitamos cargarTarjetas() de aquí, ya que se llama en abrirReserva()
   }
 
 
@@ -104,7 +103,7 @@ export class AsesorComponent implements OnInit {
     });
   }
 
-  // ⭐️ ÚNICA FUNCIÓN MODIFICADA: Cargar tarjetas filtrando por idCliente
+
   cargarTarjetas(): void {
     const idCliente = Number(localStorage.getItem('idCliente'));
 
@@ -177,22 +176,56 @@ export class AsesorComponent implements OnInit {
   // ========================================================
 
   abrirReserva(asesor: AsesorFinanciero): void {
-    this.cargarTarjetas(); // Llama a la versión actualizada que filtra por cliente
-
+    this.cargarTarjetas();
     this.asesorReserva = asesor;
-    this.horariosVisibles = this.disponibilidades[asesor.idAsesor] || [];
+
+    const hoy = new Date();
+
+
+    this.horariosVisibles = (this.disponibilidades[asesor.idAsesor] || [])
+      .filter(slot => {
+        if (!slot.fecha || !slot.horaInicio) return false;
+
+        const slotDateTime = new Date(`${slot.fecha}T${slot.horaInicio}`);
+
+
+        if (slotDateTime < hoy) return false;
+
+
+        const slotDateOnly = new Date(slot.fecha);
+        const todayDateOnly = new Date(hoy.toISOString().split("T")[0]);
+
+        if (slotDateOnly.getTime() === todayDateOnly.getTime()) {
+          const [h, m] = slot.horaInicio.split(':').map(Number);
+          if (h < hoy.getHours() || (h === hoy.getHours() && m <= hoy.getMinutes())) {
+            return false;
+          }
+        }
+
+        return true;
+      })
+      .sort((a, b) => {
+        // Ordenar por fecha
+        const fechaA = new Date(`${a.fecha}T${a.horaInicio}`);
+        const fechaB = new Date(`${b.fecha}T${b.horaInicio}`);
+        return fechaA.getTime() - fechaB.getTime();
+      });
+
+    // Reset de selección
     this.slotSeleccionado = null;
-    this.modalidadSeleccionada = '';
+    this.modalidadSeleccionada = 'Virtual';
     this.tarjetaSeleccionada = null;
     this.precioCalculado = 0;
+
     this.mostrarReservaModal = true;
   }
+
 
   cerrarReservaModal(): void {
     this.mostrarReservaModal = false;
     this.asesorReserva = null;
     this.slotSeleccionado = null;
-    this.modalidadSeleccionada = '';
+    this.modalidadSeleccionada = 'Virtual';
     this.tarjetaSeleccionada = null;
     this.precioCalculado = 0;
   }
@@ -215,7 +248,7 @@ export class AsesorComponent implements OnInit {
 
   confirmarReserva(): void {
     if (!this.slotSeleccionado || !this.asesorReserva || !this.tarjetaSeleccionada) {
-      alert('Seleccione horario, modalidad y tarjeta.');
+      alert('Seleccione horario y tarjeta.');
       return;
     }
 
@@ -227,7 +260,7 @@ export class AsesorComponent implements OnInit {
       fechaHoraInicio: `${fecha}T${this.slotSeleccionado.horaInicio}`,
       fechaHoraFin: `${fecha}T${this.slotSeleccionado.horaFin}`,
       estado: 'Reservado',
-      modalidad: this.modalidadSeleccionada,
+      modalidad: 'Virtual',   // <-- Modalidad fija
       montoTotal: this.precioCalculado,
 
       cliente: { idCliente },
@@ -250,23 +283,35 @@ export class AsesorComponent implements OnInit {
   }
 
 
-
   abrirModalReservas(): void {
     const idCliente = Number(localStorage.getItem('idCliente'));
+    const ahora = new Date();  // Fecha y hora actual
 
     this.reservaService.listarPorCliente(idCliente).subscribe({
       next: (data) => {
-        // Ordena por fecha de inicio ASCENDENTE
-        this.reservasCliente = data.sort((a, b) =>
-          new Date(a.fechaHoraInicio).getTime() - new Date(b.fechaHoraInicio).getTime()
-        );
+
+        this.reservasCliente = data
+
+          .filter(res => {
+            if (!res.fechaHoraInicio) return false;
+
+            const fechaReserva = new Date(res.fechaHoraInicio);
+
+
+            return fechaReserva > ahora;
+          })
+
+          .sort((a, b) => {
+            const fechaA = new Date(a.fechaHoraInicio);
+            const fechaB = new Date(b.fechaHoraInicio);
+            return fechaA.getTime() - fechaB.getTime();
+          });
 
         this.mostrarModalReservas = true;
       },
       error: () => alert("Error al cargar tus reservas")
     });
   }
-
 
   cerrarModalReservas(): void {
     this.mostrarModalReservas = false;
@@ -326,7 +371,7 @@ export class AsesorComponent implements OnInit {
 
         this.reservaService.listarPorCliente(idCliente).subscribe({
           next: (data) => {
-            // ✔ ORDEN ASCENDENTE POR FECHA
+
             this.reservasCliente = data.sort((a, b) =>
               new Date(a.fechaHoraInicio).getTime() - new Date(b.fechaHoraInicio).getTime()
             );

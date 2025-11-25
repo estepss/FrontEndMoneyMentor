@@ -61,7 +61,7 @@ export class Acceso {
     dni: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(8)]],
     email: ['', [Validators.required, Validators.email]],
     password: ['', [Validators.required, Validators.minLength(8)]],
-    telefono: ['999 999 999'],
+    telefono: ['999999999'],
     sobreMi: [''],
     rol: ['', Validators.required], // 'CLIENTE' | 'ASESOR'
     idUser: ['']
@@ -160,6 +160,7 @@ export class Acceso {
               localStorage.setItem('idCliente', String(cli.idCliente));
               localStorage.setItem('userId', String(data.userId));
               console.log('Cliente logeado ->', cli);
+              localStorage.setItem('email', cli.email);
               alert('¡Login correcto!');
               this.router.navigate(['/Inicio']);
             },
@@ -175,6 +176,7 @@ export class Acceso {
               localStorage.setItem('idAsesor', String(ase.idAsesor));
               localStorage.setItem('userId', String(data.userId));
               console.log('Asesor logeado ->', ase);
+              localStorage.setItem('email', ase.email);
               alert('¡Login correcto!');
               this.router.navigate(['/InicioAsesor']);
             },

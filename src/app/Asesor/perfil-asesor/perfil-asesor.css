@@ -12,7 +12,46 @@
   gap: 2rem;
   width: min(100%, 1000px);
 }
+.perfil-avatar {
+  width: 130px;
+  height: 130px;
+  border-radius: 50%;
+  background: #e6f4f8;             /* Fondo suave */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1rem auto;        /* Centrado */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
 
+/* Imagen o texto dentro del avatar */
+.perfil-avatar .avatar {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;                /* Por si usas fotos */
+  font-size: 3rem;                  /* Tamaño de iniciales */
+  font-weight: 600;
+  color: #1c8199;                   /* Color del texto */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+}
+.avatar-circle {
+  font-size: 42px;
+  font-weight: 600;
+  color: #0A6E8C;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Efecto hover suave */
+.avatar-circle:hover {
+  transform: scale(1.04);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.20);
+}
 /* ----------- Card izquierda ----------- */
 .perfil-card {
   background: #fff;

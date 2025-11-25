@@ -8,5 +8,6 @@ export class AsesorFinanciero {
   email: string;
   telefono: string;
   sobreMi: string;
+
   idPerfil: Perfil;
 }

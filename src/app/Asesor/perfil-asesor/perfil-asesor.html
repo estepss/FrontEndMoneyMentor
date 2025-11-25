@@ -4,7 +4,7 @@
     <div class="perfil-card">
       <h3 class="perfil-title">Profile Details</h3>
       <div class="perfil-avatar">
-        <img src="../../../assets/img/daf.jpg" alt="Foto de perfil" />
+        <img [src]="obtenerAvatar(perfil.nombres)" class="avatar" />
       </div>
 
       <h2 class="perfil-name">{{perfil.nombres}}</h2>
@@ -26,9 +26,9 @@
         <h3>Editar datos</h3>
 
         <div class="edit-group">
-          <label>Correo electrónico</label>
+          <label>Nombres </label>
           <div class="edit-field">
-            <input type="email" formControlName="email" />
+            <input type="email" formControlName="nombres" />
             <span class="material-icons-sharp">edit</span>
           </div>
         </div>

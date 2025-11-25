@@ -1,3 +1,4 @@
+
 <header>
   <div class="toggle">
     <div class="logo">
@@ -7,7 +8,8 @@
 
   <div class="right-section">
     <div class="nav">
-      <button id="menu-btn">
+      <!-- BOTÓN MENÚ QUE LLAMA A TS -->
+      <button id="menu-btn" (click)="toggleSidebar()">
         <span class="material-icons-sharp">menu</span>
       </button>
 
@@ -17,7 +19,7 @@
           <small class="text-muted">{{rol}}</small>
         </div>
         <div class="profile-photo">
-          <img src="../../../assets/img/daf.jpg" />
+          <img [src]="obtenerAvatar(nombre)" class="avatar" />
         </div>
       </div>
     </div>
@@ -25,7 +27,7 @@
 </header>
 
 <div class="mm-layout">
-  <aside>
+  <aside [class.open]="sidebarOpen">
     <nav class="sidebar">
       @if(esAsesor()){
       <a [routerLink]="'/InicioAsesor'">

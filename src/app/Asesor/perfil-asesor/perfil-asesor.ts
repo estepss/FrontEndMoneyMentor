@@ -1,6 +1,6 @@
 import {Component, inject} from '@angular/core';
 import {MatButton} from "@angular/material/button";
-import {FormBuilder, ReactiveFormsModule} from "@angular/forms";
+import {FormBuilder, ReactiveFormsModule, Validators} from "@angular/forms";
 import {Perfil} from '../../model/perfil';
 import {PerfilService} from '../../services/perfil-service';
 
@@ -20,10 +20,10 @@ export class PerfilAsesor {
   fb = inject(FormBuilder);
   perfilService = inject(PerfilService);
   perfilForm = this.fb.group({
-    email: [''],
-    telefono: [''],
-    password: [''],
-    sobreMi: [''],
+    nombres: [''],
+    telefono: ['', [Validators.required, Validators.minLength(9), Validators.maxLength(9)]],
+    password: ['', [Validators.required, Validators.minLength(8)]],
+    sobreMi: ['', Validators.required]
   });
 
   ngOnInit(): void {
@@ -42,7 +42,7 @@ export class PerfilAsesor {
       next: (p) => {
         this.perfil = p;
         this.perfilForm.patchValue({
-          email:    p.email ?? '',
+          nombres:    p.nombres?? '',
           telefono: p.telefono ?? '',
           sobreMi:  p.sobreMi ?? '',
           password:  p.password ?? '',
@@ -71,9 +71,9 @@ export class PerfilAsesor {
     }
 
     // 3) arma el DTO que tu back espera (NO envíes Perfil completo)
-    const { email, telefono, sobreMi, password } = this.perfilForm.getRawValue();
+    const { nombres, telefono, sobreMi, password } = this.perfilForm.getRawValue();
     const dto: any = {
-      ...(email    ? { email: email.trim() }       : {}),
+      ...(nombres    ? { nombres: nombres.trim() }       : {}),
       ...(telefono ? { telefono: telefono.trim() } : {}),
       ...(sobreMi  ? { sobreMi: sobreMi.trim() }   : {}),
       ...(password ? { password: password.trim() }                  : {}) // solo si la cambiaste
@@ -94,6 +94,9 @@ export class PerfilAsesor {
         alert('No se pudo actualizar');
       }
     });
+  }
+  obtenerAvatar(nombre: string): string {
+    return `https://ui-avatars.com/api/?name=${encodeURIComponent(nombre)}&background=ffffff&color=179bae&bold=true`;
   }
 }
 

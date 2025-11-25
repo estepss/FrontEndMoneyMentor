@@ -50,4 +50,13 @@ export class PerfilService {
     return this.httpClient.get<Perfil>(`${this.url}/Login/email/${enc}`);
   }
 
+  subirFoto(userId: number, file: File): Observable<Perfil> {
+    const formData = new FormData();
+    formData.append('file', file); // 👈 el nombre "file" debe ser el mismo del @RequestParam
+
+    return this.httpClient.post<Perfil>(
+      `${this.url}/Login/perfil/${userId}/foto`,
+      formData
+    );
+  }
 }

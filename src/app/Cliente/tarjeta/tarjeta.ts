@@ -2,17 +2,28 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
-
 // Importamos el Modelo y Servicio actualizados
 import {Tarjeta} from '../../model/tarjeta';
 import {TarjetaService} from '../../services/tarjeta-service';
+import {animate, style, transition, trigger} from '@angular/animations';
 
 @Component({
   selector: 'app-tarjeta',
   standalone: true,
   imports: [CommonModule, FormsModule, HttpClientModule],
-  templateUrl: './tarjeta.html', // Asegúrate de que el nombre del archivo HTML sea correcto
-  styleUrl: './tarjeta.css'      // Asegúrate de que el nombre del archivo CSS sea correcto
+  templateUrl: './tarjeta.html',
+  styleUrl: './tarjeta.css',
+  animations: [
+    trigger('tileEnter', [
+      transition(':enter', [
+        style({ opacity: 0, transform: 'translateY(20px) scale(0.95)' }),
+        animate(
+          '350ms ease-out',
+          style({ opacity: 1, transform: 'translateY(0) scale(1)' })
+        )
+      ])
+    ])
+  ]
 })
 export class TarjetaComponent implements OnInit {
 
@@ -54,7 +65,7 @@ export class TarjetaComponent implements OnInit {
   }
 
   // =========================================================================
-  // ⭐️ LÓGICA DE VALIDACIÓN (Implementación de reglas del TarjetaDTO) ⭐️
+  // LÓGICA DE VALIDACIÓN (Implementación de reglas del TarjetaDTO)
   // =========================================================================
 
   /**
@@ -104,7 +115,6 @@ export class TarjetaComponent implements OnInit {
       return "La fecha de expiración no puede ser anterior al mes actual.";
     }
 
-    // Si todo es correcto, retorna null
     return null;
   }
 

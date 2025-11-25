@@ -18,11 +18,13 @@ import {Clientes} from './Asesor/clientes/clientes';
 import {CalendarioAsesorComponent} from './Asesor/calendario-asesor/calendario-asesor';
 import {ChatDetalleComponent} from './Cliente/chat/chat-detalle';
 import {ChatAsesorDetalle} from './Asesor/chat-asesor/chat-asesor-detalle';
+import {NoticiasFinancieras} from './Cliente/noticias-financieras/noticias-financieras';
 
 export const routes: Routes = [
   //Landing
   {path: '', component: Landing},
   {path: 'Acceso', component: Acceso},
+
   {
     path: '',
     component: MainLayout, // layout con barra
@@ -37,7 +39,7 @@ export const routes: Routes = [
       { path: 'Chat/Detalle/:id', component: ChatDetalleComponent },
       {path: 'Perfil', component: PerfilComponent},
       {path: 'Tarjeta', component: TarjetaComponent},
-
+      {path: 'Noticias', component: NoticiasFinancieras},
     ],
   },
   {
@@ -53,5 +55,6 @@ export const routes: Routes = [
     ],
   },
   {path: '**', redirectTo: ''}, //re dirige a home
+
 ];
 

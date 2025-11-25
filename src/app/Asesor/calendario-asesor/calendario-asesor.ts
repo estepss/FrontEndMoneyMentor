@@ -4,6 +4,14 @@ import { HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { Disponibilidad } from '../../model/disponibilidad';
 import { DisponibilidadService } from '../../services/disponibilidad-service';
+import {
+  trigger,
+  transition,
+  query,
+  stagger,
+  animate,
+  style
+} from '@angular/animations';
 
 // Tipo para la celda del calendario, incluyendo el estado esPasado
 type DiaCalendario = {
@@ -20,7 +28,22 @@ type DiaCalendario = {
   standalone: true,
   imports: [CommonModule, HttpClientModule, FormsModule],
   templateUrl: './calendario-asesor.html',
-  styleUrl: './calendario-asesor.css'
+  styleUrl: './calendario-asesor.css',
+  animations: [
+    trigger('diasAnim', [
+      transition(':enter', [
+        query('.dia-celda', [
+          style({ opacity: 0, transform: 'scale(0.9)' }),
+          stagger(30, [
+            animate(
+              '200ms ease-out',
+              style({ opacity: 1, transform: 'scale(1)' })
+            )
+          ])
+        ], { optional: true })
+      ])
+    ])
+  ]
 })
 export class CalendarioAsesorComponent implements OnInit {
 

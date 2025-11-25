@@ -1,0 +1,79 @@
+<!-- noticias-financieras.component.html -->
+
+<ng-container *ngIf="!cargando; else loadingTpl">
+
+  <section class="news-page" @pageFadeIn>
+
+    <header class="news-header">
+      <div>
+        <h1 class="news-title">Noticias financieras</h1>
+        <p class="news-subtitle">
+          Últimas novedades del mercado, empresas y economía global.
+        </p>
+      </div>
+
+      <div class="news-actions">
+        <input
+          type="text"
+          class="news-search"
+          placeholder="Buscar por titulo, fuente o resumen..."
+          (input)="onSearch($any($event.target).value)">
+      </div>
+    </header>
+
+    <p class="news-count" *ngIf="noticiasFiltradas.length">
+      Mostrando {{ paginatedNoticias.length }} de {{ noticiasFiltradas.length }} noticias
+    </p>
+    <p class="news-count" *ngIf="!noticiasFiltradas.length">
+      No se encontraron noticias para “{{ terminoBusqueda }}”.
+    </p>
+
+    <div class="news-list" @cardsStagger>
+      <article *ngFor="let item of paginatedNoticias" class="news-card">
+
+        <div class="news-image-wrapper" *ngIf="item.image">
+          <img [src]="item.image" class="news-img" alt="Imagen noticia" />
+        </div>
+
+        <div class="news-content">
+          <h3 class="news-headline">{{ item.headline }}</h3>
+
+          <div class="news-meta">
+            <span class="news-source">{{ item.source }}</span>
+            <span class="news-dot">•</span>
+            <span class="news-date">
+              {{ item.datetime * 1000 | date:'dd/MM/yy, HH:mm' }}
+            </span>
+          </div>
+
+          <p class="news-summary">
+            {{ item.summary }}
+          </p>
+
+          <a class="news-link" [href]="item.url" target="_blank">
+            Leer más
+          </a>
+        </div>
+
+      </article>
+    </div>
+
+    <!-- PAGINADOR ANGULAR MATERIAL -->
+    <mat-paginator
+      [length]="length"
+      [pageSize]="pageSize"
+      [pageIndex]="pageIndex"
+      [pageSizeOptions]="pageSizeOptions"
+      showFirstLastButtons
+      (page)="onPageChange($event)">
+    </mat-paginator>
+
+  </section>
+
+</ng-container>
+
+<ng-template #loadingTpl>
+  <div class="news-loading">
+    Cargando noticias financieras...
+  </div>
+</ng-template>

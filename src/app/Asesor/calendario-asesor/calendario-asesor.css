@@ -327,6 +327,15 @@
   gap: 1rem;
   margin-top: 2rem;
 }
+.dia-celda {
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.dia-celda.dia-seleccionado {
+  transform: scale(1.08);
+  background: #3b82f6 !important;
+  color: white;
+}
 
 /* --------------------------------- */
 /* --- RESPONSIVIDAD --- */

@@ -1,11 +1,11 @@
 <div class="calculadora">
   <form [formGroup]="calcForm" (ngSubmit)="enviarDatos()">
-    <div class="title-container">
+    <div class="title-container" @pageFadeIn>
       <h1 class="title">Calculadora Financiera</h1>
     </div>
 
     <!-- Fila con 3 columnas -->
-    <div class="form-row">
+    <div class="form-row" @pageFadeIn>
       <div class="form-group">
         <label for="monto" class="form-label">Monto</label>
         <input type="number" id="monto" class="form-control" formControlName="monto" step="0.01" required>
@@ -22,13 +22,13 @@
       </div>
     </div>
 
-    <div class="col-md-12 d-flex justify-content-center gap-2">
+    <div class="col-md-12 d-flex justify-content-center gap-2" @pageFadeIn>
       <button type="submit" class="btn btn-success" [disabled]="calcForm.invalid">Calcular</button>
     </div>
   </form>
 </div>
 
-<div class="resultados row g-3 mt-3">
+<div class="resultados row g-3 mt-3" @pageFadeIn>
   <!-- VALORES POR CUOTA -->
   <div class="col-md-4">
     <label class="form-label">Capital por cuota</label>

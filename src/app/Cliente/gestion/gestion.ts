@@ -28,6 +28,7 @@ import {GestionFinanciera} from '../../model/gestion-financiera';
 import {MatSelect, MatSelectModule} from '@angular/material/select';
 import {Cliente} from '../../model/cliente';
 import {interval, switchMap} from 'rxjs';
+import {animate, style, transition, trigger} from '@angular/animations';
 
 @Component({
   selector: 'app-gestion',
@@ -65,7 +66,18 @@ import {interval, switchMap} from 'rxjs';
     // add
   ],
   templateUrl: './gestion.html',
-  styleUrl: './gestion.css'
+  styleUrl: './gestion.css',
+  animations: [
+    trigger('tileEnter', [
+      transition(':enter', [
+        style({ opacity: 0, transform: 'translateY(20px) scale(0.95)' }),
+        animate(
+          '350ms ease-out',
+          style({ opacity: 1, transform: 'translateY(0) scale(1)' })
+        )
+      ])
+    ])
+  ]
 })
 export class Gestion {
   gestionForm: FormGroup;

@@ -17,8 +17,7 @@
           <div class="dia-semana-header">{{ dia.substring(0, 3) }}</div>
         }
       </div>
-
-      <div class="dias-mes-grid">
+      <div class="dias-mes-grid" @diasAnim>
         @for (dia of diasDelMes; track dia.fecha) {
           <div
             class="dia-celda"
@@ -35,7 +34,6 @@
         }
       </div>
     </div>
-
     <div class="sidebar-container">
       <h2 class="sidebar-title">Día y horarios seleccionados</h2>
 

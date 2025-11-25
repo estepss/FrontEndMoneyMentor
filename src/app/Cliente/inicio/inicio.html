@@ -2,7 +2,7 @@
 <!-- Inicio html -->
 <section class="home">
   <div class="bienvenida">
-    <article class="tile">
+    <article class="tile" @tileEnter [routerLink]="'/Calculadora'" class="tile clickable">
       <div class="status">
         <div class="info">
           <h1>Calculadora</h1>
@@ -11,7 +11,7 @@
       </div>
     </article>
 
-    <article class="tile">
+    <article class="tile" @tileEnter [routerLink]="'/Análisis'" class="tile clickable">
       <div class="status">
         <div class="info">
           <h1>Análisis</h1>
@@ -20,7 +20,7 @@
       </div>
     </article>
 
-    <article class="tile">
+    <article class="tile" @tileEnter [routerLink]="'/Gestión'" class="tile clickable">
       <div class="status">
         <div class="info">
           <h1>Gestión</h1>
@@ -29,7 +29,7 @@
       </div>
     </article>
 
-    <article class="tile">
+    <article class="tile" @tileEnter [routerLink]="'/Asesor'" class="tile clickable">
       <div class="status">
         <div class="info">
           <h1>Asesor</h1>
@@ -38,7 +38,7 @@
       </div>
     </article>
 
-    <article class="tile">
+    <article class="tile" @tileEnter [routerLink]="'/Chat'" class="tile clickable">
       <div class="status">
         <div class="info">
           <h1>Chat</h1>
@@ -47,11 +47,20 @@
       </div>
     </article>
 
-    <article class="tile">
+    <article class="tile" @tileEnter [routerLink]="'/Perfil'" class="tile clickable">
       <div class="status">
         <div class="info">
           <h1>Perfil</h1>
           <h3>Personaliza tu perfil y actualiza tus datos.</h3>
+        </div>
+      </div>
+    </article>
+
+    <article class="tile" @tileEnter [routerLink]="'/Noticias'" class="tile clickable">
+      <div class="status">
+        <div class="info">
+          <h1>Noticias</h1>
+          <h3>Revisa las noticias reciente sobre finanzas.</h3>
         </div>
       </div>
     </article>

@@ -5,13 +5,25 @@ import {MatIcon} from '@angular/material/icon';
 import {MatButton} from '@angular/material/button';
 import {Router} from '@angular/router';
 import {ChatService} from '../../services/chat-service';
+import {animate, style, transition, trigger} from '@angular/animations';
 
 @Component({
   selector: 'app-clientes',
   standalone: true,
   imports: [CommonModule, MatIcon, MatButton],
   templateUrl: './clientes.html',
-  styleUrl: './clientes.css'
+  styleUrl: './clientes.css',
+  animations: [
+    trigger('tileEnter', [
+      transition(':enter', [
+        style({ opacity: 0, transform: 'translateY(20px) scale(0.95)' }),
+        animate(
+          '350ms ease-out',
+          style({ opacity: 1, transform: 'translateY(0) scale(1)' })
+        )
+      ])
+    ])
+  ]
 })
 export class Clientes implements OnInit {
 

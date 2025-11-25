@@ -8,7 +8,7 @@
 /* Rejilla de tarjetas */
 .bienvenida {
   display: grid;
-  grid-template-columns: repeat(3, minmax(260px, 1fr));
+  grid-template-columns: repeat(2, minmax(260px, 1fr));
   gap: 1.6rem 2rem;
   margin: 1rem 0 2rem; /* antes 7rem empujaba tod abajo */
   align-content: center; /* centra horizontalmente las columnas */
@@ -44,6 +44,14 @@
   font-size: 1rem;
   color: var(--color-dark-variant, #555);
   line-height: 1.4;
+}
+.tile {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.tile:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.15);
 }
 
 /* Responsivo */

@@ -44,6 +44,7 @@ aside .sidebar{
   border-radius:15px;
   display:flex; flex-direction:column;
   transition:.3s;
+  max-width: 1000px;
 }
 aside .sidebar:hover{ box-shadow:none; }
 

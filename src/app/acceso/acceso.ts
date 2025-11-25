@@ -96,24 +96,18 @@ export class Acceso {
       },
       error: (err) => {
         console.log('ERROR BACKEND COMPLETO:', err);
-
-        // HttpErrorResponse típico de Angular:
-        // - err.status -> 409
-        // - err.error  -> lo que devolvió Spring (objeto o string)
         let msg = 'Ocurrió un error inesperado.';
 
         if (err.status === 0) {
           msg = 'No se pudo conectar con el servidor.';
         } else if (typeof err.error === 'string') {
-          // por si el back devolviera texto plano
           msg = err.error;
         } else if (err.error?.message) {
-          // lo que mandamos desde el handler
           msg = err.error.message; //  Aquí debe venir: "El DNI ya se encuentra registrado."
         }
 
         this.backendError = msg;
-        alert(msg); // para que veas el mensaje sí o sí mientras pruebas
+        alert(msg);
       }
     });
   }
@@ -137,10 +131,9 @@ export class Acceso {
       return;
     }
 
-    // Construye tu DTO como usas normalmente
     const requestDto: Credenciales = new Credenciales();
 
-    // el Service mapeará email -> username, así no rompes tu modelo
+    // el Service mapeará email -> username, así no rompe el modelo
     requestDto.email = this.loginForm.value.email;
     requestDto.password = this.loginForm.value.password;
 
@@ -152,7 +145,6 @@ export class Acceso {
         console.log("Login response ROLs:", data.roles);
         console.log("Login response ROL:", data.roles[0]);
         localStorage.setItem('rol', data.roles[0]);
-        localStorage.setItem('rol', data.roles[0]); // si lo usas aún
 
         if (data.roles[0] === 'ROLE_CLIENTE') {
           this.clienteService.obtenerclienteporEmail(requestDto.email).subscribe({
@@ -193,7 +185,7 @@ export class Acceso {
       },
       error: (error) => {
         console.error('Login error:', error);
-        alert(error?.error?.message ?? 'Error en login');
+        alert(error?.error?.message ?? 'Error en email o contraseña');
         this.router.navigate(['/Landing']);
       }
     });

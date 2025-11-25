@@ -1,7 +1,14 @@
 import {Component, inject} from '@angular/core';
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import {CalculadoraService} from '../../services/calculadora-service';
-
+import {
+  trigger,
+  transition,
+  style,
+  animate,
+  query,
+  stagger
+} from '@angular/animations';
 
 interface CalculoResultado {
   capitalCuota: number;
@@ -18,8 +25,18 @@ interface CalculoResultado {
     ReactiveFormsModule
   ],
   templateUrl: './calculadora.html',
-  styleUrl: './calculadora.css'
-
+  styleUrl: './calculadora.css',
+  animations: [
+    // Fade + slide de toda la página
+    trigger('pageFadeIn', [
+      transition(':enter', [
+        style({ opacity: 0, transform: 'translateY(10px)' }),
+        animate('300ms ease-out',
+          style({ opacity: 1, transform: 'translateY(0)' })
+        )
+      ])
+      ]
+    )]
 })
 export class Calculadora {
   calcForm: FormGroup; //representa ujn grupo de formularios el formgroup
@@ -28,7 +45,7 @@ export class Calculadora {
 
   private calculadoraService = inject(CalculadoraService) //inyecto el servicio
 
-  resultados: Partial<CalculoResultado> = {}; // ✅ seguro para el template con "?."
+  resultados: Partial<CalculoResultado> = {}; // seguro para el template con "?."
 
   constructor()
   {

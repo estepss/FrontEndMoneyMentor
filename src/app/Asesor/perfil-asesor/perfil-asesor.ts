@@ -3,6 +3,7 @@ import {MatButton} from "@angular/material/button";
 import {FormBuilder, ReactiveFormsModule, Validators} from "@angular/forms";
 import {Perfil} from '../../model/perfil';
 import {PerfilService} from '../../services/perfil-service';
+import {animate, style, transition, trigger} from '@angular/animations';
 
 @Component({
   selector: 'app-perfil-asesor',
@@ -11,7 +12,18 @@ import {PerfilService} from '../../services/perfil-service';
         ReactiveFormsModule
     ],
   templateUrl: './perfil-asesor.html',
-  styleUrl: './perfil-asesor.css'
+  styleUrl: './perfil-asesor.css',
+  animations: [
+    trigger('tileEnter', [
+      transition(':enter', [
+        style({ opacity: 0, transform: 'translateY(20px) scale(0.95)' }),
+        animate(
+          '350ms ease-out',
+          style({ opacity: 1, transform: 'translateY(0) scale(1)' })
+        )
+      ])
+    ])
+  ]
 })
 export class PerfilAsesor {
   //router = inject(Router);
@@ -73,16 +85,15 @@ export class PerfilAsesor {
     // 3) arma el DTO que tu back espera (NO envíes Perfil completo)
     const { nombres, telefono, sobreMi, password } = this.perfilForm.getRawValue();
     const dto: any = {
-      ...(nombres    ? { nombres: nombres.trim() }       : {}),
+      ...(nombres    ? { nombres: nombres.trim() } : {}),
       ...(telefono ? { telefono: telefono.trim() } : {}),
       ...(sobreMi  ? { sobreMi: sobreMi.trim() }   : {}),
-      ...(password ? { password: password.trim() }                  : {}) // solo si la cambiaste
+      ...(password ? { password: password.trim() } : {}) // solo si la cambiaste
     };
 
     // 4) PUT /actualizar/{userId}
     this.perfilService.update(userId, dto).subscribe({
       next: (res: any) => {
-        // si el back devuelve 200 con JSON úsalo; si da 204 usa dto
         const updated = res ?? { ...this.perfil, ...dto };
         this.perfil = updated as any;                   // refresca la card izquierda
         this.perfilForm.get('password')?.reset();      // limpia password

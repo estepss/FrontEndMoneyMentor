@@ -40,7 +40,7 @@ html{
 
 body{
   width:100%;
-  font-family:'Poppins',sans-serif;
+  font-family:'Poppins', 'Roboto', sans-serif;
   font-size:.88rem;
   background:var(--color-background);
   overflow-x:hidden;
@@ -49,4 +49,4 @@ body{
 }
 /* You can add global styles to this file, and also import other style files */
 html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+body { margin: 0; font-family: 'Poppins', "Helvetica Neue", sans-serif; }

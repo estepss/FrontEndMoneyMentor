@@ -9,6 +9,7 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {MatButton} from '@angular/material/button';
 import {Credenciales} from '../../model/credenciales';
 import {tap} from 'rxjs';
+import {animate, style, transition, trigger} from '@angular/animations';
 
 @Component({
   selector: 'app-perfil',
@@ -17,7 +18,18 @@ import {tap} from 'rxjs';
     MatButton
   ],
   templateUrl: './perfil.html',
-  styleUrl: './perfil.css'
+  styleUrl: './perfil.css',
+  animations: [
+    trigger('tileEnter', [
+      transition(':enter', [
+        style({ opacity: 0, transform: 'translateY(20px) scale(0.95)' }),
+        animate(
+          '350ms ease-out',
+          style({ opacity: 1, transform: 'translateY(0) scale(1)' })
+        )
+      ])
+    ])
+  ]
 })
 export class PerfilComponent {
   //router = inject(Router);

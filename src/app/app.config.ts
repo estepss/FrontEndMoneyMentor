@@ -7,11 +7,13 @@ import { loginInterceptor } from './interceptor/login-interceptor';
 
 import { registerLocaleData } from '@angular/common';
 import localeEs from '@angular/common/locales/es';
+import {provideAnimations} from '@angular/platform-browser/animations';
 
 registerLocaleData(localeEs);
 
 export const appConfig: ApplicationConfig = {
   providers: [
+    provideAnimations(),
     provideBrowserGlobalErrorListeners(),
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),

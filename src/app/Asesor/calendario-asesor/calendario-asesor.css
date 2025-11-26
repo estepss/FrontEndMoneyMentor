@@ -342,20 +342,20 @@
 /* --------------------------------- */
 @media (max-width: 992px) {
   .calendario-layout {
-    grid-template-columns: 1fr; /* Apila el calendario y la sidebar */
+    grid-template-columns: 1fr;
   }
 }
 
 @media (max-width: 768px) {
   .dia-celda {
-    height: 60px; /* Celdas más pequeñas en móvil */
+    height: 60px;
     padding: 0.25rem;
   }
   .dias-semana-header {
     font-size: 0.8rem;
   }
   .sidebar-actions {
-    grid-template-columns: 1fr; /* Botones de acción en una sola columna */
+    grid-template-columns: 1fr;
   }
   .btn-danger {
     grid-column: span 1;

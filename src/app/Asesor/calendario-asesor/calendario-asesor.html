@@ -84,7 +84,7 @@
 
   @if (showModalRegistrar) {
     <div class="modal-overlay" (click)="showModalRegistrar = false">
-      <div class="modal-content" (click)="$event.stopPropagation()">
+      <form [formGroup]="horarioForm" class="modal-content" (click)="$event.stopPropagation()">
         <h3 class="modal-title">Registrar disponibilidad</h3>
         <p>Selecciona el nuevo horario para el <strong>{{ diaSeleccionado?.fecha | date:'d/MM/yyyy' }}</strong></p>
 
@@ -99,7 +99,7 @@
         <div class="form-group">
           <label for="horario-registrar">Selecciona nuevo horario</label>
           <select id="horario-registrar"
-                  [(ngModel)]="horarioFormulario"
+                  formControlName="horarioSeleccionado"
                   [compareWith]="compararHorarios"
                   (change)="errorSolapamiento = false">
             @for (slot of horariosPredefinidos; track slot.inicio) {
@@ -109,20 +109,21 @@
         </div>
 
         <div class="modal-actions">
-          <button class="btn btn-secondary" (click)="showModalRegistrar = false">Cancelar</button>
+          <button class="btn btn-secondary" type="button" (click)="showModalRegistrar = false">Cancelar</button>
           <button
             class="btn btn-primary"
+            type="button"
             (click)="registrarDisponibilidad()"
-            [disabled]="esHorarioFormularioPasado()"> Registrar
+            [disabled]="esHorarioFormularioPasado() || horarioForm.invalid"> Registrar
           </button>
         </div>
-      </div>
+      </form>
     </div>
   }
 
   @if (showModalEditar) {
     <div class="modal-overlay" (click)="showModalEditar = false">
-      <div class="modal-content" (click)="$event.stopPropagation()">
+      <form [formGroup]="horarioForm" class="modal-content" (click)="$event.stopPropagation()">
         <h3 class="modal-title">Editar disponibilidad</h3>
         <p>Editando horario del <strong>{{ horarioSeleccionado?.fecha | date:'d/MM/yyyy' }}</strong></p>
 
@@ -137,7 +138,7 @@
         <div class="form-group">
           <label for="horario-editar">Selecciona nuevo horario</label>
           <select id="horario-editar"
-                  [(ngModel)]="horarioFormulario"
+                  formControlName="horarioSeleccionado"
                   [compareWith]="compararHorarios"
                   (change)="errorSolapamiento = false">
             @for (slot of horariosPredefinidos; track slot.inicio) {
@@ -147,14 +148,15 @@
         </div>
 
         <div class="modal-actions">
-          <button class="btn btn-secondary" (click)="showModalEditar = false">Cancelar</button>
+          <button class="btn btn-secondary" type="button" (click)="showModalEditar = false">Cancelar</button>
           <button
             class="btn btn-primary"
+            type="button"
             (click)="actualizarDisponibilidad()"
-            [disabled]="esHorarioFormularioPasado()"> Editar
+            [disabled]="esHorarioFormularioPasado() || horarioForm.invalid"> Editar
           </button>
         </div>
-      </div>
+      </form>
     </div>
   }
 </div>

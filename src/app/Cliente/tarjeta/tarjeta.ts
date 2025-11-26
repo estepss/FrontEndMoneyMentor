@@ -1,46 +1,30 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
-// Importamos el Modelo y Servicio actualizados
-import {Tarjeta} from '../../model/tarjeta';
-import {TarjetaService} from '../../services/tarjeta-service';
-import {animate, style, transition, trigger} from '@angular/animations';
+
+import { Tarjeta } from '../../model/tarjeta';
+import { TarjetaService } from '../../services/tarjeta-service';
 
 @Component({
   selector: 'app-tarjeta',
   standalone: true,
-  imports: [CommonModule, FormsModule, HttpClientModule],
+  imports: [CommonModule, ReactiveFormsModule, HttpClientModule],
   templateUrl: './tarjeta.html',
-  styleUrl: './tarjeta.css',
-  animations: [
-    trigger('tileEnter', [
-      transition(':enter', [
-        style({ opacity: 0, transform: 'translateY(20px) scale(0.95)' }),
-        animate(
-          '350ms ease-out',
-          style({ opacity: 1, transform: 'translateY(0) scale(1)' })
-        )
-      ])
-    ])
-  ]
+  styleUrl: './tarjeta.css'
 })
 export class TarjetaComponent implements OnInit {
 
   private tarjetaService = inject(TarjetaService);
+  private fb = inject(FormBuilder);
 
-  // Variables de estado
-  nuevaTarjeta: Tarjeta = new Tarjeta();
   tarjetasAgregadas: Tarjeta[] = [];
   vistaActual: 'agregar' | 'lista' = 'agregar';
-
-
-  // ⬇️ Variable para almacenar el ID del cliente logueado
   idClienteLogueado: number = 0;
 
-  // Datos para los selects de fecha
+  tarjetaForm: FormGroup;
+
   meses: number[] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
-  // Generamos los años desde el actual hasta +5 años
   anios: number[] = this.generarAniosExpiracion();
   mesesNombres: { [key: number]: string } = {
     1: 'Enero', 2: 'Febrero', 3: 'Marzo', 4: 'Abril', 5: 'Mayo', 6: 'Junio',
@@ -48,163 +32,116 @@ export class TarjetaComponent implements OnInit {
   };
 
   constructor() {
-    this.resetearFormulario();
+    this.tarjetaForm = this.initForm();
   }
 
   ngOnInit(): void {
-    const storedId = localStorage.getItem('idCliente');
-
+    const storedId = localStorage.getItem('userId');
     if (storedId) {
       this.idClienteLogueado = parseInt(storedId, 10);
-      console.log(`TarjetaComponent inicializado para Cliente ID: ${this.idClienteLogueado}`);
-
       this.cargarTarjetas();
-    } else {
-      console.error("¡Error! No se encontró el ID del usuario en localStorage. ¿El usuario inició sesión?");
     }
   }
 
-  // =========================================================================
-  // LÓGICA DE VALIDACIÓN (Implementación de reglas del TarjetaDTO)
-  // =========================================================================
+  // --- INICIALIZACIÓN DEL FORMULARIO ---
+  initForm(): FormGroup {
+    return this.fb.group({
+      nombreTarjeta: ['', [Validators.required]],
+      // CAMBIO: Usamos un validador personalizado en lugar del pattern estricto
+      numeroTarjeta: ['', [Validators.required, this.validarNumeroTarjeta]],
+      mesExpiracion: [new Date().getMonth() + 1, [Validators.required]],
+      anioExpiracion: [new Date().getFullYear(), [Validators.required]],
+      cvc: ['', [Validators.required, Validators.pattern(/^\d{3,4}$/)]]
+    }, { validators: this.fechaExpiracionValidator });
+  }
 
   /**
-   * Valida la nueva tarjeta según las reglas del backend (TarjetaDTO).
-   * @returns {string | null} El mensaje de error si la validación falla, o null si es exitosa.
+   * Validador personalizado: Permite espacios, pero valida que haya 13-19 dígitos.
    */
-  validarTarjeta(): string | null {
-    const tarjeta = this.nuevaTarjeta;
+  validarNumeroTarjeta(control: AbstractControl): ValidationErrors | null {
+    const valor = control.value || '';
+    // "Juntamos" los números quitando espacios para validar
+    const sinEspacios = valor.replace(/\s/g, '');
+
+    // Verificar que solo sean números
+    if (!/^\d+$/.test(sinEspacios)) {
+      return { pattern: true };
+    }
+    // Verificar longitud
+    if (sinEspacios.length < 13 || sinEspacios.length > 19) {
+      return { pattern: true };
+    }
+    return null; // Válido
+  }
+
+  /**
+   * Validador de fecha de expiración
+   */
+  fechaExpiracionValidator(group: AbstractControl): ValidationErrors | null {
+    const mes = group.get('mesExpiracion')?.value;
+    const anio = group.get('anioExpiracion')?.value;
     const anioActual = new Date().getFullYear();
     const mesActual = new Date().getMonth() + 1;
 
-    // 1. nombreTarjeta (@NotBlank)
-    if (!tarjeta.nombreTarjeta || tarjeta.nombreTarjeta.trim() === '') {
-      return "El nombre del titular no puede estar vacío.";
+    if (anio < anioActual || (anio == anioActual && mes < mesActual)) {
+      return { fechaPasada: true };
     }
-
-    // 2. numeroTarjeta (@NotBlank, @Pattern: \d{13,19})
-    // Se limpia de espacios antes de validar
-    const numeroLimpio = tarjeta.numeroTarjeta.replace(/\s/g, '');
-    if (!numeroLimpio || numeroLimpio === '') {
-      return "El número de tarjeta no puede estar vacío.";
-    }
-    if (!/^\d{13,19}$/.test(numeroLimpio)) {
-      return "El número de tarjeta debe tener entre 13 y 19 dígitos.";
-    }
-
-    // 3. cvc (@NotBlank, @Pattern: \d{3,4})
-    if (!tarjeta.cvc || tarjeta.cvc.trim() === '') {
-      return "El CVC no puede estar vacío.";
-    }
-    if (!/^\d{3,4}$/.test(tarjeta.cvc.trim())) {
-      return "El CVC debe tener 3 o 4 dígitos.";
-    }
-
-    // 4. anioExpiracion (@Min(2025)) -> Adaptado a la lógica del frontend (>= año actual o siguiente)
-    if (tarjeta.anioExpiracion < anioActual) {
-      return "El año de expiración no puede ser pasado.";
-    }
-
-    // 5. mesExpiracion (@Min(1), @Max(12)) -> Esto lo controla el <select>
-    if (tarjeta.mesExpiracion < 1 || tarjeta.mesExpiracion > 12) {
-      return "Seleccione un mes de expiración válido.";
-    }
-
-    // 6. Validación de fecha: No puede expirar este mes o en el pasado
-    if (tarjeta.anioExpiracion === anioActual && tarjeta.mesExpiracion < mesActual) {
-      return "La fecha de expiración no puede ser anterior al mes actual.";
-    }
-
     return null;
   }
 
-  // =========================================================================
-  // LÓGICA CRUD
-  // =========================================================================
+  // --- LÓGICA CRUD ---
 
-  /**
-   * Carga las tarjetas EXCLUSIVAMENTE del cliente logueado.
-   */
   cargarTarjetas(): void {
     if (this.idClienteLogueado === 0) return;
-
     this.tarjetaService.listPorCliente(this.idClienteLogueado).subscribe({
-      next: (tarjetas) => {
-        this.tarjetasAgregadas = tarjetas;
-        console.log('Mis tarjetas cargadas:', tarjetas);
-      },
-      error: (err) => {
-        console.error('Error al cargar la lista de tarjetas:', err);
-      }
+      next: (tarjetas) => this.tarjetasAgregadas = tarjetas,
+      error: (err) => console.error('Error al cargar tarjetas:', err)
     });
   }
 
-  /**
-   * Guarda una nueva tarjeta asignada al cliente logueado.
-   */
   agregarTarjeta(): void {
     if (this.idClienteLogueado === 0) {
-      console.error('No se puede guardar la tarjeta: Usuario no identificado.');
-      alert('Error de sesión. Por favor, inicie sesión nuevamente.');
+      alert('Error de sesión.');
       return;
     }
 
-    // ⭐️ PASO CLAVE: VALIDAR ANTES DE CONTINUAR
-    const errorValidacion = this.validarTarjeta();
-    if (errorValidacion) {
-      alert(errorValidacion);
+    if (this.tarjetaForm.invalid) {
+      this.tarjetaForm.markAllAsTouched();
       return;
     }
 
-    // Limpieza final de datos (quitar espacios en blanco del número)
-    this.nuevaTarjeta.numeroTarjeta = this.nuevaTarjeta.numeroTarjeta.replace(/\s/g, '');
+    const formValue = this.tarjetaForm.value;
+    const nuevaTarjeta: Tarjeta = new Tarjeta();
 
-    // 2. ASIGNAR EL ID DEL CLIENTE A LA TARJETA ANTES DE ENVIAR
-    this.nuevaTarjeta.idCliente = this.idClienteLogueado;
+    nuevaTarjeta.nombreTarjeta = formValue.nombreTarjeta;
+    // IMPORTANTE: Limpiamos los espacios antes de enviar al backend
+    nuevaTarjeta.numeroTarjeta = formValue.numeroTarjeta.replace(/\s/g, '');
+    nuevaTarjeta.mesExpiracion = Number(formValue.mesExpiracion);
+    nuevaTarjeta.anioExpiracion = Number(formValue.anioExpiracion);
+    nuevaTarjeta.cvc = formValue.cvc;
+    nuevaTarjeta.idCliente = this.idClienteLogueado;
 
-    // Llamada al servicio
-    this.tarjetaService.insert(this.nuevaTarjeta).subscribe({
-      next: (tarjetaGuardada) => {
-        console.log('Tarjeta guardada exitosamente:', tarjetaGuardada);
+    this.tarjetaService.insert(nuevaTarjeta).subscribe({
+      next: () => {
         alert('Tarjeta agregada correctamente');
-
         this.cargarTarjetas();
         this.vistaActual = 'lista';
         this.resetearFormulario();
       },
-      error: (err) => {
-        console.error('Error al guardar la tarjeta:', err.error.message || err);
-        alert(`Error al guardar: ${err.error.message || 'Intente nuevamente.'}`);
-      }
+      error: (err) => alert('Error al guardar: ' + (err.error?.message || 'Intente nuevamente'))
     });
   }
 
-  /**
-   * Elimina una tarjeta de la base de datos.
-   */
   eliminarTarjeta(index: number): void {
-    const tarjetaAEliminar = this.tarjetasAgregadas[index];
+    const tarjeta = this.tarjetasAgregadas[index];
+    if (!tarjeta.idTarjeta) return;
 
-    if (!tarjetaAEliminar.idTarjeta) {
-      console.error("Error: La tarjeta no tiene ID válido.");
-      return;
-    }
-
-    if(confirm('¿Estás seguro de que deseas eliminar esta tarjeta?')) {
-      this.tarjetaService.delete(tarjetaAEliminar.idTarjeta).subscribe({
-        next: () => {
-          console.log(`Tarjeta ${tarjetaAEliminar.idTarjeta} eliminada.`);
-          this.tarjetasAgregadas.splice(index, 1);
-        },
-        error: (err) => {
-          console.error(`Error al eliminar la tarjeta:`, err);
-          alert('No se pudo eliminar la tarjeta.');
-        }
+    if(confirm('¿Eliminar esta tarjeta?')) {
+      this.tarjetaService.delete(tarjeta.idTarjeta).subscribe({
+        next: () => this.tarjetasAgregadas.splice(index, 1)
       });
     }
   }
-
-  // --- Métodos de Navegación y Utilidad ---
 
   mostrarLista(): void {
     this.vistaActual = 'lista';
@@ -217,16 +154,13 @@ export class TarjetaComponent implements OnInit {
   }
 
   resetearFormulario(): void {
-    this.nuevaTarjeta = new Tarjeta();
-
-    if (this.idClienteLogueado !== 0) {
-      this.nuevaTarjeta.idCliente = this.idClienteLogueado;
-    }
-
-    // Valores por defecto al mes/año actual para que no quede 0/0
-    this.nuevaTarjeta.mesExpiracion = new Date().getMonth() + 1;
-    this.nuevaTarjeta.anioExpiracion = new Date().getFullYear();
-    this.nuevaTarjeta.cvc = '';
+    this.tarjetaForm.reset({
+      nombreTarjeta: '',
+      numeroTarjeta: '',
+      mesExpiracion: new Date().getMonth() + 1,
+      anioExpiracion: new Date().getFullYear(),
+      cvc: ''
+    });
   }
 
   getNombreMes(mes: number): string {
@@ -234,13 +168,9 @@ export class TarjetaComponent implements OnInit {
   }
 
   generarAniosExpiracion(): number[] {
-    const anioActual = new Date().getFullYear();
-    const anios = [];
-    // Generar años desde el actual hasta el próximo 5 años (2024 a 2028 o similar)
-    for (let i = 0; i <= 5; i++) {
-      anios.push(anioActual + i);
-    }
-    return anios;
-
+    const actual = new Date().getFullYear();
+    return Array.from({length: 6}, (_, i) => actual + i);
   }
+
+  get f() { return this.tarjetaForm.controls; }
 }

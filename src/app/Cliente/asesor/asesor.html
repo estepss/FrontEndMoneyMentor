@@ -55,7 +55,6 @@
       </button>
     </div>
 
-
   </div>
 </div>
 
@@ -86,25 +85,25 @@
       </div>
 
       <!-- FORM RESEÑA -->
-      <div class="form-reseña">
+      <form [formGroup]="resenaForm" class="form-reseña" (click)="$event.stopPropagation()">
 
         <input
           type="number"
           min="1"
           max="5"
           placeholder="Calificación (1 a 5)"
-          [(ngModel)]="puntuacion"
+          formControlName="puntuacion"
         />
 
         <textarea
           placeholder="Escribir un comentario"
-          [(ngModel)]="comentario">
+          formControlName="comentario">
         </textarea>
 
-        <button class="btn-enviar" (click)="enviarResena()">
+        <button class="btn-enviar" type="button" (click)="enviarResena()" [disabled]="resenaForm.invalid">
           Enviar
         </button>
-      </div>
+      </form>
 
       <!-- LISTA RESEÑAS -->
       <div class="reseñas-previas">
@@ -148,7 +147,6 @@
 
       <p class="texto-horario">Selecciona un horario disponible:</p>
 
-
       <div class="horarios-disponibles-lista">
 
         @if (horariosVisibles.length === 0) {
@@ -171,19 +169,18 @@
 
       </div>
 
-      <!-- SELECT TARJETA -->
-      <div class="form-group">
+
+      <form [formGroup]="reservaForm" class="form-group" (click)="$event.stopPropagation()">
         <label>Tarjeta de pago</label>
-        <select [(ngModel)]="tarjetaSeleccionada">
+        <select formControlName="tarjeta">
           @for (t of tarjetas; track t.idTarjeta) {
             <option [ngValue]="t">
               {{ t.nombreTarjeta }} - **** {{ t.numeroTarjeta.slice(-4) }}
             </option>
           }
-
           <option *ngIf="tarjetas.length === 0" disabled>No tienes tarjetas registradas</option>
         </select>
-      </div>
+      </form>
 
       <!-- MONTO FINAL -->
       <p class="monto-final">
@@ -195,7 +192,7 @@
 
         <button class="btn btn-primary"
                 (click)="confirmarReserva()"
-                [disabled]="!slotSeleccionado || !modalidadSeleccionada || !tarjetaSeleccionada">
+                [disabled]="!slotSeleccionado || reservaForm.invalid">
           Confirmar Reserva
         </button>
       </div>
@@ -205,6 +202,7 @@
 }
 
 
+<!-- ===================== MIS RESERVAS ===================== -->
 @if (mostrarModalReservas) {
   <div class="modal-overlay" (click)="cerrarModalReservas()">
     <div class="reservas-modal" (click)="$event.stopPropagation()">
@@ -214,7 +212,7 @@
       <h2 class="reservas-title">Mis reservas</h2>
 
       @if (reservasCliente.length === 0) {
-        <p class="text-center sin-reservas">No tienes reservas realizadas.</p>
+        <p class="text-center sin-reservas">No tienes reservas pendientes.</p>
       } @else {
 
         <div class="reservas-grid">
@@ -259,6 +257,7 @@
 }
 
 
+<!-- ===================== REPROGRAMAR ===================== -->
 @if (mostrarModalReprogramar && reservaAReprogramar) {
   <div class="modal-overlay" (click)="cerrarReprogramar()">
     <div class="reprogramar-modal" (click)="$event.stopPropagation()">
@@ -267,22 +266,22 @@
 
       <h3>Reprogramar cita</h3>
 
-      <label>Seleccione un nuevo horario:</label>
-      <select [(ngModel)]="nuevoHorarioSeleccionado" class="select-horarios">
-        @for (disp of horariosDisponiblesReprogramacion; track disp.idDisponibilidad) {
-          <option [ngValue]="disp">
-            {{ disp.fecha }} | {{ disp.horaInicio }} - {{ disp.horaFin }}
-          </option>
-        }
-      </select>
+      <form [formGroup]="reprogramForm">
+        <label>Seleccione un nuevo horario:</label>
+        <select formControlName="nuevoHorario" class="select-horarios">
+          @for (disp of horariosDisponiblesReprogramacion; track disp.idDisponibilidad) {
+            <option [ngValue]="disp">
+              {{ disp.fecha }} | {{ disp.horaInicio }} - {{ disp.horaFin }}
+            </option>
+          }
+        </select>
 
-      <div class="modal-actions">
-        <button class="btn-secondary" (click)="cerrarReprogramar()">Cancelar</button>
-        <button class="btn-primary" (click)="confirmarReprogramacion()">Guardar</button>
-      </div>
+        <div class="modal-actions">
+          <button class="btn-secondary" (click)="cerrarReprogramar()">Cancelar</button>
+          <button class="btn-primary" (click)="confirmarReprogramacion()" [disabled]="reprogramForm.invalid">Guardar</button>
+        </div>
+      </form>
 
     </div>
   </div>
 }
-
-

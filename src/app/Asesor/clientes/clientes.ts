@@ -60,7 +60,15 @@ export class Clientes implements OnInit {
     });
   }
   cargarClientes() {
-    this.reservaService.getClientesConReservas().subscribe({
+    const idAsesor = Number(localStorage.getItem('idAsesor'));
+
+    if (!idAsesor) {
+      alert("No se encontró el ID del asesor.");
+      this.cargando = false;
+      return;
+    }
+
+    this.reservaService.listarClientesPorAsesor(idAsesor).subscribe({
       next: (data) => {
         console.log("CLIENTES RECIBIDOS:", data);
         this.clientes = data ?? [];

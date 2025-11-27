@@ -5,13 +5,25 @@ import {MatIcon} from '@angular/material/icon';
 import {MatButton} from '@angular/material/button';
 import {Router} from '@angular/router';
 import {ChatService} from '../../services/chat-service';
+import {animate, style, transition, trigger} from '@angular/animations';
 
 @Component({
   selector: 'app-clientes',
   standalone: true,
   imports: [CommonModule, MatIcon, MatButton],
   templateUrl: './clientes.html',
-  styleUrl: './clientes.css'
+  styleUrl: './clientes.css',
+  animations: [
+    trigger('tileEnter', [
+      transition(':enter', [
+        style({ opacity: 0, transform: 'translateY(20px) scale(0.95)' }),
+        animate(
+          '350ms ease-out',
+          style({ opacity: 1, transform: 'translateY(0) scale(1)' })
+        )
+      ])
+    ])
+  ]
 })
 export class Clientes implements OnInit {
 
@@ -48,7 +60,15 @@ export class Clientes implements OnInit {
     });
   }
   cargarClientes() {
-    this.reservaService.getClientesConReservas().subscribe({
+    const idAsesor = Number(localStorage.getItem('idAsesor'));
+
+    if (!idAsesor) {
+      alert("No se encontró el ID del asesor.");
+      this.cargando = false;
+      return;
+    }
+
+    this.reservaService.listarClientesPorAsesor(idAsesor).subscribe({
       next: (data) => {
         console.log("CLIENTES RECIBIDOS:", data);
         this.clientes = data ?? [];

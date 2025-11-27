@@ -18,10 +18,14 @@ export class ReservaService {
   }
 
 
+
   listarPorCliente(idCliente: number): Observable<any[]> {
     return this.http.get<any[]>(`${this.baseUrl}/cliente/${idCliente}`);
   }
 
+  listarPorAsesor(idAsesor: number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.baseUrl}/asesor/${idAsesor}`);
+  }
 
   actualizar(reservaActualizada: any): Observable<any> {
     return this.http.put<any>(`${this.baseUrl}`, reservaActualizada);

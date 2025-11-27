@@ -13,6 +13,7 @@ import {
   animate,
   style
 } from '@angular/animations';
+import {ReservaService} from '../../services/reserva-service';
 
 type DiaCalendario = {
   fecha: Date;
@@ -49,7 +50,9 @@ type DiaCalendario = {
 export class CalendarioAsesorComponent implements OnInit {
 
   private disponibilidadService = inject(DisponibilidadService);
+  private reservaService = inject(ReservaService); // <--- INYECTAR EL SERVICIO
   private fb = inject(FormBuilder); // Inyectamos FormBuilder
+
 
   // --- ESTADO DEL CALENDARIO ---
   public fechaActual = new Date();
@@ -62,7 +65,7 @@ export class CalendarioAsesorComponent implements OnInit {
   public horariosDelDiaSeleccionado: Disponibilidad[] = [];
   public diaSeleccionado: DiaCalendario | null = null;
   public horarioSeleccionado: Disponibilidad | null = null;
-
+  public errorEliminar: string | null = null;
   // --- ESTADO DE MODALES ---
   public showModalRegistrar = false;
   public showModalEditar = false;
@@ -272,6 +275,7 @@ export class CalendarioAsesorComponent implements OnInit {
   }
 
   seleccionarDia(dia: DiaCalendario): void {
+    this.errorEliminar = null;
     if (!dia.esMesActual || dia.esPasado) {
       if (dia.esPasado) console.warn("No puedes seleccionar un día pasado.");
       this.diaSeleccionado = dia;
@@ -285,6 +289,7 @@ export class CalendarioAsesorComponent implements OnInit {
   }
 
   seleccionarHorario(horario: Disponibilidad): void {
+    this.errorEliminar = null;
     this.horarioSeleccionado = horario;
   }
 
@@ -355,22 +360,55 @@ export class CalendarioAsesorComponent implements OnInit {
   }
 
   eliminarDisponibilidad(): void {
+    // Validaciones básicas que ya tenías
     if (!this.horarioSeleccionado || !this.horarioSeleccionado.idDisponibilidad) return;
     if (this.diaSeleccionado?.esPasado) return;
 
-    const idParaEliminar = this.horarioSeleccionado.idDisponibilidad;
-    this.disponibilidadService.delete(idParaEliminar).subscribe({
+    // 1. Datos para comparar
+    const idAsesor = this.idAsesorLogueado;
+    // Formato fecha: "2023-11-25" y hora "10:00"
+    const fechaTarget = this.horarioSeleccionado.fecha;
+    const horaTarget = this.horarioSeleccionado.horaInicio;
+
+    // 2. Llamamos al servicio de reservas
+    this.reservaService.listarPorAsesor(idAsesor).subscribe({
+      next: (reservas) => {
+
+        // 3. Verificamos si alguna reserva coincide con la fecha y hora del slot
+        const tieneReserva = reservas.some(reserva => {
+          // La reserva viene como "2023-11-25T10:00:00"
+          // Verificamos si esa cadena EMPIEZA con "2023-11-25T10:00"
+          const fechaHoraSlot = `${fechaTarget}T${horaTarget}`;
+          return reserva.fechaHoraInicio && reserva.fechaHoraInicio.startsWith(fechaHoraSlot);
+        });
+
+        if (tieneReserva) {
+          // 4. SI TIENE RESERVA: Mostramos error y NO borramos
+          this.errorEliminar = 'No se puede eliminar: Ya existe una reserva con un cliente en este horario.';
+        } else {
+          // 5. SI NO TIENE RESERVA: Procedemos a eliminar (Tu lógica original)
+          this.realizarEliminacion(this.horarioSeleccionado!.idDisponibilidad);
+        }
+      },
+      error: (err) => {
+        console.error("Error al consultar reservas", err);
+        // Por seguridad, si falla la consulta, sugerimos no borrar o mostrar aviso
+        this.errorEliminar = 'Error de conexión. No se pudo verificar si hay reservas.';
+      }
+    });
+  }
+
+  // Método auxiliar para no repetir código dentro del subscribe
+  realizarEliminacion(id: number): void {
+    this.disponibilidadService.delete(id).subscribe({
       next: () => {
         this.horarioSeleccionado = null;
+        this.errorEliminar = null;
         this.cargarDisponibilidadesDelAsesor();
       },
       error: (err) => console.error("Error al eliminar:", err)
     });
   }
-
-  // ------------------------------------------------------------------
-  // MODALES Y UTILS
-  // ------------------------------------------------------------------
 
   abrirModalRegistrar(): void {
     if (!this.diaSeleccionado || this.diaSeleccionado.esPasado) return;

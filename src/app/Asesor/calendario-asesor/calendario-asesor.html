@@ -36,6 +36,11 @@
     </div>
     <div class="sidebar-container">
       <h2 class="sidebar-title">Día y horarios seleccionados</h2>
+      @if (errorEliminar) {
+        <div style="background-color: #fee2e2; color: #991b1b; padding: 10px; border-radius: 6px; margin: 10px 0; font-size: 0.9rem; border: 1px solid #fecaca;">
+          <strong>¡Atención!</strong> {{ errorEliminar }}
+        </div>
+      }
 
       @if (diaSeleccionado && diaSeleccionado.esPasado) {
         <p class="error-message">No se pueden gestionar horarios en fechas pasadas.</p>

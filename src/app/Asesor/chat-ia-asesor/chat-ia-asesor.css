@@ -1,0 +1,194 @@
+/* ===== CONTENEDOR GENERAL ===== */
+.assistant {
+  width: 100%;
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 1rem;
+  animation: fadeIn 0.6s ease;
+}
+
+/* ===== TÍTULOS ===== */
+.title {
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  font-weight: 800;
+  color: #0f172a;
+  text-align: center;
+  margin-bottom: 6px;
+  margin-top: -30px;
+}
+
+.subtitle {
+  text-align: center;
+  color: #64748b;
+  margin-top: -5px;
+  margin-bottom: 20px;
+  font-size: clamp(0.85rem, 2vw, 1rem);
+  margin-top: 20px;
+  margin-bottom: 10px;
+}
+
+.status-text {
+  text-align: center;
+  color: #475569;
+  font-size: clamp(0.85rem, 2vw, 1rem);
+  margin-bottom: 15px;
+}
+
+/* ===== CONTENEDOR DEL CHAT ===== */
+.chat-container {
+  background: #ffffff;
+  border-radius: 22px;
+  box-shadow: 0 15px 45px rgba(0, 0, 0, 0.10);
+  border: 1px solid #e2e8f0;
+  overflow: hidden;
+  width: 100%;
+}
+
+/* ===== HEADER ===== */
+.chat-header {
+  background: #293C48;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: white;
+}
+
+.bot-avatar {
+  width: clamp(40px, 7vw, 60px);
+  height: clamp(40px, 7vw, 60px);
+  border-radius: 12px;
+  object-fit: cover;
+  border: 2px solid rgba(255,255,255,0.2);
+}
+
+.bot-name {
+  font-size: clamp(1.1rem, 3vw, 1.35rem);
+  font-weight: 600;
+  margin: 0;
+}
+
+.bot-status {
+  font-size: clamp(0.8rem, 2vw, 0.95rem);
+  opacity: 0.8;
+  margin: 0;
+}
+
+/* ===== CUERPO DEL CHAT ===== */
+.chat-body {
+  background: #f8fafc;
+  height: 55vh;       /* Responsive natural */
+  min-height: 300px;
+  padding: 1rem;
+  overflow-y: auto;
+}
+
+/* ===== MENSAJES ===== */
+.msg {
+  display: flex;
+  margin-bottom: 14px;
+}
+
+.msg.user {
+  justify-content: flex-end;
+}
+
+/* ===== BURBUJAS ===== */
+.bubble {
+  max-width: min(80%, 480px);
+  padding: 12px 16px;
+  border-radius: 16px;
+  line-height: 1.5;
+  font-size: clamp(0.85rem, 2.2vw, 1rem);
+  animation: fadeInUp 0.25s ease-out;
+  box-shadow: 0px 2px 10px rgba(0,0,0,0.08);
+}
+
+/* Usuario */
+.user .bubble {
+  background: #2563eb;
+  color: white;
+  border-bottom-right-radius: 6px;
+}
+
+/* Bot */
+.bot .bubble {
+  background: #ffffff;
+  color: #0f172a;
+  border-left: 4px solid #2563eb;
+  border-bottom-left-radius: 6px;
+}
+
+/* ===== LOADING ===== */
+.loading {
+  display: flex;
+  gap: 6px;
+  margin-top: 15px;
+}
+
+.loading .dot {
+  width: 8px;
+  height: 8px;
+  background: #64748b;
+  border-radius: 50%;
+  animation: bounce 0.6s infinite alternate;
+}
+
+.loading .dot:nth-child(2) { animation-delay: 0.2s; }
+.loading .dot:nth-child(3) { animation-delay: 0.4s; }
+
+/* ===== INPUT ===== */
+.chat-input {
+  display: flex;
+  padding: 1rem;
+  background: #fff;
+  border-top: 1px solid #e2e8f0;
+  gap: 12px;
+}
+
+.input-box {
+  flex: 1;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  padding: 12px;
+  font-size: clamp(0.9rem, 2.3vw, 1rem);
+  outline: none;
+  background: #f8fafc;
+  transition: 0.2s;
+}
+
+.input-box:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+}
+
+.send-btn {
+  background: #0f172a;
+  color: white;
+  border: none;
+  padding: 0 16px;
+  border-radius: 10px;
+  font-size: clamp(1rem, 3vw, 1.1rem);
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.send-btn:hover {
+  background: #1e293b;
+}
+
+/* ===== ANIMACIONES ===== */
+@keyframes fadeIn {
+  from { opacity: 0;}
+  to {opacity: 1;}
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes bounce {
+  from { transform: translateY(0); }
+  to { transform: translateY(-5px); }
+}

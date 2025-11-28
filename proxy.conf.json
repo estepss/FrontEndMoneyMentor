@@ -1,0 +1,17 @@
+{
+  "/finnhub": {
+    "target": "https://finnhub.io/api/v1",
+    "secure": true,
+    "changeOrigin": true,
+    "logLevel": "debug",
+    "pathRewrite": {
+      "^/finnhub": ""
+    }
+  },
+  "/groq": {
+    "target": "https://api.groq.com",
+    "secure": false,
+    "changeOrigin": true,
+    "pathRewrite": { "^/groq": "" }
+  }
+}

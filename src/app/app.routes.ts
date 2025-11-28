@@ -20,6 +20,7 @@ import {ChatDetalleComponent} from './Cliente/chat/chat-detalle';
 import {ChatAsesorDetalle} from './Asesor/chat-asesor/chat-asesor-detalle';
 import {ChatIa} from './Cliente/chat-ia/chat-ia';
 import {NoticiasFinancieras} from './Cliente/noticias-financieras/noticias-financieras';
+import {ChatIaAsesor} from './Asesor/chat-ia-asesor/chat-ia-asesor';
 
 export const routes: Routes = [
   //Landing
@@ -53,6 +54,7 @@ export const routes: Routes = [
       { path: 'ChatAsesor', component: ChatAsesor },
       { path: 'ChatAsesor/Detalle/:id', component: ChatAsesorDetalle },
       { path: 'CalendarioAsesor', component: CalendarioAsesorComponent },
+      {path: 'ChatIAAsesor', component: ChatIaAsesor},
       { path: 'PerfilAsesor', component: PerfilAsesor },
       {path: 'NoticiasAsesor', component: NoticiasFinancieras},
     ],

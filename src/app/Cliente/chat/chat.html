@@ -1,7 +1,18 @@
 <h1 class="titulo" @tileEnter>Tus asesores</h1>
 <p class="subtitulo" @tileEnter>Consulta con tu asesor financiero cuando lo necesites</p>
 
-<div class="lista-chats" @tileEnter>
+
+<div *ngIf="chats.length === 0" class="no-chats" @tileEnter>
+  <p>No hay chats disponibles actualmente.</p>
+
+  <button class="btn-reservas" (click)="irAAsesores()">
+    Crear una reserva
+    <i class="bi bi-calendar-event"></i>
+  </button>
+</div>
+
+
+<div class="lista-chats" @tileEnter *ngIf="chats.length > 0">
   <div class="chat-card" *ngFor="let chat of chats" (click)="abrirChat(chat)">
     <img [src]="obtenerAvatar(chat.asesor.nombre)" class="avatar" />
     <div class="info">
@@ -10,3 +21,4 @@
     </div>
   </div>
 </div>
+

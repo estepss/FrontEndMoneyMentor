@@ -18,6 +18,7 @@ import {Clientes} from './Asesor/clientes/clientes';
 import {CalendarioAsesorComponent} from './Asesor/calendario-asesor/calendario-asesor';
 import {ChatDetalleComponent} from './Cliente/chat/chat-detalle';
 import {ChatAsesorDetalle} from './Asesor/chat-asesor/chat-asesor-detalle';
+import {ChatIa} from './Cliente/chat-ia/chat-ia';
 import {NoticiasFinancieras} from './Cliente/noticias-financieras/noticias-financieras';
 
 export const routes: Routes = [
@@ -39,6 +40,7 @@ export const routes: Routes = [
       { path: 'Chat/Detalle/:id', component: ChatDetalleComponent },
       {path: 'Perfil', component: PerfilComponent},
       {path: 'Tarjeta', component: TarjetaComponent},
+      {path: 'ChatIA', component: ChatIa},
       {path: 'Noticias', component: NoticiasFinancieras},
     ],
   },

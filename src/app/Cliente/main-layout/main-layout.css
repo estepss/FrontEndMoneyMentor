@@ -44,6 +44,7 @@ aside .sidebar{
   border-radius:15px;
   display:flex; flex-direction:column;
   transition:.3s;
+  max-width: 1000px;
 }
 aside .sidebar:hover{ box-shadow:none; }
 
@@ -142,33 +143,84 @@ aside .sidebar a:hover span{ margin-left:.6rem; }
 main{ margin-top:.5rem; }
 
 
-/* Responsivo */
-@media (min-width:1201px){
-  header{ position:fixed; }
-}
-@media (max-width:1200px){
-  .container{ grid-template-columns:12rem auto; }
-  aside .sidebar h3, aside .logo h2{ display:none; }
-  aside .sidebar a{ width:5.6rem; }
-  aside .sidebar a:last-child{ position:relative; margin-top:1.8rem; }
-}
-@media (max-width:768px){
-  .mm-layout{ width:100%; grid-template-columns:1fr; padding:0 var(--padding-1); }
-  aside{
-    position:fixed; left:-100%;
-    background:var(--color-white);
-    width:15rem; height:100vh; z-index:2; display:none;
-    box-shadow:1rem 3rem 4rem var(--color-light);
-    animation:showMenu .4s ease forwards;
-  }
-  @keyframes showMenu{ to{ left:0; } }
 
-  .right-section .nav{
-    position:fixed; top:0; left:0; right:0;
-    height:4.6rem; display:flex; align-items:center; justify-content:end;
-    background:var(--color-white); padding:0 var(--padding-1);
-    box-shadow:0 1rem 1rem var(--color-light); z-index:2;
+/* =================== RESPONSIVE =================== */
+
+/* ====== Tablets / pantallas medianas ====== */
+@media (max-width: 1200px) {
+  /* corregido: antes tenías .container */
+  .mm-layout {
+    grid-template-columns: 12rem auto;
   }
-  .right-section .nav button{ display:inline-block; background:transparent; color:var(--color-dark); position:absolute; left:1rem; }
-  .right-section .nav button span{ font-size:2rem; }
+
+  /* si quieres icon-only en el menú lateral en tablets grandes:
+  aside .sidebar h3,
+  aside .logo h2 {
+    display: none;
+  }
+  aside .sidebar a {
+    width: 5.6rem;
+  }
+  aside .sidebar a:last-child {
+    position: relative;
+    margin-top: 1.8rem;
+  }
+  */
+}
+
+/* ====== Tablets / móviles: sidebar como drawer ====== */
+@media (max-width: 900px) {
+  .mm-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1rem;
+  }
+
+  /* botón de menú aparece */
+  #menu-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* ASIDE como panel lateral oculto */
+  aside {
+    position: fixed;
+    top: 70px; /* altura del header */
+    left: -260px; /* oculto por defecto */
+    width: 240px;
+    height: calc(100vh - 70px);
+    z-index: 200;
+    transition: left 0.3s ease;
+  }
+
+  /* cuando tiene la clase .open (Angular) → se muestra */
+  aside.open {
+    left: 0;
+  }
+
+  /* el contenido principal ocupa  el ancho */
+  main {
+    padding: 0.5rem 0.5rem 1.5rem;
+  }
+}
+
+/* ====== Móviles pequeños ====== */
+@media (max-width: 600px) {
+  header {
+    padding: 0 1rem;
+  }
+
+  .mm-layout {
+    padding: 0.5rem;
+  }
+
+  .profile .info p {
+    font-size: 0.85rem;
+  }
+
+  .sidebar a h3 {
+    font-size: 0.9rem;
+  }
 }

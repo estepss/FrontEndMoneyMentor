@@ -109,6 +109,18 @@
   background-color: #f9f9f9;
 }
 
+/* NUEVA CLASE: Días que están en el pasado */
+.dia-pasado {
+  background-color: #f0f0f0;
+  color: #c0c0c0;
+  cursor: not-allowed !important;
+  opacity: 0.8;
+}
+.dia-pasado:hover {
+  background-color: #f0f0f0 !important;
+}
+
+
 .dia-hoy {
   background-color: var(--color-turquesa-oscuro);
   color: white;
@@ -215,18 +227,24 @@
   transition: background-color 0.2s, filter 0.2s;
   font-size: 0.9rem;
 }
+.btn:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
 .btn-primary {
   background-color: var(--color-turquesa);
   color: white;
 }
-.btn-primary:hover {
+.btn-primary:hover:not(:disabled) {
   background-color: var(--color-turquesa-oscuro);
 }
 .btn-secondary {
   background-color: var(--color-dark-blue);
   color: white;
 }
-.btn-secondary:hover {
+.btn-secondary:hover:not(:disabled) {
   filter: brightness(1.2);
 }
 .btn-danger {
@@ -234,7 +252,7 @@
   color: white;
   grid-column: span 2; /* Botón eliminar ocupa todo el ancho */
 }
-.btn-danger:hover {
+.btn-danger:hover:not(:disabled) {
   filter: brightness(1.1);
 }
 
@@ -276,6 +294,15 @@
   color: #555;
   margin-bottom: 1.5rem;
 }
+/* Estilo para mensajes de error o advertencia */
+.modal-content .error-message {
+  color: var(--color-rojo);
+  font-weight: 600;
+  text-align: center;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
 
 .form-group {
   margin-bottom: 1.5rem;
@@ -300,26 +327,35 @@
   gap: 1rem;
   margin-top: 2rem;
 }
+.dia-celda {
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.dia-celda.dia-seleccionado {
+  transform: scale(1.08);
+  background: #3b82f6 !important;
+  color: white;
+}
 
 /* --------------------------------- */
 /* --- RESPONSIVIDAD --- */
 /* --------------------------------- */
 @media (max-width: 992px) {
   .calendario-layout {
-    grid-template-columns: 1fr; /* Apila el calendario y la sidebar */
+    grid-template-columns: 1fr;
   }
 }
 
 @media (max-width: 768px) {
   .dia-celda {
-    height: 60px; /* Celdas más pequeñas en móvil */
+    height: 60px;
     padding: 0.25rem;
   }
   .dias-semana-header {
     font-size: 0.8rem;
   }
   .sidebar-actions {
-    grid-template-columns: 1fr; /* Botones de acción en una sola columna */
+    grid-template-columns: 1fr;
   }
   .btn-danger {
     grid-column: span 1;

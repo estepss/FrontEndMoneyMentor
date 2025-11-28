@@ -68,3 +68,26 @@
   font-size: 0.9rem;
   padding-top: 0.5rem;
 }
+
+.no-chats {
+  text-align: center;
+  margin-top: 3rem;
+  color: #4a5c68;
+  font-size: 1.1rem;
+}
+
+.btn-reservas {
+  margin-top: 1.5rem;
+  background-color: #17a2b8;
+  border: none;
+  padding: 12px 24px;
+  color: white;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease-in-out;
+}
+
+.btn-reservas:hover {
+  background-color: #118a9e;
+}

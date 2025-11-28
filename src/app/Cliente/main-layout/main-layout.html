@@ -7,9 +7,11 @@
 
   <div class="right-section">
     <div class="nav">
-      <button id="menu-btn">
+      <!-- BOTÓN MENÚ QUE LLAMA A TS -->
+      <button id="menu-btn" (click)="toggleSidebar()">
         <span class="material-icons-sharp">menu</span>
       </button>
+
 
       <div class="profile">
         <div class="info">
@@ -17,7 +19,7 @@
           <small class="text-muted">{{rol}}</small>
         </div>
         <div class="profile-photo">
-          <img src="../../../assets/img/daf.jpg" />
+          <img [src]="obtenerAvatar(nombre)" class="avatar" />
         </div>
       </div>
     </div>
@@ -25,7 +27,7 @@
 </header>
 
 <div class="mm-layout">
-  <aside>
+  <aside [class.open]="sidebarOpen">
     <nav class="sidebar">
       @if(esCliente()){
       <a [routerLink]="'/Inicio'">
@@ -71,6 +73,11 @@
         <a [routerLink]="'/ChatIA'">
           <span class="material-icons-sharp">smart_toy</span>
           <h3>Asistente IA</h3>
+        </a>
+
+        <a [routerLink]="'/Noticias'">
+          <span class="material-icons-sharp">search</span>
+          <h3>Noticias</h3>
         </a>
 
       <a [routerLink]="'/Logout'">

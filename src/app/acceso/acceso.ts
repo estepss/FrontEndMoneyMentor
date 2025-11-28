@@ -50,7 +50,7 @@ export class Acceso {
   // Form de LOGIN (placeholder)
   loginForm: FormGroup = this.fb.group({
     email: ['', [Validators.required, Validators.email]],
-    password: ['', [Validators.required]]
+    password: ['', [Validators.required, Validators.minLength(8)]],
   });
 
 
@@ -58,17 +58,19 @@ export class Acceso {
   accesoForm: FormGroup = this.fb.group({
     idPerfil: [''],
     nombres: ['', Validators.required],
-    dni: ['', [Validators.required, Validators.minLength(8)]],
+    dni: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(8)]],
     email: ['', [Validators.required, Validators.email]],
-    password: ['', [Validators.required, Validators.minLength(6)]],
-    telefono: [''],
+    password: ['', [Validators.required, Validators.minLength(8)]],
+    telefono: ['999999999'],
     sobreMi: [''],
     rol: ['', Validators.required], // 'CLIENTE' | 'ASESOR'
     idUser: ['']
   });
 
   // === REGISTRO ===
+  private backendError: any;
   onSubmit() {
+    this.backendError  = null;
     if (this.accesoForm.invalid) return;
     const v = this.accesoForm.value;
 
@@ -92,9 +94,20 @@ export class Acceso {
 
 
       },
-      error: (e) => {
-        console.error(e);
-        alert(e?.error?.message ?? 'No se pudo registrar');
+      error: (err) => {
+        console.log('ERROR BACKEND COMPLETO:', err);
+        let msg = 'Ocurrió un error inesperado.';
+
+        if (err.status === 0) {
+          msg = 'No se pudo conectar con el servidor.';
+        } else if (typeof err.error === 'string') {
+          msg = err.error;
+        } else if (err.error?.message) {
+          msg = err.error.message; //  Aquí debe venir: "El DNI ya se encuentra registrado."
+        }
+
+        this.backendError = msg;
+        alert(msg);
       }
     });
   }
@@ -118,10 +131,9 @@ export class Acceso {
       return;
     }
 
-    // Construye tu DTO como usas normalmente
     const requestDto: Credenciales = new Credenciales();
 
-    // el Service mapeará email -> username, así no rompes tu modelo
+    // el Service mapeará email -> username, así no rompe el modelo
     requestDto.email = this.loginForm.value.email;
     requestDto.password = this.loginForm.value.password;
 
@@ -133,7 +145,6 @@ export class Acceso {
         console.log("Login response ROLs:", data.roles);
         console.log("Login response ROL:", data.roles[0]);
         localStorage.setItem('rol', data.roles[0]);
-        localStorage.setItem('rol', data.roles[0]); // si lo usas aún
 
         if (data.roles[0] === 'ROLE_CLIENTE') {
           this.clienteService.obtenerclienteporEmail(requestDto.email).subscribe({
@@ -141,6 +152,7 @@ export class Acceso {
               localStorage.setItem('idCliente', String(cli.idCliente));
               localStorage.setItem('userId', String(data.userId));
               console.log('Cliente logeado ->', cli);
+              localStorage.setItem('email', cli.email);
               alert('¡Login correcto!');
               this.router.navigate(['/Inicio']);
             },
@@ -156,6 +168,7 @@ export class Acceso {
               localStorage.setItem('idAsesor', String(ase.idAsesor));
               localStorage.setItem('userId', String(data.userId));
               console.log('Asesor logeado ->', ase);
+              localStorage.setItem('email', ase.email);
               alert('¡Login correcto!');
               this.router.navigate(['/InicioAsesor']);
             },
@@ -172,7 +185,7 @@ export class Acceso {
       },
       error: (error) => {
         console.error('Login error:', error);
-        alert(error?.error?.message ?? 'Error en login');
+        alert(error?.error?.message ?? 'Error en email o contraseña');
         this.router.navigate(['/Landing']);
       }
     });

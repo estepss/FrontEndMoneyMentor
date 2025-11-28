@@ -1,8 +1,9 @@
 import {Component, inject} from '@angular/core';
 import {MatButton} from "@angular/material/button";
-import {FormBuilder, ReactiveFormsModule} from "@angular/forms";
+import {FormBuilder, ReactiveFormsModule, Validators} from "@angular/forms";
 import {Perfil} from '../../model/perfil';
 import {PerfilService} from '../../services/perfil-service';
+import {animate, style, transition, trigger} from '@angular/animations';
 
 @Component({
   selector: 'app-perfil-asesor',
@@ -11,7 +12,18 @@ import {PerfilService} from '../../services/perfil-service';
         ReactiveFormsModule
     ],
   templateUrl: './perfil-asesor.html',
-  styleUrl: './perfil-asesor.css'
+  styleUrl: './perfil-asesor.css',
+  animations: [
+    trigger('tileEnter', [
+      transition(':enter', [
+        style({ opacity: 0, transform: 'translateY(20px) scale(0.95)' }),
+        animate(
+          '350ms ease-out',
+          style({ opacity: 1, transform: 'translateY(0) scale(1)' })
+        )
+      ])
+    ])
+  ]
 })
 export class PerfilAsesor {
   //router = inject(Router);
@@ -20,10 +32,10 @@ export class PerfilAsesor {
   fb = inject(FormBuilder);
   perfilService = inject(PerfilService);
   perfilForm = this.fb.group({
-    email: [''],
-    telefono: [''],
-    password: [''],
-    sobreMi: [''],
+    nombres: [''],
+    telefono: ['', [Validators.required, Validators.minLength(9), Validators.maxLength(9)]],
+    password: ['', [Validators.required, Validators.minLength(8)]],
+    sobreMi: ['', Validators.required]
   });
 
   ngOnInit(): void {
@@ -42,7 +54,7 @@ export class PerfilAsesor {
       next: (p) => {
         this.perfil = p;
         this.perfilForm.patchValue({
-          email:    p.email ?? '',
+          nombres:    p.nombres?? '',
           telefono: p.telefono ?? '',
           sobreMi:  p.sobreMi ?? '',
           password:  p.password ?? '',
@@ -71,18 +83,17 @@ export class PerfilAsesor {
     }
 
     // 3) arma el DTO que tu back espera (NO envíes Perfil completo)
-    const { email, telefono, sobreMi, password } = this.perfilForm.getRawValue();
+    const { nombres, telefono, sobreMi, password } = this.perfilForm.getRawValue();
     const dto: any = {
-      ...(email    ? { email: email.trim() }       : {}),
+      ...(nombres    ? { nombres: nombres.trim() } : {}),
       ...(telefono ? { telefono: telefono.trim() } : {}),
       ...(sobreMi  ? { sobreMi: sobreMi.trim() }   : {}),
-      ...(password ? { password: password.trim() }                  : {}) // solo si la cambiaste
+      ...(password ? { password: password.trim() } : {}) // solo si la cambiaste
     };
 
     // 4) PUT /actualizar/{userId}
     this.perfilService.update(userId, dto).subscribe({
       next: (res: any) => {
-        // si el back devuelve 200 con JSON úsalo; si da 204 usa dto
         const updated = res ?? { ...this.perfil, ...dto };
         this.perfil = updated as any;                   // refresca la card izquierda
         this.perfilForm.get('password')?.reset();      // limpia password
@@ -94,6 +105,9 @@ export class PerfilAsesor {
         alert('No se pudo actualizar');
       }
     });
+  }
+  obtenerAvatar(nombre: string): string {
+    return `https://ui-avatars.com/api/?name=${encodeURIComponent(nombre)}&background=ffffff&color=179bae&bold=true`;
   }
 }
 

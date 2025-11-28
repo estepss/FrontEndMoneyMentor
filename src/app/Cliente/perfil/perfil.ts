@@ -2,13 +2,14 @@ import {Component, inject, OnInit} from '@angular/core';
 import {GestionService} from '../../services/gestion-service';
 import {ClienteService} from '../../services/cliente-service';
 import { Cliente } from '../../model/cliente';
-import {FormBuilder, FormGroup, ReactiveFormsModule} from '@angular/forms';
+import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import {PerfilService} from '../../services/perfil-service';
 import {Perfil, Rol} from '../../model/perfil';
 import {ActivatedRoute, Router} from '@angular/router';
 import {MatButton} from '@angular/material/button';
 import {Credenciales} from '../../model/credenciales';
 import {tap} from 'rxjs';
+import {animate, style, transition, trigger} from '@angular/animations';
 
 @Component({
   selector: 'app-perfil',
@@ -17,25 +18,35 @@ import {tap} from 'rxjs';
     MatButton
   ],
   templateUrl: './perfil.html',
-  styleUrl: './perfil.css'
+  styleUrl: './perfil.css',
+  animations: [
+    trigger('tileEnter', [
+      transition(':enter', [
+        style({ opacity: 0, transform: 'translateY(20px) scale(0.95)' }),
+        animate(
+          '350ms ease-out',
+          style({ opacity: 1, transform: 'translateY(0) scale(1)' })
+        )
+      ])
+    ])
+  ]
 })
 export class PerfilComponent {
   //router = inject(Router);
-  perfil!: Perfil;
+  perfil: Perfil;
   cargando = true;
   fb = inject(FormBuilder);
   perfilService = inject(PerfilService);
   perfilForm = this.fb.group({
-    email: [''],
-    telefono: [''],
-    password: [''],
-    sobreMi: [''],
+    nombres: [''],
+    telefono: ['', [Validators.required, Validators.minLength(9), Validators.maxLength(9)]],
+    password: ['', [Validators.required, Validators.minLength(8)]],
+    sobreMi: ['', Validators.required]
   });
 
   ngOnInit(): void {
     const raw = localStorage.getItem('userId');
     const userId = raw ? Number(raw) : NaN;
-    console.log('userId leído =', raw, userId);
 
     if (Number.isNaN(userId)) {
       this.cargando = false;
@@ -48,10 +59,10 @@ export class PerfilComponent {
       next: (p) => {
         this.perfil = p;
         this.perfilForm.patchValue({
-          email:    p.email ?? '',
+          nombres:  p.nombres?? '',
           telefono: p.telefono ?? '',
           sobreMi:  p.sobreMi ?? '',
-          password:  p.password ?? '',
+          password: p.password ?? '',
         });
         this.cargando = false;
       },
@@ -77,9 +88,9 @@ export class PerfilComponent {
     }
 
     // 3) arma el DTO que tu back espera (NO envíes Perfil completo)
-    const { email, telefono, sobreMi, password } = this.perfilForm.getRawValue();
+    const { nombres, telefono, sobreMi, password } = this.perfilForm.getRawValue();
     const dto: any = {
-      ...(email    ? { email: email.trim() }       : {}),
+      ...(nombres    ? { nombres: nombres.trim() }       : {}),
       ...(telefono ? { telefono: telefono.trim() } : {}),
       ...(sobreMi  ? { sobreMi: sobreMi.trim() }   : {}),
       ...(password ? { password: password.trim() }                  : {}) // solo si la cambiaste
@@ -100,5 +111,9 @@ export class PerfilComponent {
         alert('No se pudo actualizar');
       }
     });
+
+  }
+  obtenerAvatar(nombre: string): string {
+    return `https://ui-avatars.com/api/?name=${encodeURIComponent(nombre)}&background=ffffff&color=179bae&bold=true`;
   }
 }

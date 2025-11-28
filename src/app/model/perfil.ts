@@ -10,6 +10,7 @@ export class Perfil {
   password: string;
   telefono: string;
   sobreMi: string;
+
   rol: Rol;
   idUser: Credenciales;
 }

@@ -1,4 +1,4 @@
-<mat-card class="shell">
+<mat-card class="shell" @tileEnter>
   <h1 class="title">Gestión Financiera</h1>
   <p class="subtitle">Introduzca nuevo ingreso o egreso</p>
 
@@ -34,7 +34,7 @@
 
     </div>
 
-    <div class="actions">
+    <div class="actions" @tileEnter>
       <button
         mat-raised-button
         color="primary"
@@ -53,7 +53,7 @@
     </div>
   </form>
 </mat-card>
-<div class="mat-elevation-z8">
+<div class="mat-elevation-z8" @tileEnter>
   <table mat-table [dataSource]="dataSource" matSort>
     <!-- Position Column -->
     <ng-container matColumnDef="idGestion">

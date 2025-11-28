@@ -3,46 +3,49 @@
 
   <div class="calendario-layout">
 
-    <!-- 1. CONTENEDOR DEL CALENDARIO -->
     <div class="calendar-container">
-      <!-- Encabezado del Calendario (Mes y Navegación) -->
       <div class="calendar-header">
         <button (click)="cambiarMes(-1)" class="nav-arrow">&lt;</button>
         <span class="mes-anio">{{ getMesAnio() | titlecase }}</span>
-        <button (click)="cambiarMes(1)" class="nav-arrow">&gt;</button>
+        <button (click)="cambiarMes(1)" class="nav-arrow" [disabled]="esMesFuturoLejano()">
+          &gt;
+        </button>
       </div>
 
-      <!-- Encabezado de Días de la Semana -->
       <div class="dias-semana-grid">
         @for (dia of nombresDias; track dia) {
           <div class="dia-semana-header">{{ dia.substring(0, 3) }}</div>
         }
       </div>
-
-      <!-- Cuadrícula de Días del Mes -->
-      <div class="dias-mes-grid">
+      <div class="dias-mes-grid" @diasAnim>
         @for (dia of diasDelMes; track dia.fecha) {
           <div
             class="dia-celda"
             [class.no-mes-actual]="!dia.esMesActual"
             [class.dia-hoy]="dia.esHoy"
+            [class.dia-pasado]="dia.esPasado && dia.esMesActual"
             [class.dia-seleccionado]="dia.fecha === diaSeleccionado?.fecha"
             (click)="seleccionarDia(dia)">
             <span class="numero-dia">{{ dia.numero }}</span>
-            <!-- Indicador si hay disponibilidad -->
-            @if (dia.disponibilidades.length > 0 && dia.esMesActual) {
+            @if (dia.disponibilidades.length > 0 && dia.esMesActual && !dia.esPasado) {
               <div class="disponibilidad-dot"></div>
             }
           </div>
         }
       </div>
     </div>
-
-    <!-- 2. BARRA LATERAL (Horarios y Acciones) -->
     <div class="sidebar-container">
       <h2 class="sidebar-title">Día y horarios seleccionados</h2>
+      @if (errorEliminar) {
+        <div style="background-color: #fee2e2; color: #991b1b; padding: 10px; border-radius: 6px; margin: 10px 0; font-size: 0.9rem; border: 1px solid #fecaca;">
+          <strong>¡Atención!</strong> {{ errorEliminar }}
+        </div>
+      }
 
-      <!-- Lista de Horarios -->
+      @if (diaSeleccionado && diaSeleccionado.esPasado) {
+        <p class="error-message">No se pueden gestionar horarios en fechas pasadas.</p>
+      }
+
       <div class="horarios-lista">
         @if (!diaSeleccionado) {
           <p class="horario-placeholder">-- Seleccione un día --</p>
@@ -54,35 +57,56 @@
               class="horario-item"
               [class.horario-seleccionado]="horario.idDisponibilidad === horarioSeleccionado?.idDisponibilidad"
               (click)="seleccionarHorario(horario)">
-              <!-- Formato: 10am - 12pm -->
               {{ formatoHoraAmPm(horario.horaInicio) }} - {{ formatoHoraAmPm(horario.horaFin) }}
             </div>
           }
         }
       </div>
 
-      <!-- Botones de Acción -->
       <div class="sidebar-actions">
-        <button class="btn btn-primary" (click)="abrirModalRegistrar()">Registrar</button>
-        <button class="btn btn-secondary" (click)="abrirModalEditar()">Editar</button>
-        <button class="btn btn-danger" (click)="eliminarDisponibilidad()">Eliminar</button>
+        <button
+          class="btn btn-primary"
+          (click)="abrirModalRegistrar()"
+          [disabled]="!diaSeleccionado || diaSeleccionado.esPasado">
+          Registrar
+        </button>
+        <button
+          class="btn btn-secondary"
+          (click)="abrirModalEditar()"
+          [disabled]="!horarioSeleccionado || diaSeleccionado?.esPasado">
+          Editar
+        </button>
+        <button
+          class="btn btn-danger"
+          (click)="eliminarDisponibilidad()"
+          [disabled]="!horarioSeleccionado || diaSeleccionado?.esPasado">
+          Eliminar
+        </button>
       </div>
     </div>
 
   </div>
 
-  <!-- 3. MODALES (Ocultos por defecto) -->
-
-  <!-- Modal para REGISTRAR Disponibilidad -->
   @if (showModalRegistrar) {
     <div class="modal-overlay" (click)="showModalRegistrar = false">
-      <div class="modal-content" (click)="$event.stopPropagation()">
+      <form [formGroup]="horarioForm" class="modal-content" (click)="$event.stopPropagation()">
         <h3 class="modal-title">Registrar disponibilidad</h3>
         <p>Selecciona el nuevo horario para el <strong>{{ diaSeleccionado?.fecha | date:'d/MM/yyyy' }}</strong></p>
 
+        @if (esHorarioFormularioPasado()) {
+          <p class="error-message">¡Advertencia! Este horario de fin ya ha pasado para la fecha seleccionada.</p>
+        }
+
+        @if (errorSolapamiento) {
+          <p class="error-message">¡Error! Ya existe un registro en este rango de horas.</p>
+        }
+
         <div class="form-group">
           <label for="horario-registrar">Selecciona nuevo horario</label>
-          <select id="horario-registrar" [(ngModel)]="horarioFormulario" [compareWith]="compararHorarios">
+          <select id="horario-registrar"
+                  formControlName="horarioSeleccionado"
+                  [compareWith]="compararHorarios"
+                  (change)="errorSolapamiento = false">
             @for (slot of horariosPredefinidos; track slot.inicio) {
               <option [ngValue]="{ inicio: slot.inicio, fin: slot.fin }">{{ slot.texto }}</option>
             }
@@ -90,24 +114,38 @@
         </div>
 
         <div class="modal-actions">
-          <button class="btn btn-secondary" (click)="showModalRegistrar = false">Cancelar</button>
-          <button class="btn btn-primary" (click)="registrarDisponibilidad()">Registrar</button>
+          <button class="btn btn-secondary" type="button" (click)="showModalRegistrar = false">Cancelar</button>
+          <button
+            class="btn btn-primary"
+            type="button"
+            (click)="registrarDisponibilidad()"
+            [disabled]="esHorarioFormularioPasado() || horarioForm.invalid"> Registrar
+          </button>
         </div>
-      </div>
+      </form>
     </div>
   }
 
-  <!-- Modal para EDITAR Disponibilidad -->
   @if (showModalEditar) {
     <div class="modal-overlay" (click)="showModalEditar = false">
-      <div class="modal-content" (click)="$event.stopPropagation()">
+      <form [formGroup]="horarioForm" class="modal-content" (click)="$event.stopPropagation()">
         <h3 class="modal-title">Editar disponibilidad</h3>
         <p>Editando horario del <strong>{{ horarioSeleccionado?.fecha | date:'d/MM/yyyy' }}</strong></p>
 
+        @if (esHorarioFormularioPasado()) {
+          <p class="error-message">¡Advertencia! Este horario de fin ya ha pasado para la fecha seleccionada.</p>
+        }
+
+        @if (errorSolapamiento) {
+          <p class="error-message">¡Error! El nuevo horario choca con otro existente.</p>
+        }
+
         <div class="form-group">
           <label for="horario-editar">Selecciona nuevo horario</label>
-          <!-- Usamos ngModel para el objeto {inicio, fin} -->
-          <select id="horario-editar" [(ngModel)]="horarioFormulario" [compareWith]="compararHorarios">
+          <select id="horario-editar"
+                  formControlName="horarioSeleccionado"
+                  [compareWith]="compararHorarios"
+                  (change)="errorSolapamiento = false">
             @for (slot of horariosPredefinidos; track slot.inicio) {
               <option [ngValue]="{ inicio: slot.inicio, fin: slot.fin }">{{ slot.texto }}</option>
             }
@@ -115,11 +153,15 @@
         </div>
 
         <div class="modal-actions">
-          <button class="btn btn-secondary" (click)="showModalEditar = false">Cancelar</button>
-          <button class="btn btn-primary" (click)="actualizarDisponibilidad()">Editar</button>
+          <button class="btn btn-secondary" type="button" (click)="showModalEditar = false">Cancelar</button>
+          <button
+            class="btn btn-primary"
+            type="button"
+            (click)="actualizarDisponibilidad()"
+            [disabled]="esHorarioFormularioPasado() || horarioForm.invalid"> Editar
+          </button>
         </div>
-      </div>
+      </form>
     </div>
   }
 </div>
-

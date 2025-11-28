@@ -8,39 +8,45 @@
     }
   </h1>
 
-  <!-- VISTA: AGREGAR TARJETA (FORMULARIO) -->
+  <!-- VISTA: AGREGAR TARJETA (FORMULARIO REACTIVO) -->
   @if (vistaActual === 'agregar') {
     <div class="card-form-container">
       <div class="form-header" style="background-color: #935B44;">
         Ingresar una tarjeta
       </div>
 
-      <form class="form-body">
+      <!-- Vinculamos el FormGroup aquí -->
+      <form [formGroup]="tarjetaForm" class="form-body">
 
-        <!-- Campo Nombre (CORREGIDO) -->
+        <!-- Campo Nombre -->
         <div class="input-group">
           <label for="nombre">Nombre</label>
           <input
             id="nombre"
             type="text"
-            [(ngModel)]="nuevaTarjeta.nombreTarjeta"
-            name="nombre"
-            required
+            formControlName="nombreTarjeta"
             placeholder="Nombre en la tarjeta"
+            [class.is-invalid]="f['nombreTarjeta'].invalid && f['nombreTarjeta'].touched"
           />
+          <!-- Mensaje de error opcional en HTML -->
+          @if (f['nombreTarjeta'].invalid && f['nombreTarjeta'].touched) {
+            <div class="error-text">El nombre es obligatorio.</div>
+          }
         </div>
 
-        <!-- Campo Número de Tarjeta (CORREGIDO) -->
+        <!-- Campo Número de Tarjeta -->
         <div class="input-group">
           <label for="numero">Número de Tarjeta</label>
           <input
             id="numero"
             type="text"
-            [(ngModel)]="nuevaTarjeta.numeroTarjeta"
-            name="numero"
-            required
+            formControlName="numeroTarjeta"
             placeholder="XXXX XXXX XXXX XXXX"
+            [class.is-invalid]="f['numeroTarjeta'].invalid && f['numeroTarjeta'].touched"
           />
+          @if (f['numeroTarjeta'].hasError('pattern') && f['numeroTarjeta'].touched) {
+            <div class="error-text">Debe tener entre 13 y 19 dígitos numéricos.</div>
+          }
         </div>
 
         <!-- Campos Fecha y CVC -->
@@ -49,18 +55,20 @@
           <div class="inline-section expiration-date">
             <label>Fecha de expiración</label>
             <div class="inline-fields">
-              <select [(ngModel)]="nuevaTarjeta.mesExpiracion" name="mes" required>
-                <!-- (CORREGIDO) Usamos getNombreMes() -->
+              <select formControlName="mesExpiracion">
                 @for (mes of meses; track mes) {
                   <option [value]="mes">{{ getNombreMes(mes) }}</option>
                 }
               </select>
-              <select [(ngModel)]="nuevaTarjeta.anioExpiracion" name="anio" required>
+              <select formControlName="anioExpiracion">
                 @for (anio of anios; track anio) {
                   <option [value]="anio">{{ anio }}</option>
                 }
               </select>
             </div>
+            @if (tarjetaForm.hasError('fechaPasada') && (f['mesExpiracion'].touched || f['anioExpiracion'].touched)) {
+              <div class="error-text">Tarjeta caducada.</div>
+            }
           </div>
 
           <div class="inline-section cvc-field">
@@ -68,15 +76,17 @@
             <input
               id="cvc"
               type="text"
-              [(ngModel)]="nuevaTarjeta.cvc"
-              name="cvc"
-              required
+              formControlName="cvc"
               placeholder="XXX"
+              [class.is-invalid]="f['cvc'].invalid && f['cvc'].touched"
             />
+            @if (f['cvc'].invalid && f['cvc'].touched) {
+              <div class="error-text">3 o 4 dígitos.</div>
+            }
           </div>
         </div>
 
-        <!-- Botones de Acción (Funciones ya coinciden) -->
+        <!-- Botones de Acción -->
         <div class="form-actions">
           <button
             type="button"
@@ -98,7 +108,7 @@
     </div>
   }
 
-  <!-- VISTA: LISTA DE TARJETAS AGREGADAS -->
+  <!-- VISTA: LISTA DE TARJETAS AGREGADAS (Misma lógica de visualización) -->
   @if (vistaActual === 'lista') {
     <div class="cards-list-container">
       @if (tarjetasAgregadas.length === 0) {
@@ -114,25 +124,21 @@
               <span class="material-icons-sharp">delete</span>
             </div>
 
-            <!-- Nombre (CORREGIDO) -->
             <div class="data-group">
               <span class="label">Nombre</span>
               <span class="value">{{ tarjeta.nombreTarjeta }}</span>
               <hr/>
             </div>
 
-            <!-- Número de Tarjeta (CORREGIDO) -->
             <div class="data-group">
               <span class="label">Número de Tarjeta</span>
               <span class="value">{{ tarjeta.numeroTarjeta }}</span>
               <hr/>
             </div>
 
-            <!-- Fecha de expiración y CVC -->
             <div class="data-group-inline">
               <div class="inline-data expiration-info">
                 <span class="label">Fecha de expiración</span>
-                <!-- (CORREGIDO) Usamos getNombreMes() -->
                 <span class="value">{{ getNombreMes(tarjeta.mesExpiracion) }} / {{ tarjeta.anioExpiracion }}</span>
               </div>
               <div class="inline-data cvc-info">

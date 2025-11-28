@@ -1,148 +1,176 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
-// 1. Importamos el NUEVO SERVICIO y el MODELO (Clase)
-// Esta importación ya no causará conflicto
+
 import { Tarjeta } from '../../model/tarjeta';
-import {TarjetaService} from '../../services/tarjeta-service';
+import { TarjetaService } from '../../services/tarjeta-service';
 
 @Component({
   selector: 'app-tarjeta',
   standalone: true,
-  imports: [CommonModule, FormsModule, HttpClientModule],
+  imports: [CommonModule, ReactiveFormsModule, HttpClientModule],
   templateUrl: './tarjeta.html',
   styleUrl: './tarjeta.css'
 })
 export class TarjetaComponent implements OnInit {
 
-  // 2. Inyectamos el servicio (como tu profesor)
   private tarjetaService = inject(TarjetaService);
+  private fb = inject(FormBuilder);
 
-  // 3. 'nuevaTarjeta' ahora es una instancia de la CLASE Tarjeta
-  nuevaTarjeta: Tarjeta = new Tarjeta();
-
-  // 4. 'tarjetasAgregadas' usará la CLASE Tarjeta
   tarjetasAgregadas: Tarjeta[] = [];
-
   vistaActual: 'agregar' | 'lista' = 'agregar';
+  idClienteLogueado: number = 0;
 
-  // (Tus arrays de meses y años para los <select> están perfectos)
+  tarjetaForm: FormGroup;
+
   meses: number[] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
-  anios: number[] = [2024, 2025, 2026, 2027, 2028];
+  anios: number[] = this.generarAniosExpiracion();
   mesesNombres: { [key: number]: string } = {
     1: 'Enero', 2: 'Febrero', 3: 'Marzo', 4: 'Abril', 5: 'Mayo', 6: 'Junio',
     7: 'Julio', 8: 'Agosto', 9: 'Septiembre', 10: 'Octubre', 11: 'Noviembre', 12: 'Diciembre'
   };
 
   constructor() {
-    // 5. Asignamos los valores por defecto del mockup al formulario
-    this.resetearFormulario();
+    this.tarjetaForm = this.initForm();
   }
 
   ngOnInit(): void {
-    // Al iniciar, cargamos la lista de tarjetas (si la vista es 'lista')
-    // Opcionalmente, puedes mover cargarTarjetas() a mostrarLista()
-    this.cargarTarjetas();
+    const storedId = localStorage.getItem('idCliente');
+    if (storedId) {
+      this.idClienteLogueado = parseInt(storedId, 10);
+      this.cargarTarjetas();
+    }
+  }
+
+  // --- INICIALIZACIÓN DEL FORMULARIO ---
+  initForm(): FormGroup {
+    return this.fb.group({
+      nombreTarjeta: ['', [Validators.required]],
+      // CAMBIO: Usamos un validador personalizado en lugar del pattern estricto
+      numeroTarjeta: ['', [Validators.required, this.validarNumeroTarjeta]],
+      mesExpiracion: [new Date().getMonth() + 1, [Validators.required]],
+      anioExpiracion: [new Date().getFullYear(), [Validators.required]],
+      cvc: ['', [Validators.required, Validators.pattern(/^\d{3,4}$/)]]
+    }, { validators: this.fechaExpiracionValidator });
   }
 
   /**
-   * NUEVO: Carga la lista de tarjetas desde el backend
+   * Validador personalizado: Permite espacios, pero valida que haya 13-19 dígitos.
    */
+  validarNumeroTarjeta(control: AbstractControl): ValidationErrors | null {
+    const valor = control.value || '';
+    // "Juntamos" los números quitando espacios para validar
+    const sinEspacios = valor.replace(/\s/g, '');
+
+    // Verificar que solo sean números
+    if (!/^\d+$/.test(sinEspacios)) {
+      return { pattern: true };
+    }
+    // Verificar longitud
+    if (sinEspacios.length < 13 || sinEspacios.length > 19) {
+      return { pattern: true };
+    }
+    return null; // Válido
+  }
+
+  /**
+   * Validador de fecha de expiración
+   */
+  fechaExpiracionValidator(group: AbstractControl): ValidationErrors | null {
+    const mes = group.get('mesExpiracion')?.value;
+    const anio = group.get('anioExpiracion')?.value;
+    const anioActual = new Date().getFullYear();
+    const mesActual = new Date().getMonth() + 1;
+
+    if (anio < anioActual || (anio == anioActual && mes < mesActual)) {
+      return { fechaPasada: true };
+    }
+    return null;
+  }
+
+  // --- LÓGICA CRUD ---
+
   cargarTarjetas(): void {
-    this.tarjetaService.list().subscribe({
-      next: (tarjetas) => {
-        this.tarjetasAgregadas = tarjetas;
-        console.log('Tarjetas cargadas desde la BD:', tarjetas);
-      },
-      error: (err) => {
-        console.error('Error al cargar la lista de tarjetas:', err);
-      }
+    if (this.idClienteLogueado === 0) return;
+    this.tarjetaService.listPorCliente(this.idClienteLogueado).subscribe({
+      next: (tarjetas) => this.tarjetasAgregadas = tarjetas,
+      error: (err) => console.error('Error al cargar tarjetas:', err)
     });
   }
 
-  /**
-   * MODIFICADO: Llama al servicio 'insert()'
-   */
   agregarTarjeta(): void {
-    // Validaciones básicas (tu DTO de Java manejará el resto)
-    if (!this.nuevaTarjeta.nombreTarjeta || !this.nuevaTarjeta.numeroTarjeta) {
-      console.error('Por favor, complete los campos obligatorios.');
+    if (this.idClienteLogueado === 0) {
+      alert('Error de sesión.');
       return;
     }
 
-    // Quitamos espacios del número de tarjeta antes de enviar
-    this.nuevaTarjeta.numeroTarjeta = this.nuevaTarjeta.numeroTarjeta.replace(/\s/g, '');
+    if (this.tarjetaForm.invalid) {
+      this.tarjetaForm.markAllAsTouched();
+      return;
+    }
 
-    this.tarjetaService.insert(this.nuevaTarjeta).subscribe({
-      next: (tarjetaGuardada) => {
-        console.log('Tarjeta guardada exitosamente en BD:', tarjetaGuardada);
-        // Si se guarda, recargamos la lista desde la BD
+    const formValue = this.tarjetaForm.value;
+    const nuevaTarjeta: Tarjeta = new Tarjeta();
+
+    nuevaTarjeta.nombreTarjeta = formValue.nombreTarjeta;
+    // IMPORTANTE: Limpiamos los espacios antes de enviar al backend
+    nuevaTarjeta.numeroTarjeta = formValue.numeroTarjeta.replace(/\s/g, '');
+    nuevaTarjeta.mesExpiracion = Number(formValue.mesExpiracion);
+    nuevaTarjeta.anioExpiracion = Number(formValue.anioExpiracion);
+    nuevaTarjeta.cvc = formValue.cvc;
+    nuevaTarjeta.idCliente = this.idClienteLogueado;
+
+    this.tarjetaService.insert(nuevaTarjeta).subscribe({
+      next: () => {
+        alert('Tarjeta agregada correctamente');
         this.cargarTarjetas();
         this.vistaActual = 'lista';
-        this.resetearFormulario(); // Limpiamos el formulario
+        this.resetearFormulario();
       },
-      error: (err) => {
-        console.error('Error al guardar la tarjeta en el backend:', err);
-        // Aquí puedes manejar errores de validación (ej. 400 Bad Request)
-        if (err.status === 400) {
-          // err.error contiene los mensajes de @NotBlank, @Pattern, etc.
-          console.error('Errores de validación:', err.error);
-        }
-      }
+      error: (err) => alert('Error al guardar: ' + (err.error?.message || 'Intente nuevamente'))
     });
   }
 
-  /**
-   * MODIFICADO: Llama al servicio 'delete()'
-   */
   eliminarTarjeta(index: number): void {
-    const tarjetaAEliminar = this.tarjetasAgregadas[index];
+    const tarjeta = this.tarjetasAgregadas[index];
+    if (!tarjeta.idTarjeta) return;
 
-    if (!tarjetaAEliminar.idTarjeta) {
-      console.error('Error: No se puede eliminar una tarjeta sin ID.');
-      return;
+    if(confirm('¿Eliminar esta tarjeta?')) {
+      this.tarjetaService.delete(tarjeta.idTarjeta).subscribe({
+        next: () => this.tarjetasAgregadas.splice(index, 1)
+      });
     }
-
-    this.tarjetaService.delete(tarjetaAEliminar.idTarjeta).subscribe({
-      next: () => {
-        console.log(`Tarjeta ${tarjetaAEliminar.idTarjeta} eliminada de la BD.`);
-        // Si se borra de la BD, la quitamos del array local (o recargamos la lista)
-        this.tarjetasAgregadas.splice(index, 1);
-      },
-      error: (err) => {
-        console.error(`Error al eliminar la tarjeta ${tarjetaAEliminar.idTarjeta}:`, err);
-      }
-    });
   }
 
-  /**
-   * MODIFICADO: Carga los datos al cambiar de vista
-   */
   mostrarLista(): void {
     this.vistaActual = 'lista';
-    this.cargarTarjetas(); // Carga los datos frescos de la BD
+    this.cargarTarjetas();
   }
 
   mostrarAgregar(): void {
     this.vistaActual = 'agregar';
-    this.resetearFormulario(); // Resetea el formulario si vuelve a agregar
+    this.resetearFormulario();
   }
 
-  /**
-   * NUEVO: Resetea el formulario a los valores del mockup
-   */
   resetearFormulario(): void {
-    this.nuevaTarjeta = new Tarjeta(); // Llama al constructor
-    // Sobrescribimos con los datos del mockup
-    this.nuevaTarjeta.nombreTarjeta = 'Fernando Velarde';
-    this.nuevaTarjeta.numeroTarjeta = '3333 4444 5555 6666';
-    this.nuevaTarjeta.mesExpiracion = 9;
-    this.nuevaTarjeta.anioExpiracion = 2025;
-    this.nuevaTarjeta.cvc = '111';
+    this.tarjetaForm.reset({
+      nombreTarjeta: '',
+      numeroTarjeta: '',
+      mesExpiracion: new Date().getMonth() + 1,
+      anioExpiracion: new Date().getFullYear(),
+      cvc: ''
+    });
   }
 
   getNombreMes(mes: number): string {
     return this.mesesNombres[mes] || mes.toString();
   }
+
+  generarAniosExpiracion(): number[] {
+    const actual = new Date().getFullYear();
+    return Array.from({length: 6}, (_, i) => actual + i);
+  }
+
+  get f() { return this.tarjetaForm.controls; }
 }

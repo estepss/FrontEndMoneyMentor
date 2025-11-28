@@ -9,5 +9,6 @@ export class Cliente {
   email: string;
   telefono: string;
   sobreMi: string;
+
   iduser: Credenciales;
 }

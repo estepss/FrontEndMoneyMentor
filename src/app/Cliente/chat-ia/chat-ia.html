@@ -1,0 +1,40 @@
+<section class="assistant">
+  <h2 class="title">Asistente Virtual – WealthyAI</h2>
+  <p class="subtitle">Tu asistente financiero inteligente siempre listo para ayudarte</p>
+
+  <small class="status-text">{{ statusText }}</small>
+
+  <div class="chat-container">
+
+    <div class="chat-header">
+      <img src="../../../assets/robot2.png" class="bot-avatar" />
+      <div>
+        <h3 class="bot-name">WealthyAI</h3>
+        <p class="bot-status">Disponible</p>
+      </div>
+    </div>
+
+    <div class="chat-body" id="chat-body">
+      <div *ngFor="let m of uiMessages" class="msg" [ngClass]="m.sender">
+        <div class="bubble">{{ m.text }}</div>
+      </div>
+
+      <div class="loading" *ngIf="generating">
+        <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+      </div>
+    </div>
+
+    <form class="chat-input" [formGroup]="form" (ngSubmit)="onSubmit()">
+      <input
+        formControlName="texto"
+        type="text"
+        placeholder="Escribe tu consulta..."
+        class="input-box"
+      />
+
+      <button type="submit" class="send-btn" [disabled]="generating">
+        <span class="material-icons-sharp">send</span>
+      </button>
+    </form>
+  </div>
+</section>

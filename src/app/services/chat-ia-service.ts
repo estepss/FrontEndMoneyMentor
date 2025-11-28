@@ -7,7 +7,7 @@ import { Observable } from 'rxjs';
 })
 export class ChatIAService {
 
-  private apiKey = ""; //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
+  private apiKey = "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";
   private url = "/groq/openai/v1/chat/completions";
 
   constructor(private http: HttpClient) {}

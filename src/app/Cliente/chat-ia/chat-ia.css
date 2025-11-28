@@ -1,106 +1,122 @@
 /* ===== CONTENEDOR GENERAL ===== */
 .assistant {
-  max-width: 950px;
-  margin: 0 auto;
-  padding: 2rem;
+  width: 100%;
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 1rem;
   animation: fadeIn 0.6s ease;
 }
 
+/* ===== TÍTULOS ===== */
 .title {
-  font-size: 2.3rem;
-  font-weight: 700;
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  font-weight: 800;
   color: #0f172a;
   text-align: center;
+  margin-bottom: 6px;
+  margin-top: -30px;
 }
 
 .subtitle {
   text-align: center;
   color: #64748b;
   margin-top: -5px;
-  margin-bottom: 25px;
+  margin-bottom: 20px;
+  font-size: clamp(0.85rem, 2vw, 1rem);
+  margin-top: 20px;
+  margin-bottom: 10px;
 }
 
 .status-text {
-  display: block;
   text-align: center;
-  color: #64748b;
+  color: #475569;
+  font-size: clamp(0.85rem, 2vw, 1rem);
   margin-bottom: 15px;
 }
 
-/* ===== TARJETA DEL CHAT ===== */
+/* ===== CONTENEDOR DEL CHAT ===== */
 .chat-container {
-  background: white;
-  border-radius: 18px;
-  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.12);
+  background: #ffffff;
+  border-radius: 22px;
+  box-shadow: 0 15px 45px rgba(0, 0, 0, 0.10);
+  border: 1px solid #e2e8f0;
   overflow: hidden;
+  width: 100%;
 }
 
 /* ===== HEADER ===== */
 .chat-header {
-  background: #0f172a;
+  background: #293C48;
   padding: 1rem;
   display: flex;
   align-items: center;
+  gap: 12px;
   color: white;
 }
 
 .bot-avatar {
-  width: 55px;
-  height: 55px;
-  margin-right: 12px;
-  filter: drop-shadow(0px 2px 3px rgba(0,0,0,0.3));
+  width: clamp(40px, 7vw, 60px);
+  height: clamp(40px, 7vw, 60px);
+  border-radius: 12px;
+  object-fit: cover;
+  border: 2px solid rgba(255,255,255,0.2);
 }
 
 .bot-name {
-  font-size: 1.3rem;
+  font-size: clamp(1.1rem, 3vw, 1.35rem);
+  font-weight: 600;
   margin: 0;
 }
 
 .bot-status {
-  font-size: 0.9rem;
-  opacity: 0.7;
+  font-size: clamp(0.8rem, 2vw, 0.95rem);
+  opacity: 0.8;
   margin: 0;
 }
 
 /* ===== CUERPO DEL CHAT ===== */
 .chat-body {
-  background: #f1f5f9;
-  height: 480px;
-  padding: 1.2rem;
+  background: #f8fafc;
+  height: 55vh;       /* Responsive natural */
+  min-height: 300px;
+  padding: 1rem;
   overflow-y: auto;
 }
 
 /* ===== MENSAJES ===== */
 .msg {
   display: flex;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
 }
 
 .msg.user {
   justify-content: flex-end;
 }
 
+/* ===== BURBUJAS ===== */
 .bubble {
-  max-width: 70%;
+  max-width: min(80%, 480px);
   padding: 12px 16px;
-  border-radius: 14px;
-  line-height: 1.45;
-  font-size: 0.95rem;
+  border-radius: 16px;
+  line-height: 1.5;
+  font-size: clamp(0.85rem, 2.2vw, 1rem);
   animation: fadeInUp 0.25s ease-out;
+  box-shadow: 0px 2px 10px rgba(0,0,0,0.08);
 }
 
 /* Usuario */
 .user .bubble {
-  background: #3b82f6;
+  background: #2563eb;
   color: white;
-  border-bottom-right-radius: 4px;
+  border-bottom-right-radius: 6px;
 }
 
 /* Bot */
 .bot .bubble {
-  background: #475569;
-  color: white;
-  border-bottom-left-radius: 4px;
+  background: #ffffff;
+  color: #0f172a;
+  border-left: 4px solid #2563eb;
+  border-bottom-left-radius: 6px;
 }
 
 /* ===== LOADING ===== */
@@ -124,32 +140,35 @@
 /* ===== INPUT ===== */
 .chat-input {
   display: flex;
-  padding: 0.8rem;
+  padding: 1rem;
   background: #fff;
   border-top: 1px solid #e2e8f0;
+  gap: 12px;
 }
 
 .input-box {
   flex: 1;
   border: 1px solid #cbd5e1;
-  border-radius: 10px;
+  border-radius: 12px;
   padding: 12px;
-  font-size: 1rem;
+  font-size: clamp(0.9rem, 2.3vw, 1rem);
   outline: none;
+  background: #f8fafc;
+  transition: 0.2s;
 }
 
 .input-box:focus {
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59,130,246,.2);
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
 }
 
 .send-btn {
   background: #0f172a;
   color: white;
   border: none;
-  padding: 0 18px;
-  margin-left: 10px;
+  padding: 0 16px;
   border-radius: 10px;
+  font-size: clamp(1rem, 3vw, 1.1rem);
   cursor: pointer;
   transition: 0.2s;
 }
@@ -158,27 +177,11 @@
   background: #1e293b;
 }
 
-/* ===== BOTÓN VOZ ===== */
-.voice-btn {
-  margin-top: 20px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: #334155;
-  color: white;
-  padding: 10px 18px;
-  border-radius: 10px;
-  border: none;
-  cursor: pointer;
-  transition: 0.2s;
+/* ===== ANIMACIONES ===== */
+@keyframes fadeIn {
+  from { opacity: 0;}
+  to {opacity: 1;}
 }
-
-.voice-btn:hover {
-  background: #1e293b;
-}
-
-/* ANIMACIONES */
-@keyframes fadeIn { from { opacity: 0;} to {opacity: 1;} }
 
 @keyframes fadeInUp {
   from { opacity: 0; transform: translateY(10px); }

@@ -3,7 +3,9 @@ import {catchError, EMPTY, throwError} from "rxjs";
 
 
 export const loginInterceptor: HttpInterceptorFn = (req, next) => {
-
+  if (req.url.startsWith('/groq')) {
+    return next(req);
+  }
   console.log("Intercepto!!");
   const token = localStorage.getItem('token');
   console.log("Token recuperado:", token)

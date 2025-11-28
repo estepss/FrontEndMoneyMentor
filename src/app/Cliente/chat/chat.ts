@@ -2,7 +2,7 @@ import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ChatService } from '../../services/chat-service';
-import {animate, style, transition, trigger} from '@angular/animations';
+import { animate, style, transition, trigger } from '@angular/animations';
 
 @Component({
   selector: 'app-chat',
@@ -23,7 +23,9 @@ import {animate, style, transition, trigger} from '@angular/animations';
   ]
 })
 export class ChatComponent {
+
   chats: any[] = [];
+
   private chatService = inject(ChatService);
   private router = inject(Router);
 
@@ -44,5 +46,10 @@ export class ChatComponent {
 
   obtenerAvatar(nombre: string): string {
     return `https://ui-avatars.com/api/?name=${encodeURIComponent(nombre)}&background=ffffff&color=179bae&bold=true`;
+  }
+
+  // NUEVO: IR AL MÓDULO DE RESERVAS (Asesor)
+  irAAsesores() {
+    this.router.navigate(['/Asesor']);
   }
 }

@@ -54,6 +54,7 @@ export const routes: Routes = [
       { path: 'ChatAsesor/Detalle/:id', component: ChatAsesorDetalle },
       { path: 'CalendarioAsesor', component: CalendarioAsesorComponent },
       { path: 'PerfilAsesor', component: PerfilAsesor },
+      {path: 'NoticiasAsesor', component: NoticiasFinancieras},
     ],
   },
   {path: '**', redirectTo: ''}, //re dirige a home

@@ -1,6 +1,10 @@
 <h1 class="titulo"  @tileEnter>Chats con tus clientes</h1>
 <p class="subtitulo"  @tileEnter> Selecciona una conversación para continuar</p>
 
+<div *ngIf="chats.length === 0" class="no-chats" @tileEnter>
+  <p>No hay chats disponibles actualmente.</p>
+</div>
+
 <div class="lista-chats"  @tileEnter>
   <div class="chat-card" *ngFor="let chat of chats" (click)="abrirChat(chat)">
     <img [src]="obtenerAvatar(chat.cliente.nombre)" class="avatar" />

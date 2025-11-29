@@ -10,17 +10,17 @@ const baseUrl = 'http://localhost:8080/api';
 export class ChatService {
   constructor(private http: HttpClient) {}
 
-  // 🔹 Listar todos los chats de un cliente
+  // Listar todos los chats de un cliente
   listByCliente(idCliente: number): Observable<any[]> {
     return this.http.get<any[]>(`${baseUrl}/chats/cliente/${idCliente}`);
   }
 
-  // 🔹 Listar todos los chats de un asesor
+  // Listar todos los chats de un asesor
   listByAsesor(idAsesor: number): Observable<any[]> {
     return this.http.get<any[]>(`${baseUrl}/chats/asesor/${idAsesor}`);
   }
 
-  // 🔹 Obtener o crear chat
+  // Obtener o crear chat
   getOrCreateChat(idCliente: number, idAsesor: number): Observable<any> {
     return this.http.post(`${baseUrl}/chats`, {
       cliente: { idCliente },
@@ -28,12 +28,12 @@ export class ChatService {
     });
   }
 
-  // 🔹 Listar mensajes por chat
+  // Listar mensajes por chat
   listMensajes(idChat: number): Observable<any[]> {
     return this.http.get<any[]>(`${baseUrl}/mensajes/chat/${idChat}`);
   }
 
-  // 🔹 Enviar mensaje
+  // Enviar mensaje
   enviarMensaje(idChat: number, contenido: string, emisor: string): Observable<any> {
     return this.http.post(`${baseUrl}/mensajes`, {
       idChat,

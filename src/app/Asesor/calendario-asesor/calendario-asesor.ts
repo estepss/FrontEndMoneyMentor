@@ -424,18 +424,48 @@ export class CalendarioAsesorComponent implements OnInit {
   abrirModalEditar(): void {
     if (!this.horarioSeleccionado || this.diaSeleccionado?.esPasado) return;
 
-    // Buscamos el objeto exacto en el array para que el select lo reconozca
-    const match = this.horariosPredefinidos.find(h =>
-      h.inicio === this.horarioSeleccionado?.horaInicio &&
-      h.fin === this.horarioSeleccionado?.horaFin
-    );
+    // 1. Limpiamos errores previos
+    this.errorEliminar = null;
 
-    this.horarioForm.setValue({
-      horarioSeleccionado: match || this.horariosPredefinidos[0]
+    // 2. Datos para comparar (igual que en eliminar)
+    const idAsesor = this.idAsesorLogueado;
+    const fechaTarget = this.horarioSeleccionado.fecha;
+    const horaTarget = this.horarioSeleccionado.horaInicio;
+
+    // 3. Llamamos al servicio de reservas antes de abrir el modal
+    this.reservaService.listarPorAsesor(idAsesor).subscribe({
+      next: (reservas) => {
+
+        // 4. Verificamos coincidencia (Misma lógica que eliminar)
+        const tieneReserva = reservas.some(reserva => {
+          const fechaHoraSlot = `${fechaTarget}T${horaTarget}`;
+          // Validamos que exista y empiece con la fecha/hora del slot
+          return reserva.fechaHoraInicio && reserva.fechaHoraInicio.startsWith(fechaHoraSlot);
+        });
+
+        if (tieneReserva) {
+          // SI TIENE RESERVA: Mostramos el error y NO abrimos el modal
+          this.errorEliminar = 'No se puede editar: Este horario ya tiene una reserva confirmada.';
+        } else {
+          // SI NO TIENE RESERVA: Procedemos a abrir el modal (Tu lógica original)
+          const match = this.horariosPredefinidos.find(h =>
+            h.inicio === this.horarioSeleccionado?.horaInicio &&
+            h.fin === this.horarioSeleccionado?.horaFin
+          );
+
+          this.horarioForm.setValue({
+            horarioSeleccionado: match || this.horariosPredefinidos[0]
+          });
+
+          this.errorSolapamiento = false;
+          this.showModalEditar = true;
+        }
+      },
+      error: (err) => {
+        console.error("Error al verificar reservas:", err);
+        this.errorEliminar = 'Error de conexión. No se pudo verificar si es editable.';
+      }
     });
-
-    this.errorSolapamiento = false;
-    this.showModalEditar = true;
   }
 
   compararHorarios(o1: any, o2: any): boolean {

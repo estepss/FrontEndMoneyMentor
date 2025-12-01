@@ -136,9 +136,22 @@ export class TarjetaComponent implements OnInit {
     const tarjeta = this.tarjetasAgregadas[index];
     if (!tarjeta.idTarjeta) return;
 
-    if(confirm('¿Eliminar esta tarjeta?')) {
+    if(confirm('¿Deseas eliminar esta tarjeta?')) {
       this.tarjetaService.delete(tarjeta.idTarjeta).subscribe({
-        next: () => this.tarjetasAgregadas.splice(index, 1)
+        next: () => {
+          // Si todo sale bien, la quitamos de la lista visual
+          this.tarjetasAgregadas.splice(index, 1);
+          alert("Tarjeta eliminada correctamente.");
+        },
+        error: (err) => {
+          console.error(err);
+          // Validamos si es el error 409 (Conflicto de llave foránea)
+          if (err.status === 409) {
+            alert('No se puede eliminar esta tarjeta porque está asociada a una Reserva o Pago existente.');
+          } else {
+            alert('Ocurrió un error inesperado al eliminar la tarjeta.');
+          }
+        }
       });
     }
   }
